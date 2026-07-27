@@ -1,0 +1,7 @@
+# The generated tree is compared by hash across rebuilds, so its bytes may not depend on
+# which platform checked it out. Everything here is text and everything here stays LF.
+* text eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.svg text eol=lf
