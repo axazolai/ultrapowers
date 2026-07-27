@@ -1,0 +1,19 @@
+{
+  "name": "ultrapowers",
+  "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques. A fork of obra/superpowers by Jesse Vincent, MIT.",
+  "version": "6.2.0-up.1",
+  "author": {
+    "name": "axazolai"
+  },
+  "homepage": "https://github.com/axazolai/ultrapowers",
+  "repository": "https://github.com/axazolai/ultrapowers",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "best-practices",
+    "workflows"
+  ]
+}

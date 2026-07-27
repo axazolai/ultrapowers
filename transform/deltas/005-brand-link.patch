@@ -1,0 +1,11 @@
+--- a/plugins/ultrapowers/skills/brainstorming/scripts/server.cjs
++++ b/plugins/ultrapowers/skills/brainstorming/scripts/server.cjs
+@@ -248,7 +247,7 @@
+     ? ''
+     : '<img class="brand-logo" src="' + ULTRAPOWERS_BRAND_IMAGE_URL + '?v=' + encodeURIComponent(ULTRAPOWERS_VERSION) + '" alt="Prime Radiant" referrerpolicy="no-referrer" decoding="async">';
+ 
+-  return '<div class="brand"><a href="https://github.com/obra/superpowers">' + logo + '<span class="brand-copy">' + text + '</span></a></div>';
++  return '<div class="brand"><a href="https://github.com/axazolai/ultrapowers">' + logo + '<span class="brand-copy">' + text + '</span></a></div>';
+ }
+ 
+ function renderBranding(html) {

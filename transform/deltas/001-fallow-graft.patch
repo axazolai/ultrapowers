@@ -1,0 +1,16 @@
+--- a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
++++ b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
+@@ -36,6 +36,13 @@
+ 
+     ## What to Check
+ 
++<!-- fallow-graft:v1 -->
++**Structural pre-pass (fallow):** Before the checks below —
++- If this repo is a GSD project (a `.planning/` directory exists), SKIP this pre-pass: GSD's own review owns the fallow pass there. Do not run fallow.
++- Otherwise, if the `fallow` binary is resolvable (`node_modules/.bin/fallow`, or on PATH), run it over the changed files and fold any dead-code / duplication / circular-dependency findings into the Issues section, at the severity fallow reports.
++- Otherwise (fallow not installed), add ONE Minor note: "Structural pre-pass skipped — install with `pnpm add -D fallow` (workspace root: `pnpm add -D fallow -w`)." Never fail the review over a missing fallow binary.
++
++
+     **Plan alignment:**
+     - Does the implementation match the plan / requirements?
+     - Are deviations justified improvements, or problematic departures?
