@@ -8,6 +8,19 @@
     { "from": "SUPERPOWERS", "to": "ULTRAPOWERS" }
   ],
 
+  "protect": ["obra/superpowers"],
+  "$protect-why": [
+    "obra/superpowers is upstream's identity, not a word about the plugin, so the engine never",
+    "rewrites it. Measured on 6.2.0: four occurrences across three tracked files, and they do not",
+    "all want the same treatment - the brand link in the brainstorming server should become ours,",
+    "the plugin.json homepage/repository should become ours, and the comment citing upstream issue",
+    "571 must stay theirs or it becomes a dead link and a false claim about where the bug was filed.",
+    "That difference is intent, which no rule over paths or strings can infer. So the engine leaves",
+    "every occurrence alone and each decision is made once, in a numbered delta, where judgement",
+    "belongs. The failure mode this avoids is the important one: when a future upstream release adds",
+    "a link we have never seen, doing nothing is always safe, and inventing an owner name is not."
+  ],
+
   "attribution": {
     "$why": [
       "MIT obliges the fork to carry upstream's copyright and to name what it forked. The earlier",
