@@ -1,0 +1,380 @@
+{
+  "describesTree": "da1e7bb99212a060f90ffd6def69ff606775a79c",
+  "describesTag": "upstream/6.2.0",
+  "pluginRoot": "plugins/ultrapowers",
+  "$doc": [
+    "The plugin map. 'rules' classify an upstream path; 'manifest' records the class every",
+    "known upstream path actually resolved to. Rules propose, the manifest confirms: a path",
+    "present upstream but absent from the manifest is NEW and /up-update refuses until a human",
+    "puts it in one of the two buckets. That is the whole point of keeping both.",
+    "First matching rule wins, so order is load-bearing."
+  ],
+  "rules": [
+    {
+      "match": ".claude-plugin/plugin.json",
+      "class": "tracked",
+      "reason": "the Claude Code plugin manifest - the one file that makes this a plugin at all"
+    },
+    {
+      "match": ".claude-plugin/marketplace.json",
+      "class": "ignored",
+      "reason": "upstream's own dev marketplace, source './' and owned by Jesse Vincent; our fork serves a marketplace of its own from the repo root, so shipping this one would misattribute a manifest we do not use"
+    },
+    {
+      "match": "hooks/hooks.json",
+      "class": "tracked",
+      "reason": "SessionStart wiring - this is what injects using-superpowers at session start"
+    },
+    {
+      "match": "hooks/session-start",
+      "class": "tracked",
+      "reason": "the SessionStart hook body"
+    },
+    {
+      "match": "hooks/run-hook.cmd",
+      "class": "tracked",
+      "reason": "polyglot cmd/bash wrapper hooks.json invokes; required on Windows"
+    },
+    {
+      "match": "hooks/hooks-cursor.json",
+      "class": "ignored",
+      "reason": "Cursor harness wiring - not Claude Code"
+    },
+    {
+      "match": "skills/using-superpowers/references/**",
+      "class": "ignored",
+      "reason": "per-harness adaptation notes for Codex/Pi/Gemini/Antigravity; this fork targets Claude Code only, and delta 002 removes the Platform Adaptation section that links them so no reference is left dangling"
+    },
+    {
+      "match": "skills/**",
+      "class": "tracked",
+      "reason": "the skills library - the substance of the plugin"
+    },
+    {
+      "match": "LICENSE",
+      "class": "tracked",
+      "mode": "verbatim",
+      "alsoAtRoot": true,
+      "reason": "MIT obligation: the upstream copyright notice must survive redistribution byte-for-byte, so it is never passed through the rename"
+    },
+    {
+      "match": "README.md",
+      "class": "ignored",
+      "reason": "replaced by a fork-owned README: every obra/superpowers occurrence upstream is an install instruction for upstream's own distribution channels, so renaming or protecting it both produce a README that installs the wrong plugin. Attribution lives in our README by construction"
+    },
+    {
+      "match": ".agents/**",
+      "class": "ignored",
+      "reason": "other harness (agents.md convention)"
+    },
+    {
+      "match": ".codex-plugin/**",
+      "class": "ignored",
+      "reason": "other harness (Codex)"
+    },
+    {
+      "match": ".cursor-plugin/**",
+      "class": "ignored",
+      "reason": "other harness (Cursor)"
+    },
+    {
+      "match": ".kimi-plugin/**",
+      "class": "ignored",
+      "reason": "other harness (Kimi)"
+    },
+    {
+      "match": ".opencode/**",
+      "class": "ignored",
+      "reason": "other harness (opencode)"
+    },
+    {
+      "match": ".pi/**",
+      "class": "ignored",
+      "reason": "other harness (Pi)"
+    },
+    {
+      "match": "gemini-extension.json",
+      "class": "ignored",
+      "reason": "other harness (Gemini extension manifest)"
+    },
+    {
+      "match": "assets/**",
+      "class": "ignored",
+      "reason": "app icon and logo, referenced only by .codex-plugin/plugin.json; they leave with the harness that used them"
+    },
+    {
+      "match": "tests/**",
+      "class": "ignored",
+      "reason": "upstream's own harness test suite - shell/python drivers for Codex, Kimi, opencode and Claude Code eval runs; not plugin content and not runnable as part of this fork"
+    },
+    {
+      "match": "docs/**",
+      "class": "ignored",
+      "reason": "upstream's plans and specs - their development record, not ours"
+    },
+    {
+      "match": ".github/**",
+      "class": "ignored",
+      "reason": "upstream CI, funding and issue templates"
+    },
+    {
+      "match": "scripts/**",
+      "class": "ignored",
+      "reason": "upstream release tooling (version bump, codex packaging, shell lint); the fork releases through /up-update instead"
+    },
+    {
+      "match": "package.json",
+      "class": "ignored",
+      "reason": "npm/pi packaging for upstream's multi-harness distribution; delta 003 repoints the one runtime reader of it (brainstorming server.cjs) at .claude-plugin/plugin.json"
+    },
+    {
+      "match": ".version-bump.json",
+      "class": "ignored",
+      "reason": "config for upstream's scripts/bump-version.sh, which we do not ship"
+    },
+    {
+      "match": ".pre-commit-config.yaml",
+      "class": "ignored",
+      "reason": "upstream repo tooling"
+    },
+    {
+      "match": ".gitattributes",
+      "class": "ignored",
+      "reason": "upstream repo tooling; the fork owns its own, because the built tree's line endings are our concern not theirs"
+    },
+    {
+      "match": ".gitignore",
+      "class": "ignored",
+      "reason": "upstream repo tooling"
+    },
+    {
+      "match": "AGENTS.md",
+      "class": "ignored",
+      "reason": "contributor instructions for upstream's repository (a symlink to CLAUDE.md), not plugin content"
+    },
+    {
+      "match": "CLAUDE.md",
+      "class": "ignored",
+      "reason": "contributor instructions for upstream's repository, not plugin content"
+    },
+    {
+      "match": "GEMINI.md",
+      "class": "ignored",
+      "reason": "contributor instructions for upstream's repository, not plugin content"
+    },
+    {
+      "match": "CODE_OF_CONDUCT.md",
+      "class": "ignored",
+      "reason": "governance of upstream's project, which the fork does not administer"
+    },
+    {
+      "match": "RELEASE-NOTES.md",
+      "class": "ignored",
+      "reason": "upstream's changelog; /up-update prints its diff on an upstream bump instead of shipping it"
+    }
+  ],
+  "forkOwned": [
+    {
+      "src": "fork-owned/marketplace.json",
+      "dest": ".claude-plugin/marketplace.json",
+      "reason": "the fork is its own marketplace, so a fresh machine needs only `/plugin marketplace add axazolai/ultrapowers` with no git authentication"
+    },
+    {
+      "src": "fork-owned/gitattributes",
+      "dest": ".gitattributes",
+      "reason": "keeps the generated tree's line endings LF on Windows checkouts; a CRLF checkout would make the byte-for-byte rebuild check fail for reasons that have nothing to do with the build"
+    },
+    {
+      "src": "fork-owned/README.plugin.md",
+      "dest": "plugins/ultrapowers/README.md",
+      "reason": "the plugin README: install instructions point at this fork, and MIT attribution to obra/superpowers and Jesse Vincent lives here by construction rather than by freezing upstream strings"
+    },
+    {
+      "src": "fork-owned/README.repo.md",
+      "dest": "README.md",
+      "reason": "repository-level README: what this repo is, how the three branches relate, and how to rebuild"
+    }
+  ],
+  "manifest": {
+    ".agents/plugins/marketplace.json": "ignored",
+    ".claude-plugin/marketplace.json": "ignored",
+    ".claude-plugin/plugin.json": "tracked",
+    ".codex-plugin/plugin.json": "ignored",
+    ".cursor-plugin/plugin.json": "ignored",
+    ".gitattributes": "ignored",
+    ".github/FUNDING.yml": "ignored",
+    ".github/ISSUE_TEMPLATE/bug_report.md": "ignored",
+    ".github/ISSUE_TEMPLATE/config.yml": "ignored",
+    ".github/ISSUE_TEMPLATE/feature_request.md": "ignored",
+    ".github/ISSUE_TEMPLATE/platform_support.md": "ignored",
+    ".github/PULL_REQUEST_TEMPLATE.md": "ignored",
+    ".gitignore": "ignored",
+    ".kimi-plugin/plugin.json": "ignored",
+    ".opencode/INSTALL.md": "ignored",
+    ".opencode/plugins/superpowers.js": "ignored",
+    ".pi/extensions/superpowers.ts": "ignored",
+    ".pre-commit-config.yaml": "ignored",
+    ".version-bump.json": "ignored",
+    "AGENTS.md": "ignored",
+    "CLAUDE.md": "ignored",
+    "CODE_OF_CONDUCT.md": "ignored",
+    "GEMINI.md": "ignored",
+    "LICENSE": "tracked",
+    "README.md": "ignored",
+    "RELEASE-NOTES.md": "ignored",
+    "assets/app-icon.png": "ignored",
+    "assets/superpowers-small.svg": "ignored",
+    "docs/README.kimi.md": "ignored",
+    "docs/README.opencode.md": "ignored",
+    "docs/plans/2025-11-22-opencode-support-design.md": "ignored",
+    "docs/plans/2025-11-22-opencode-support-implementation.md": "ignored",
+    "docs/plans/2025-11-28-skills-improvements-from-user-feedback.md": "ignored",
+    "docs/plans/2026-01-17-visual-brainstorming.md": "ignored",
+    "docs/porting-to-a-new-harness.md": "ignored",
+    "docs/superpowers/plans/2026-01-22-document-review-system.md": "ignored",
+    "docs/superpowers/plans/2026-02-19-visual-brainstorming-refactor.md": "ignored",
+    "docs/superpowers/plans/2026-03-11-zero-dep-brainstorm-server.md": "ignored",
+    "docs/superpowers/plans/2026-03-23-codex-app-compatibility.md": "ignored",
+    "docs/superpowers/plans/2026-04-06-worktree-rototill.md": "ignored",
+    "docs/superpowers/plans/2026-05-06-lift-drill-into-evals.md": "ignored",
+    "docs/superpowers/plans/2026-05-07-pi-extension-and-evals.md": "ignored",
+    "docs/superpowers/plans/2026-06-09-sdd-task-scoped-review-dispatch.md": "ignored",
+    "docs/superpowers/plans/2026-06-09-visual-companion-issues.md": "ignored",
+    "docs/superpowers/plans/2026-06-10-visual-companion-auth-hardening.md": "ignored",
+    "docs/superpowers/plans/2026-06-11-visual-companion-final-hardening-fixup.md": "ignored",
+    "docs/superpowers/plans/2026-07-06-sdd-plan-scoped-workspace.md": "ignored",
+    "docs/superpowers/plans/2026-07-15-sdd-fix-loop-redesign.md": "ignored",
+    "docs/superpowers/specs/2026-01-22-document-review-system-design.md": "ignored",
+    "docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md": "ignored",
+    "docs/superpowers/specs/2026-03-11-zero-dep-brainstorm-server-design.md": "ignored",
+    "docs/superpowers/specs/2026-03-23-codex-app-compatibility-design.md": "ignored",
+    "docs/superpowers/specs/2026-04-06-worktree-rototill-design.md": "ignored",
+    "docs/superpowers/specs/2026-05-05-platform-neutral-config-refs-design.md": "ignored",
+    "docs/superpowers/specs/2026-05-05-platform-neutral-prose-design.md": "ignored",
+    "docs/superpowers/specs/2026-05-05-platform-neutral-readme-design.md": "ignored",
+    "docs/superpowers/specs/2026-05-06-lift-drill-into-evals-design.md": "ignored",
+    "docs/superpowers/specs/2026-06-09-sdd-task-scoped-review-dispatch-design.md": "ignored",
+    "docs/superpowers/specs/2026-06-10-positive-instruction-redesign-design.md": "ignored",
+    "docs/superpowers/specs/2026-06-10-strict-cost-sdd-design.md": "ignored",
+    "docs/superpowers/specs/2026-06-10-visual-companion-auth-hardening-design.md": "ignored",
+    "docs/superpowers/specs/2026-06-11-visual-companion-final-hardening-fixup-design.md": "ignored",
+    "docs/superpowers/specs/2026-07-06-sdd-plan-scoped-workspace-eval-results.md": "ignored",
+    "docs/superpowers/specs/2026-07-06-sdd-plan-scoped-workspace.md": "ignored",
+    "docs/superpowers/specs/2026-07-15-sdd-fix-loop-redesign-design.md": "ignored",
+    "docs/testing.md": "ignored",
+    "docs/windows/polyglot-hooks.md": "ignored",
+    "gemini-extension.json": "ignored",
+    "hooks/hooks-cursor.json": "ignored",
+    "hooks/hooks.json": "tracked",
+    "hooks/run-hook.cmd": "tracked",
+    "hooks/session-start": "tracked",
+    "package.json": "ignored",
+    "scripts/bump-version.sh": "ignored",
+    "scripts/lint-shell.sh": "ignored",
+    "scripts/package-codex-plugin.sh": "ignored",
+    "scripts/sync-to-codex-plugin.sh": "ignored",
+    "skills/brainstorming/SKILL.md": "tracked",
+    "skills/brainstorming/scripts/frame-template.html": "tracked",
+    "skills/brainstorming/scripts/helper.js": "tracked",
+    "skills/brainstorming/scripts/server.cjs": "tracked",
+    "skills/brainstorming/scripts/start-server.sh": "tracked",
+    "skills/brainstorming/scripts/stop-server.sh": "tracked",
+    "skills/brainstorming/spec-document-reviewer-prompt.md": "tracked",
+    "skills/brainstorming/visual-companion.md": "tracked",
+    "skills/dispatching-parallel-agents/SKILL.md": "tracked",
+    "skills/executing-plans/SKILL.md": "tracked",
+    "skills/finishing-a-development-branch/SKILL.md": "tracked",
+    "skills/receiving-code-review/SKILL.md": "tracked",
+    "skills/requesting-code-review/SKILL.md": "tracked",
+    "skills/requesting-code-review/code-reviewer.md": "tracked",
+    "skills/subagent-driven-development/SKILL.md": "tracked",
+    "skills/subagent-driven-development/implementer-prompt.md": "tracked",
+    "skills/subagent-driven-development/re-review-prompt.md": "tracked",
+    "skills/subagent-driven-development/scripts/review-package": "tracked",
+    "skills/subagent-driven-development/scripts/sdd-workspace": "tracked",
+    "skills/subagent-driven-development/scripts/task-brief": "tracked",
+    "skills/subagent-driven-development/task-reviewer-prompt.md": "tracked",
+    "skills/systematic-debugging/CREATION-LOG.md": "tracked",
+    "skills/systematic-debugging/SKILL.md": "tracked",
+    "skills/systematic-debugging/condition-based-waiting-example.ts": "tracked",
+    "skills/systematic-debugging/condition-based-waiting.md": "tracked",
+    "skills/systematic-debugging/defense-in-depth.md": "tracked",
+    "skills/systematic-debugging/find-polluter.sh": "tracked",
+    "skills/systematic-debugging/root-cause-tracing.md": "tracked",
+    "skills/systematic-debugging/test-academic.md": "tracked",
+    "skills/systematic-debugging/test-pressure-1.md": "tracked",
+    "skills/systematic-debugging/test-pressure-2.md": "tracked",
+    "skills/systematic-debugging/test-pressure-3.md": "tracked",
+    "skills/test-driven-development/SKILL.md": "tracked",
+    "skills/test-driven-development/writing-good-tests.md": "tracked",
+    "skills/using-git-worktrees/SKILL.md": "tracked",
+    "skills/using-superpowers/SKILL.md": "tracked",
+    "skills/using-superpowers/references/antigravity-tools.md": "ignored",
+    "skills/using-superpowers/references/codex-tools.md": "ignored",
+    "skills/using-superpowers/references/gemini-tools.md": "ignored",
+    "skills/using-superpowers/references/pi-tools.md": "ignored",
+    "skills/verification-before-completion/SKILL.md": "tracked",
+    "skills/writing-plans/SKILL.md": "tracked",
+    "skills/writing-plans/plan-document-reviewer-prompt.md": "tracked",
+    "skills/writing-skills/SKILL.md": "tracked",
+    "skills/writing-skills/anthropic-best-practices.md": "tracked",
+    "skills/writing-skills/examples/CLAUDE_MD_TESTING.md": "tracked",
+    "skills/writing-skills/graphviz-conventions.dot": "tracked",
+    "skills/writing-skills/persuasion-principles.md": "tracked",
+    "skills/writing-skills/render-graphs.js": "tracked",
+    "skills/writing-skills/testing-skills-with-subagents.md": "tracked",
+    "tests/antigravity/run-tests.sh": "ignored",
+    "tests/antigravity/test-antigravity-tools.sh": "ignored",
+    "tests/brainstorm-server/auth.test.js": "ignored",
+    "tests/brainstorm-server/branding.test.js": "ignored",
+    "tests/brainstorm-server/browser-launcher.test.js": "ignored",
+    "tests/brainstorm-server/helper.test.js": "ignored",
+    "tests/brainstorm-server/lifecycle.test.js": "ignored",
+    "tests/brainstorm-server/package-lock.json": "ignored",
+    "tests/brainstorm-server/package.json": "ignored",
+    "tests/brainstorm-server/server.test.js": "ignored",
+    "tests/brainstorm-server/start-server.test.sh": "ignored",
+    "tests/brainstorm-server/stop-server.test.sh": "ignored",
+    "tests/brainstorm-server/windows-lifecycle.test.sh": "ignored",
+    "tests/brainstorm-server/ws-protocol.test.js": "ignored",
+    "tests/claude-code/README.md": "ignored",
+    "tests/claude-code/analyze-token-usage.py": "ignored",
+    "tests/claude-code/run-skill-tests.sh": "ignored",
+    "tests/claude-code/test-helpers.sh": "ignored",
+    "tests/claude-code/test-sdd-workspace.sh": "ignored",
+    "tests/claude-code/test-subagent-driven-development-integration.sh": "ignored",
+    "tests/claude-code/test-subagent-driven-development.sh": "ignored",
+    "tests/claude-code/test-worktree-native-preference.sh": "ignored",
+    "tests/claude-code/test-worktree-path-policy.sh": "ignored",
+    "tests/codex-plugin-sync/test-sync-to-codex-plugin.sh": "ignored",
+    "tests/codex/test-marketplace-manifest.sh": "ignored",
+    "tests/codex/test-package-codex-plugin.sh": "ignored",
+    "tests/explicit-skill-requests/prompts/action-oriented.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/after-planning-flow.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/claude-suggested-it.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/i-know-what-sdd-means.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/mid-conversation-execute-plan.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/please-use-brainstorming.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/skip-formalities.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/subagent-driven-development-please.txt": "ignored",
+    "tests/explicit-skill-requests/prompts/use-systematic-debugging.txt": "ignored",
+    "tests/explicit-skill-requests/run-all.sh": "ignored",
+    "tests/explicit-skill-requests/run-extended-multiturn-test.sh": "ignored",
+    "tests/explicit-skill-requests/run-haiku-test.sh": "ignored",
+    "tests/explicit-skill-requests/run-multiturn-test.sh": "ignored",
+    "tests/explicit-skill-requests/run-test.sh": "ignored",
+    "tests/hooks/test-session-start.sh": "ignored",
+    "tests/kimi/run-tests.sh": "ignored",
+    "tests/kimi/test-plugin-manifest.sh": "ignored",
+    "tests/opencode/run-tests.sh": "ignored",
+    "tests/opencode/setup.sh": "ignored",
+    "tests/opencode/test-bootstrap-caching.mjs": "ignored",
+    "tests/opencode/test-bootstrap-caching.sh": "ignored",
+    "tests/opencode/test-plugin-loading.sh": "ignored",
+    "tests/opencode/test-priority.sh": "ignored",
+    "tests/opencode/test-tools.sh": "ignored",
+    "tests/pi/test-pi-extension.mjs": "ignored",
+    "tests/shell-lint/test-lint-shell.sh": "ignored",
+    "tests/systematic-debugging/test-find-polluter.sh": "ignored"
+  }
+}

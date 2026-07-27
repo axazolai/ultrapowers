@@ -1,0 +1,46 @@
+{
+  "originalTag": "upstream/6.2.0",
+  "originalTree": "da1e7bb99212a060f90ffd6def69ff606775a79c",
+
+  "substitutions": [
+    { "from": "superpowers", "to": "ultrapowers" },
+    { "from": "Superpowers", "to": "Ultrapowers" },
+    { "from": "SUPERPOWERS", "to": "ULTRAPOWERS" }
+  ],
+
+  "attribution": {
+    "$why": [
+      "MIT obliges the fork to carry upstream's copyright and to name what it forked. The earlier",
+      "design discharged that by freezing upstream strings in place. That is wrong here: every",
+      "obra/superpowers occurrence in upstream's README is an install instruction for upstream's own",
+      "distribution channels, so freezing them ships a README that installs the wrong plugin.",
+      "So attribution is ASSERTED on the built tree instead of frozen in the source: we author the",
+      "text, and the build refuses if the credit is missing. An assertion cannot rot into a stale",
+      "protected string the way a freeze can."
+    ],
+    "require": [
+      {
+        "path": "plugins/ultrapowers/LICENSE",
+        "verbatimFrom": "LICENSE",
+        "reason": "MIT: the upstream copyright notice must survive redistribution byte-for-byte"
+      },
+      {
+        "path": "plugins/ultrapowers/README.md",
+        "contains": ["obra/superpowers", "Jesse Vincent", "MIT", "fork"],
+        "reason": "MIT attribution: the fork must name upstream, its author and its repository, and state that it is a fork"
+      },
+      {
+        "path": "plugins/ultrapowers/.claude-plugin/plugin.json",
+        "contains": ["obra/superpowers"],
+        "reason": "attribution in the manifest description, which is what a user sees in /plugin without opening the README"
+      }
+    ]
+  },
+
+  "thresholds": {
+    "changedFilesPct": 25,
+    "unclassifiedRefuses": true,
+    "attributionMissingRefuses": true,
+    "$comment": "A3: changedFilesPct is a starting value, not a measurement - calibrate over the first real updates. A threshold that never fires is decoration; one that always fires is noise. The other two are absolutes: a build that cannot classify an upstream file, or that has lost its attribution, must never be published."
+  }
+}
