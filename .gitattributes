@@ -1,0 +1,4 @@
+# The transform is read from the working tree: deltas match by exact context and fork-owned
+# files are copied byte-for-byte. A CRLF checkout would break both for reasons unrelated to
+# anything upstream did, so nothing here is ever platform-converted.
+* text eol=lf
