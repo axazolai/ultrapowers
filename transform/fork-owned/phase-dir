@@ -38,14 +38,27 @@ mkdir -p "$base"
 
 # The lock covers the whole allocation, not the target path: two racers with different slugs
 # each win a plain mkdir of their own NN-<slug> and walk away sharing the number.
-# 300 tries at 10ms is ~3s, far longer than the two scans a holder runs, so exhausting the
-# budget means a crashed run left the lock behind, not that we are merely queued.
+# Roughly one waiter gets in per poll round, so 300 polls outlast a queue only while the
+# critical section stays short -- which is why it holds no forks: two globs and a mkdir.
+# Exhaustion cannot itself tell a queue from an abandoned lock, so report the lock's age --
+# its mtime is its creation time -- and let the reader decide whether deleting it is safe.
 lock="$base/.phase-dir.lock"
 attempt=0
 until mkdir "$lock" 2>/dev/null; do
   attempt=$((attempt + 1))
   if [ "$attempt" -ge 300 ]; then
-    echo "phase-dir: $lock held by another run; delete it if it is stale" >&2
+    # No lock present yet mkdir keeps failing: the cause is not contention (unwritable base,
+    # ENOSPC, a file in the way), so repeat it undirected and let the real errno speak.
+    if [ ! -d "$lock" ]; then
+      mkdir "$lock"
+      break
+    fi
+    mtime=$(stat -c %Y "$lock" 2>/dev/null || stat -f %m "$lock" 2>/dev/null || true)
+    case "$mtime" in
+      "" | *[!0-9]*) held="is held" ;;
+      *) held="has been held for $(($(date +%s) - mtime))s" ;;
+    esac
+    echo "phase-dir: $lock $held; delete it only if the run that created it is gone" >&2
     exit 1
   fi
   sleep 0.01
