@@ -1,0 +1,49 @@
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -75,3 +75,3 @@
+     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
+-    "Final review clean: delete this plan's workspace" [shape=box];
++    "Final review clean: write NN-SUMMARY, keep the workspace" [shape=box];
+     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+@@ -104,4 +104,4 @@
+     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
+-    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: delete this plan's workspace";
+-    "Final review clean: delete this plan's workspace" -> "Use ultrapowers:finishing-a-development-branch";
++    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
++    "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
+ }
+@@ -134,3 +134,7 @@
+ - Create the ledger with its identity as the first line:
+   `# SDD ledger — plan: <plan file path>`.
++- The ledger is read cold, by someone else. At the end of the plan a summary
++  writer subagent folds it into `NN-SUMMARY.md`, so every entry must stand on
++  its own: task number, commit range, ruling, deviation. An entry that only
++  makes sense to its own author has not been written yet.
+ - The ledger is your recovery map: the commits it names exist in git even
+@@ -418,4 +418,19 @@
+-When the final whole-branch review is clean and its fixes are merged,
+-delete this plan's workspace (`rm -rf <workspace>`) — the git history is
+-the record now. Sibling directories belong to other plans; leave them
+-alone.
++When the final whole-branch review is clean and its fixes are merged, write
++the phase summary — do not delete anything.
++
++Dispatch the summary writer ([summary-writer-prompt.md](summary-writer-prompt.md))
++with the ledger, the implementer reports, the plan file, and the destination
++`<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
++document's text.
++
++The workspace stays. Diffs and briefs remain on disk, at hand, for as long as
++they are useful. Clearing `.ultrapowers/sdd/` is a separate, deliberate,
++janitorial act — nothing in it is lost, which is exactly why it need not
++happen on a schedule. Sibling directories belong to other plans; leave them
++alone.
++
++The premise the old instruction rested on was false. Git history holds commits
++and diffs; it does not hold the rulings on parked findings, and it does not
++hold why an approach was abandoned. Measured on one repository: 159 KB of
++irreplaceable content against 725 KB of diffs already in git. Deleting the
++workspace destroyed the first to be rid of the second.
+@@ -500,1 +500,1 @@
+-[Delete this plan's workspace — the record now lives in git]
++[Dispatch the summary writer: it writes 04-SUMMARY.md and returns the path. Workspace kept.]
