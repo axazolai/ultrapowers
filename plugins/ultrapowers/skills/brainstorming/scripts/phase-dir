@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Resolve and ensure one planning directory under .ultrapowers/, and print its absolute path.
+#
+# Single source of truth for where a phase's documents live, so brainstorming, writing-plans
+# and subagent-driven-development cannot drift to different directories for the same work.
+# The directory's NN- prefix is also the document prefix: 03-planning-tree/03-SPEC.md.
+#
+# Re-running with the same kind and slug re-resolves the existing directory: a later skill
+# in the same phase asks for the same thing and must get the same answer, never a second
+# directory. Numbers are allocated above the highest existing one and never reused, so a
+# deleted phase cannot have its number silently taken over by unrelated work.
+#
+# Usage: phase-dir phase|task|adhoc SLUG
+set -euo pipefail
+
+if [ $# -ne 2 ]; then
+  echo "usage: phase-dir phase|task|adhoc SLUG" >&2
+  exit 2
+fi
+
+kind=$1
+slug=$2
+
+case "$kind" in
+  phase) sub=phases ;;
+  task) sub=tasks ;;
+  adhoc) sub=adhoc ;;
+  *) echo "unknown kind: $kind (expected phase, task or adhoc)" >&2; exit 2 ;;
+esac
+
+case "$slug" in
+  "" | . | .. | */* | *\\*) echo "bad slug: $slug" >&2; exit 2 ;;
+esac
+
+root=$(git rev-parse --show-toplevel)
+base="$root/.ultrapowers/$sub"
+mkdir -p "$base"
+
+# The lock covers the whole allocation, not the target path: two racers with different slugs
+# each win a plain mkdir of their own NN-<slug> and walk away sharing the number.
+# Roughly one waiter gets in per poll round, so 300 polls outlast a queue only while the
+# critical section stays short -- which is why it holds no forks: two globs and a mkdir.
+# Exhaustion cannot itself tell a queue from an abandoned lock, so report the lock's age --
+# its mtime is its creation time -- and let the reader decide whether deleting it is safe.
+lock="$base/.phase-dir.lock"
+attempt=0
+until mkdir "$lock" 2>/dev/null; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge 300 ]; then
+    # No lock present yet mkdir keeps failing: the cause is not contention (unwritable base,
+    # ENOSPC, a file in the way), so repeat it undirected and let the real errno speak.
+    if [ ! -d "$lock" ]; then
+      mkdir "$lock"
+      break
+    fi
+    mtime=$(stat -c %Y "$lock" 2>/dev/null || stat -f %m "$lock" 2>/dev/null || true)
+    case "$mtime" in
+      "" | *[!0-9]*) held="is held" ;;
+      *) held="has been held for $(($(date +%s) - mtime))s" ;;
+    esac
+    echo "phase-dir: $lock $held; delete it only if the run that created it is gone" >&2
+    exit 1
+  fi
+  sleep 0.01
+done
+trap 'rmdir "$lock" 2>/dev/null || true' EXIT
+trap 'exit 1' INT TERM
+
+for d in "$base"/[0-9][0-9]-"$slug"; do
+  if [ -d "$d" ]; then
+    printf '%s\n' "$d"
+    exit 0
+  fi
+done
+
+next=1
+for d in "$base"/[0-9][0-9]-*; do
+  [ -d "$d" ] || continue
+  n=${d##*/}
+  n=${n%%-*}
+  n=$((10#$n))
+  [ "$n" -ge "$next" ] && next=$((n + 1))
+done
+
+dir=$(printf '%s/%02d-%s' "$base" "$next" "$slug")
+mkdir "$dir"
+printf '%s\n' "$dir"

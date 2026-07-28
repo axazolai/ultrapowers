@@ -20,21 +20,53 @@ ledger and the tool results carry the record.
 
 ```dot
 digraph when_to_use {
-    "Have implementation plan?" [shape=diamond];
+    "Phase artefact, or >1 commit?" [shape=diamond];
     "Tasks mostly independent?" [shape=diamond];
     "Stay in this session?" [shape=diamond];
+    "one agent, whole chain" [shape=box];
     "subagent-driven-development" [shape=box];
     "executing-plans" [shape=box];
-    "Manual execution or brainstorm first" [shape=box];
+    "Offer: direct, or an agent" [shape=box];
 
-    "Have implementation plan?" -> "Tasks mostly independent?" [label="yes"];
-    "Have implementation plan?" -> "Manual execution or brainstorm first" [label="no"];
+    "Phase artefact, or >1 commit?" -> "Tasks mostly independent?" [label="yes"];
+    "Phase artefact, or >1 commit?" -> "Offer: direct, or an agent" [label="no"];
     "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
-    "Tasks mostly independent?" -> "Manual execution or brainstorm first" [label="no - tightly coupled"];
+    "Tasks mostly independent?" -> "one agent, whole chain" [label="no - coupled"];
     "Stay in this session?" -> "subagent-driven-development" [label="yes"];
     "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
 }
 ```
+
+**Agent-driven execution is the norm.** The exception is a one-off isolated
+task, and there the correct move is to offer the choice, not to decide
+silently.
+
+| Situation | Execution |
+|---|---|
+| Work produces a phase artefact (SPEC/PLAN/SUMMARY/VERIFICATION/REVIEW) | Agent |
+| Work spans more than one commit | Agent |
+| Tasks are tightly coupled | Agent — **one** agent, given the chain, not one per task |
+| Single edit in a known location, no plan needed | Offer: directly, or via an agent |
+
+"Offer" means ask. It does not mean proceed and mention it afterwards.
+
+Absence of a plan is not an execution route. It is a reason to write a plan.
+
+**Who writes which document:**
+
+| Artefact | Written by | Why |
+|---|---|---|
+| `NN-SPEC.md` | main session | brainstorming is a dialogue with the human, one question at a time — not delegable |
+| `NN-PLAN.md` | main session | writing-plans negotiates as it goes |
+| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
+| `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
+| `NN-REVIEW.md` | **subagent** | already the case — [code-reviewer.md](../requesting-code-review/code-reviewer.md) |
+| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator |
+
+Anything requiring the human's answers stays in the main session. Anything
+requiring bulk reading goes to an agent. A document writer returns a path and
+a confirmation — never the document's text, which would spend on the way back
+exactly what the delegation saved.
 
 **vs. Executing Plans (parallel session):**
 - Same session (no context switch)
@@ -73,7 +105,7 @@ digraph process {
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
-    "Final review clean: delete this plan's workspace" [shape=box];
+    "Final review clean: write NN-SUMMARY, keep the workspace" [shape=box];
     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
     "Setup: worktree, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
@@ -102,8 +134,8 @@ digraph process {
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [label="no"];
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
-    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: delete this plan's workspace";
-    "Final review clean: delete this plan's workspace" -> "Use ultrapowers:finishing-a-development-branch";
+    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
+    "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
 }
 ```
 
@@ -133,6 +165,10 @@ a ledger file, not only in todos.
   plan's progress: leave it in place and start your own, fresh.
 - Create the ledger with its identity as the first line:
   `# SDD ledger — plan: <plan file path>`.
+- The ledger is read cold, by someone else. At the end of the plan a summary
+  writer subagent folds it into `NN-SUMMARY.md`, so every entry must stand on
+  its own: task number, commit range, ruling, deviation. An entry that only
+  makes sense to its own author has not been written yet.
 - The ledger is your recovery map: the commits it names exist in git even
   when your context no longer remembers creating them. After compaction,
   trust the ledger and `git log` over your own recollection.
@@ -415,10 +451,29 @@ finishing-a-development-branch presents the options.
 
 ## Finish
 
-When the final whole-branch review is clean and its fixes are merged,
-delete this plan's workspace (`rm -rf <workspace>`) — the git history is
-the record now. Sibling directories belong to other plans; leave them
+When the final whole-branch review is clean and its fixes are merged, write the
+phase documents — do not delete anything.
+
+Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
+with the plan file, the whole-branch review package, and the destination
+`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
+
+Dispatch the summary writer ([summary-writer-prompt.md](summary-writer-prompt.md))
+with the ledger, the implementer reports, the plan file, and the destination
+`<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
+document's text.
+
+The workspace stays. Diffs and briefs remain on disk, at hand, for as long as
+they are useful. Clearing `.ultrapowers/sdd/` is a separate, deliberate,
+janitorial act — nothing in it is lost, which is exactly why it need not
+happen on a schedule. Sibling directories belong to other plans; leave them
 alone.
+
+The premise the old instruction rested on was false. Git history holds commits
+and diffs; it does not hold the rulings on parked findings, and it does not
+hold why an approach was abandoned. Measured on one repository: 159 KB of
+irreplaceable content against 725 KB of diffs already in git. Deleting the
+workspace destroyed the first to be rid of the second.
 
 Use ultrapowers:finishing-a-development-branch.
 
@@ -441,8 +496,8 @@ Use ultrapowers:finishing-a-development-branch.
 You: I'm using Subagent-Driven Development to execute this plan.
 
 [Setup: worktree verified]
-[Read plan file once: docs/ultrapowers/plans/feature-plan.md]
-[Resolve workspace: scripts/sdd-workspace docs/ultrapowers/plans/feature-plan.md — no ledger inside, fresh start]
+[Read plan file once: .ultrapowers/phases/04-hooks/04-PLAN.md]
+[Resolve workspace: scripts/sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
 [Create todos for all tasks]
 
 Task 1: Hook installation script
@@ -497,7 +552,7 @@ Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
 [Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer, most capable model]
 Final reviewer: All requirements met. Deferred minors triaged: none block merge.
 
-[Delete this plan's workspace — the record now lives in git]
+[Dispatch the summary writer: it writes 04-SUMMARY.md and returns the path. Workspace kept.]
 
 Done! Using ultrapowers:finishing-a-development-branch.
 ```

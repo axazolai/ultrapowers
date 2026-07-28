@@ -26,7 +26,7 @@ You MUST create a task for each of these items and complete them in order:
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+6. **Write design doc** — resolve the phase directory with `bash scripts/phase-dir phase <topic-slug>`, save the design there as `NN-SPEC.md`, and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
 9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
@@ -70,6 +70,10 @@ digraph brainstorming {
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
+<!-- grilling-graft:v1 - interview discipline from `grilling` in mattpocock/skills (MIT, (c) Matt Pocock) -->
+- Facts are yours to find; decisions are your partner's to make. If a question can be settled by exploring the environment - filesystem, git history, installed versions, the code itself - look it up instead of spending a question on it. A question you could have answered yourself costs your partner an answer and buys nothing.
+- Give every question your own recommended answer and the reasoning for it. Asking without recommending hands back work you were meant to do.
+- Walk the decision tree in dependency order: an early answer can reshape which questions are still worth asking, so resolve what other decisions depend on first.
 - Focus on understanding: purpose, constraints, success criteria
 
 **Exploring approaches:**
@@ -104,7 +108,7 @@ digraph brainstorming {
 
 **Documentation:**
 
-- Write the validated design (spec) to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md`
+- Write the validated design (spec) to the phase directory: `bash scripts/phase-dir phase <topic-slug>` prints `.ultrapowers/phases/NN-<topic-slug>/`, and the document is `NN-SPEC.md` inside it, where `NN` is that directory's own prefix. Use `task` instead of `phase` for quick work, `adhoc` for unplanned out-of-phase work.
   - (User preferences for spec location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
