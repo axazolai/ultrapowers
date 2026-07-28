@@ -1,0 +1,76 @@
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -22,15 +22,16 @@
+-digraph when_to_use {
+-    "Have implementation plan?" [shape=diamond];
+-    "Tasks mostly independent?" [shape=diamond];
+-    "Stay in this session?" [shape=diamond];
+-    "subagent-driven-development" [shape=box];
+-    "executing-plans" [shape=box];
+-    "Manual execution or brainstorm first" [shape=box];
+-
+-    "Have implementation plan?" -> "Tasks mostly independent?" [label="yes"];
+-    "Have implementation plan?" -> "Manual execution or brainstorm first" [label="no"];
+-    "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
+-    "Tasks mostly independent?" -> "Manual execution or brainstorm first" [label="no - tightly coupled"];
+-    "Stay in this session?" -> "subagent-driven-development" [label="yes"];
+-    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
+-}
++digraph when_to_use {
++    "Phase artefact, or >1 commit?" [shape=diamond];
++    "Tasks mostly independent?" [shape=diamond];
++    "Stay in this session?" [shape=diamond];
++    "one agent, whole chain" [shape=box];
++    "subagent-driven-development" [shape=box];
++    "executing-plans" [shape=box];
++    "Offer: direct, or an agent" [shape=box];
++
++    "Phase artefact, or >1 commit?" -> "Tasks mostly independent?" [label="yes"];
++    "Phase artefact, or >1 commit?" -> "Offer: direct, or an agent" [label="no"];
++    "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
++    "Tasks mostly independent?" -> "one agent, whole chain" [label="no - coupled"];
++    "Stay in this session?" -> "subagent-driven-development" [label="yes"];
++    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
++}
+@@ -39,1 +39,32 @@
++**Agent-driven execution is the norm.** The exception is a one-off isolated
++task, and there the correct move is to offer the choice, not to decide
++silently.
++
++| Situation | Execution |
++|---|---|
++| Work produces a phase artefact (SPEC/PLAN/SUMMARY/VERIFICATION/REVIEW) | Agent |
++| Work spans more than one commit | Agent |
++| Tasks are tightly coupled | Agent — **one** agent, given the chain, not one per task |
++| Single edit in a known location, no plan needed | Offer: directly, or via an agent |
++
++"Offer" means ask. It does not mean proceed and mention it afterwards.
++
++Absence of a plan is not an execution route. It is a reason to write a plan.
++
++**Who writes which document:**
++
++| Artefact | Written by | Why |
++|---|---|---|
++| `NN-SPEC.md` | main session | brainstorming is a dialogue with the human, one question at a time — not delegable |
++| `NN-PLAN.md` | main session | writing-plans negotiates as it goes |
++| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
++| `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
++| `NN-REVIEW.md` | **subagent** | already the case — [code-reviewer.md](../requesting-code-review/code-reviewer.md) |
++| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator |
++
++Anything requiring the human's answers stays in the main session. Anything
++requiring bulk reading goes to an agent. A document writer returns a path and
++a confirmation — never the document's text, which would spend on the way back
++exactly what the delegation saved.
++
+ **vs. Executing Plans (parallel session):**
+@@ -422,2 +422,6 @@
+-When the final whole-branch review is clean and its fixes are merged, write
+-the phase summary — do not delete anything.
++When the final whole-branch review is clean and its fixes are merged, write the
++phase documents — do not delete anything.
++
++Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
++with the plan file, the whole-branch review package, and the destination
++`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
