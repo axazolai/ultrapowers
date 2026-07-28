@@ -94,10 +94,15 @@ function report(result, cfg) {
   return problems.length;
 }
 
+function safeGit(args) {
+  try { return git(args).trim(); } catch { return null; }
+}
+
 function main(argv) {
   const cmd = argv[0] || "check";
   const { result, cfg, inventory } = runBuild();
-  const problems = report(result, cfg);
+  // `facts` writes JSON to stdout; a human report on the same stream would corrupt it.
+  const problems = cmd === "facts" ? refusals(result, cfg).length : report(result, cfg);
 
   if (cmd === "emit") {
     const dir = argv[1] || join(REPO, ".build");
@@ -108,6 +113,33 @@ function main(argv) {
   if (cmd === "tree") {
     console.log(writeTree(result.files));
     return problems ? 1 : 0;
+  }
+  if (cmd === "facts") {
+    // The machine-readable contract /up-update assesses. Kept here rather than reimplemented there:
+    // the fork owns how it is built, and two implementations of that would drift.
+    const built = writeTree(result.files);
+    const mainTree = safeGit(["rev-parse", "main^{tree}"]);
+    const mainDrift = mainTree && mainTree !== built
+      ? git(["diff", "--name-only", mainTree, built]).split("\n").filter(Boolean)
+      : [];
+    process.stdout.write(JSON.stringify({
+      originalTag: cfg.originalTag,
+      originalTree: cfg.originalTree,
+      pluginRoot: inventory.pluginRoot,
+      files: result.files.size,
+      treeHash: built,
+      mainTree,
+      mainDrift,
+      applied: result.applied,
+      obsolete: result.obsolete,
+      failed: result.failed,
+      failures: result.failures,
+      attributionMissing: result.attributionMissing,
+      residual: result.residual,
+      mapDrift: result.mapDrift,
+      thresholds: cfg.thresholds,
+    }, null, 2) + "\n");
+    return 0;
   }
   if (cmd === "drift") {
     const built = writeTree(result.files);
