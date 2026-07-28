@@ -204,6 +204,11 @@
       "src": "fork-owned/summary-writer-prompt.md",
       "dest": "plugins/ultrapowers/skills/subagent-driven-development/summary-writer-prompt.md",
       "reason": "the SUMMARY is a fold of the ledger plus every implementer report - tens of thousands of tokens the controller must not read itself, so the fold is delegated and only a path comes back"
+    },
+    {
+      "src": "fork-owned/verification-prompt.md",
+      "dest": "plugins/ultrapowers/skills/subagent-driven-development/verification-prompt.md",
+      "reason": "goal-backward verification reads the whole branch diff and decides little - bulk reading that belongs in a subagent, returning a verdict and a path"
     }
   ],
   "manifest": {
