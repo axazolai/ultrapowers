@@ -77,7 +77,7 @@ export function build({ tree, cfg, inventory, forkOwned, deltas = [] }) {
   for (const f of inventory.forkOwned ?? []) {
     const text = forkOwned?.get(f.src);
     if (text === undefined) throw new Error(`fork-owned file missing from the patch branch: ${f.src}`);
-    files.set(f.dest, { mode: "100644", text });
+    files.set(f.dest, { mode: f.mode ?? "100644", text });
   }
 
   const applied = [], obsolete = [], failed = [], failures = [];

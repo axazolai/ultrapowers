@@ -179,3 +179,22 @@ test("a manifest with no version field is a loud failure, not a silent unversion
   t.set(".claude-plugin/plugin.json", { mode: "100644", text: '{\n  "name": "superpowers"\n}\n' });
   assert.throws(() => build({ tree: t, cfg: VERSIONED, inventory: INVENTORY, forkOwned: FORK_OWNED, deltas: [] }), /version field/);
 });
+
+test("fork-owned files carry their declared mode, defaulting to 100644", () => {
+  const inventory = {
+    pluginRoot: "plugins/ultrapowers",
+    rules: [],
+    manifest: [],
+    forkOwned: [
+      { src: "fork-owned/runme", dest: "plugins/ultrapowers/skills/x/scripts/runme", mode: "100755" },
+      { src: "fork-owned/plain.md", dest: "plugins/ultrapowers/skills/x/plain.md" },
+    ],
+  };
+  const forkOwned = new Map([
+    ["fork-owned/runme", "#!/usr/bin/env bash\nexit 0\n"],
+    ["fork-owned/plain.md", "text\n"],
+  ]);
+  const result = build({ tree: new Map(), cfg: { substitutions: [], protect: [] }, inventory, forkOwned });
+  assert.equal(result.files.get("plugins/ultrapowers/skills/x/scripts/runme").mode, "100755");
+  assert.equal(result.files.get("plugins/ultrapowers/skills/x/plain.md").mode, "100644");
+});
