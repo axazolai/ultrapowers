@@ -1,0 +1,42 @@
+--- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
++++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
+@@ -28,3 +28,3 @@
+ 5. **Present design** — in sections scaled to their complexity, get user approval after each section
+-6. **Write design doc** — save to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
++6. **Write design doc** — resolve the phase directory with `bash scripts/phase-dir phase <topic-slug>`, save the design there as `NN-SPEC.md`, and commit
+ 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+@@ -111,3 +111,3 @@
+-- Write the validated design (spec) to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md`
++- Write the validated design (spec) to the phase directory: `bash scripts/phase-dir phase <topic-slug>` prints `.ultrapowers/phases/NN-<topic-slug>/`, and the document is `NN-SPEC.md` inside it, where `NN` is that directory's own prefix. Use `task` instead of `phase` for quick work, `adhoc` for unplanned out-of-phase work.
+   - (User preferences for spec location override this default)
+ - Use elements-of-style:writing-clearly-and-concisely skill if available
+--- a/plugins/ultrapowers/skills/brainstorming/spec-document-reviewer-prompt.md
++++ b/plugins/ultrapowers/skills/brainstorming/spec-document-reviewer-prompt.md
+@@ -7,1 +7,1 @@
+-**Dispatch after:** Spec document is written to docs/ultrapowers/specs/
++**Dispatch after:** Spec document is written to `.ultrapowers/phases/NN-slug/NN-SPEC.md`
+--- a/plugins/ultrapowers/skills/writing-plans/SKILL.md
++++ b/plugins/ultrapowers/skills/writing-plans/SKILL.md
+@@ -18,2 +18,2 @@
+-**Save plans to:** `docs/ultrapowers/plans/YYYY-MM-DD-<feature-name>.md`
++**Save plans to:** the phase directory the spec already owns, as `NN-PLAN.md` — `bash ../brainstorming/scripts/phase-dir phase <feature-slug>` prints `.ultrapowers/phases/NN-<feature-slug>/`, re-resolving the existing directory rather than allocating a second one
+ - (User preferences for plan location override this default)
+@@ -154,1 +154,1 @@
+-**"Plan complete and saved to `docs/ultrapowers/plans/<filename>.md`. Two execution options:**
++**"Plan complete and saved to `.ultrapowers/phases/NN-<feature-slug>/NN-PLAN.md`. Two execution options:**
+--- a/plugins/ultrapowers/skills/requesting-code-review/SKILL.md
++++ b/plugins/ultrapowers/skills/requesting-code-review/SKILL.md
+@@ -59,3 +59,3 @@
+   DESCRIPTION: Added verifyIndex() and repairIndex() with 4 issue types
+-  PLAN_OR_REQUIREMENTS: Task 2 from docs/ultrapowers/plans/deployment-plan.md
++  PLAN_OR_REQUIREMENTS: Task 2 from .ultrapowers/phases/04-deployment/04-PLAN.md
+   BASE_SHA: a7981ec
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -443,4 +443,4 @@
+ [Setup: worktree verified]
+-[Read plan file once: docs/ultrapowers/plans/feature-plan.md]
+-[Resolve workspace: scripts/sdd-workspace docs/ultrapowers/plans/feature-plan.md — no ledger inside, fresh start]
++[Read plan file once: .ultrapowers/phases/04-hooks/04-PLAN.md]
++[Resolve workspace: scripts/sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
+ [Create todos for all tasks]
