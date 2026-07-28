@@ -43,6 +43,23 @@ function checkAttribution(files, tree, cfg) {
   return missing;
 }
 
+// The plugin version is DERIVED, never patched. It used to live inside delta 004's text, which
+// meant an upstream bump left the delta asserting the old upstream version - correct only until the
+// first time it mattered. Deriving it makes it right by construction on every rebuild.
+function stampVersion(files, cfg, inventory) {
+  const spec = cfg.version;
+  if (!spec) return null;
+  const path = `${inventory.pluginRoot}/.claude-plugin/plugin.json`;
+  const entry = files.get(path);
+  if (!entry) return null;
+  const upstream = String(cfg.originalTag ?? "").replace(/^upstream\//, "");
+  const version = `${upstream}-up.${spec.revision}`;
+  const stamped = entry.text.replace(/("version"\s*:\s*)"[^"]*"/, `$1"${version}"`);
+  if (stamped === entry.text) throw new Error(`no version field to stamp in ${path}`);
+  files.set(path, { ...entry, text: stamped });
+  return version;
+}
+
 export function build({ tree, cfg, inventory, forkOwned, deltas = [] }) {
   const mapDrift = reconcile({ paths: [...tree.keys()], rules: inventory.rules, manifest: inventory.manifest });
 
@@ -71,6 +88,8 @@ export function build({ tree, cfg, inventory, forkOwned, deltas = [] }) {
     else { failed.push(delta.name); failures.push({ name: delta.name, detail: r.detail }); }
   }
 
+  const version = stampVersion(files, cfg, inventory);
+
   const residual = [];
   for (const [path, entry] of files) {
     for (const m of maskProtected(entry.text, cfg.protect).matchAll(UPSTREAM_NAME)) residual.push({ path, text: m[0] });
@@ -83,6 +102,7 @@ export function build({ tree, cfg, inventory, forkOwned, deltas = [] }) {
     obsolete,
     failed,
     failures,
+    version,
     attributionMissing: checkAttribution(files, tree, cfg),
     residual,
   };

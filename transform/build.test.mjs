@@ -40,7 +40,7 @@ function tree() {
   return new Map([
     ["LICENSE", { mode: "100644", text: LICENSE }],
     ["skills/using-superpowers/SKILL.md", { mode: "100755", text: "Superpowers: run superpowers:brainstorming\nsee obra/superpowers\n" }],
-    [".claude-plugin/plugin.json", { mode: "100644", text: '{\n  "name": "superpowers"\n}\n' }],
+    [".claude-plugin/plugin.json", { mode: "100644", text: '{\n  "name": "superpowers",\n  "version": "6.2.0"\n}\n' }],
     ["docs/plan.md", { mode: "100644", text: "superpowers internals\n" }],
   ]);
 }
@@ -100,7 +100,7 @@ test("a delta that no longer applies is reported by name, never silently dropped
 test("a change upstream has since made itself is obsolete, and does not fail the build", () => {
   const delta = {
     name: "003-done-upstream.patch",
-    text: `--- a/plugins/ultrapowers/.claude-plugin/plugin.json\n+++ b/plugins/ultrapowers/.claude-plugin/plugin.json\n@@ -1,3 +1,3 @@\n {\n-  "name": "old"\n+  "name": "ultrapowers"\n }\n`,
+    text: `--- a/plugins/ultrapowers/.claude-plugin/plugin.json\n+++ b/plugins/ultrapowers/.claude-plugin/plugin.json\n@@ -2 +2 @@\n-  "name": "old",\n+  "name": "ultrapowers",\n`,
   };
   const r = run({ deltas: [delta] });
   assert.deepEqual(r.obsolete, ["003-done-upstream.patch"]);
@@ -155,4 +155,27 @@ test("two builds of the same input produce identical output, path order included
 test("output paths are emitted in sorted order, so the tree hash cannot depend on input order", () => {
   const keys = [...run().files.keys()];
   assert.deepEqual(keys, [...keys].sort());
+});
+
+// The version is derived from the recorded base, never written into a delta. A version baked into
+// a patch is correct exactly until upstream publishes a new release - the one moment it must be
+// right. These two cases are the whole argument.
+const VERSIONED = { ...CFG, originalTag: "upstream/6.2.0", version: { revision: 1 } };
+
+test("the shipped version is derived from the recorded base and our revision", () => {
+  const r = build({ tree: tree(), cfg: VERSIONED, inventory: INVENTORY, forkOwned: FORK_OWNED, deltas: [] });
+  assert.equal(r.version, "6.2.0-up.1");
+  assert.match(r.files.get("plugins/ultrapowers/.claude-plugin/plugin.json").text, /"version": "6\.2\.0-up\.1"/);
+});
+
+test("a new upstream release moves the version with no delta edited", () => {
+  const r = build({ tree: tree(), cfg: { ...VERSIONED, originalTag: "upstream/6.3.0", version: { revision: 2 } },
+    inventory: INVENTORY, forkOwned: FORK_OWNED, deltas: [] });
+  assert.equal(r.version, "6.3.0-up.2");
+});
+
+test("a manifest with no version field is a loud failure, not a silent unversioned plugin", () => {
+  const t = tree();
+  t.set(".claude-plugin/plugin.json", { mode: "100644", text: '{\n  "name": "superpowers"\n}\n' });
+  assert.throws(() => build({ tree: t, cfg: VERSIONED, inventory: INVENTORY, forkOwned: FORK_OWNED, deltas: [] }), /version field/);
 });

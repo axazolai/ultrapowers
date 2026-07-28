@@ -37,7 +37,7 @@ function readDeltas() {
     .map((name) => ({ name, text: readFileSync(join(dir, name), "utf8") }));
 }
 
-export function runBuild() {
+export function runBuild({ withDeltas = true } = {}) {
   const cfg = JSON.parse(readFileSync(join(HERE, "config.json"), "utf8"));
   const inventory = JSON.parse(readFileSync(join(HERE, "inventory.json"), "utf8"));
   const tree = readOriginal(cfg.originalTag);
@@ -45,7 +45,7 @@ export function runBuild() {
   if (actualTree !== cfg.originalTree) {
     throw new Error(`the recorded base moved: config says ${cfg.originalTree}, ${cfg.originalTag} is ${actualTree}`);
   }
-  return { result: build({ tree, cfg, inventory, forkOwned: readForkOwned(inventory), deltas: readDeltas() }), cfg, inventory };
+  return { result: build({ tree, cfg, inventory, forkOwned: readForkOwned(inventory), deltas: withDeltas ? readDeltas() : [] }), cfg, inventory };
 }
 
 export function refusals(result, cfg) {
@@ -100,7 +100,8 @@ function safeGit(args) {
 
 function main(argv) {
   const cmd = argv[0] || "check";
-  const { result, cfg, inventory } = runBuild();
+  const base = argv.includes("--base");   // emit the pre-delta tree: what a delta must be authored against
+  const { result, cfg, inventory } = runBuild({ withDeltas: !base });
   // `facts` writes JSON to stdout; a human report on the same stream would corrupt it.
   const problems = cmd === "facts" ? refusals(result, cfg).length : report(result, cfg);
 
@@ -126,6 +127,7 @@ function main(argv) {
       originalTag: cfg.originalTag,
       originalTree: cfg.originalTree,
       pluginRoot: inventory.pluginRoot,
+      version: result.version,
       files: result.files.size,
       treeHash: built,
       mainTree,
