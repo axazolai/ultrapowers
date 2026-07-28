@@ -9,7 +9,7 @@
   ],
 
   "version": {
-    "revision": 1,
+    "revision": 2,
     "$why": "The shipped version is <upstream version>-up.<revision>, derived from originalTag at build time rather than written into a delta. A version baked into a patch is correct exactly until upstream publishes a new release, which is the one moment it needs to be right. Bump revision when the fork changes but upstream has not."
   },
 
