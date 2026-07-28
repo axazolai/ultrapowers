@@ -1,0 +1,11 @@
+--- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
++++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
+@@ -70,4 +70,8 @@
+ - For appropriately-scoped projects, ask questions one at a time to refine the idea
+ - Prefer multiple choice questions when possible, but open-ended is fine too
+ - Only one question per message - if a topic needs more exploration, break it into multiple questions
++<!-- grilling-graft:v1 - interview discipline from `grilling` in mattpocock/skills (MIT, (c) Matt Pocock) -->
++- Facts are yours to find; decisions are your partner's to make. If a question can be settled by exploring the environment - filesystem, git history, installed versions, the code itself - look it up instead of spending a question on it. A question you could have answered yourself costs your partner an answer and buys nothing.
++- Give every question your own recommended answer and the reasoning for it. Asking without recommending hands back work you were meant to do.
++- Walk the decision tree in dependency order: an early answer can reshape which questions are still worth asking, so resolve what other decisions depend on first.
+ - Focus on understanding: purpose, constraints, success criteria
