@@ -193,6 +193,12 @@
       "src": "fork-owned/README.repo.md",
       "dest": "README.md",
       "reason": "repository-level README: what this repo is, how the three branches relate, and how to rebuild"
+    },
+    {
+      "src": "fork-owned/phase-dir",
+      "dest": "plugins/ultrapowers/skills/brainstorming/scripts/phase-dir",
+      "mode": "100755",
+      "reason": "one allocator for .ultrapowers/{phases,tasks,adhoc}/NN-slug/, so brainstorming, writing-plans and subagent-driven-development cannot disagree about which directory a phase's documents belong to"
     }
   ],
   "manifest": {
