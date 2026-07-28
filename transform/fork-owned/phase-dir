@@ -36,6 +36,23 @@ root=$(git rev-parse --show-toplevel)
 base="$root/.ultrapowers/$sub"
 mkdir -p "$base"
 
+# The lock covers the whole allocation, not the target path: two racers with different slugs
+# each win a plain mkdir of their own NN-<slug> and walk away sharing the number.
+# 300 tries at 10ms is ~3s, far longer than the two scans a holder runs, so exhausting the
+# budget means a crashed run left the lock behind, not that we are merely queued.
+lock="$base/.phase-dir.lock"
+attempt=0
+until mkdir "$lock" 2>/dev/null; do
+  attempt=$((attempt + 1))
+  if [ "$attempt" -ge 300 ]; then
+    echo "phase-dir: $lock held by another run; delete it if it is stale" >&2
+    exit 1
+  fi
+  sleep 0.01
+done
+trap 'rmdir "$lock" 2>/dev/null || true' EXIT
+trap 'exit 1' INT TERM
+
 for d in "$base"/[0-9][0-9]-"$slug"; do
   if [ -d "$d" ]; then
     printf '%s\n' "$d"
@@ -46,12 +63,12 @@ done
 next=1
 for d in "$base"/[0-9][0-9]-*; do
   [ -d "$d" ] || continue
-  n=$(basename "$d")
+  n=${d##*/}
   n=${n%%-*}
   n=$((10#$n))
   [ "$n" -ge "$next" ] && next=$((n + 1))
 done
 
 dir=$(printf '%s/%02d-%s' "$base" "$next" "$slug")
-mkdir -p "$dir"
+mkdir "$dir"
 printf '%s\n' "$dir"

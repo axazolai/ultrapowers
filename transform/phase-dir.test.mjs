@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync } from "node:fs";
+import { execFileSync, spawn } from "node:child_process";
+import { mkdtempSync, mkdirSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, basename, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -45,4 +45,52 @@ test("rejects an unknown kind and a slug containing a separator", () => {
   const dir = repo();
   assert.throws(() => run(dir, "milestone", "x"));
   assert.throws(() => run(dir, "phase", "a/b"));
+});
+
+const RACERS = 12;
+
+const runParallel = (dir, slugs) =>
+  Promise.all(
+    slugs.map(
+      (slug) =>
+        new Promise((resolve, reject) => {
+          const child = spawn("bash", [SCRIPT, "phase", slug], { cwd: dir });
+          let out = "";
+          let err = "";
+          child.stdout.on("data", (c) => (out += c));
+          child.stderr.on("data", (c) => (err += c));
+          child.on("error", reject);
+          child.on("close", (code) =>
+            code === 0 ? resolve(out.trim()) : reject(new Error(`exit ${code}: ${err.trim()}`)),
+          );
+        }),
+    ),
+  );
+
+const allocated = (dir) =>
+  readdirSync(join(dir, ".ultrapowers", "phases"))
+    .filter((d) => /^[0-9][0-9]-/.test(d))
+    .sort();
+
+test("parallel allocations for different slugs never share a number", async () => {
+  const dir = repo();
+  const slugs = Array.from({ length: RACERS }, (_, i) => `slug-${i}`);
+  const printed = await runParallel(dir, slugs);
+  const dirs = allocated(dir);
+  assert.deepEqual(printed.map((p) => basename(p)).sort(), dirs);
+  assert.equal(dirs.length, RACERS, `expected ${RACERS} directories, got ${dirs}`);
+  const prefixes = dirs.map((d) => d.slice(0, 2));
+  assert.equal(new Set(prefixes).size, RACERS, `numbers shared between directories: ${dirs}`);
+});
+
+test("parallel allocations for one slug all resolve to a single directory", async () => {
+  for (let round = 0; round < 12; round++) {
+    const dir = repo();
+    const printed = await runParallel(
+      dir,
+      Array.from({ length: RACERS }, () => "shared"),
+    );
+    assert.deepEqual(allocated(dir), ["01-shared"], `round ${round} allocated twice`);
+    assert.equal(new Set(printed).size, 1, `round ${round} printed ${[...new Set(printed)]}`);
+  }
 });
