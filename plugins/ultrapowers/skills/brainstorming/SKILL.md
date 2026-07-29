@@ -65,6 +65,8 @@ digraph brainstorming {
 **Understanding the idea:**
 
 - Check out the current project state first (files, docs, recent commits)
+- Check whether the project's stack has drifted from its compiled rules: run `node ~/.claude/hooks/lib/stack-rules-check.mjs <root>`. On `stale`, name what appeared and what vanished, and add the `rules-src/` layers answering the new markers — a stack that vanished leaves rules that no longer apply, which is as wrong as rules that never arrived. On `ok`, `missing` or `legacy`, say nothing.
+- This is the right moment for that question and the only one. Design happens orders of magnitude less often than a session starts, and "have we drifted from the stack?" is meaningful here and noise everywhere else.
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
@@ -89,6 +91,8 @@ digraph brainstorming {
 - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
 - Ask after each section whether it looks right so far
 - Cover: architecture, components, data flow, error handling, testing
+- **Testing Decisions** — name the seams at which the behaviour will be verified. Prefer an existing seam to a new one, take the highest one available, aim for one per change. State a seam as an intent to verify — "behaviour is checked at the HTTP contract" — never as a file or a class, so it survives a change of structure. Required only when the work produces executable behaviour; for documentation or configuration, omit it explicitly, not silently.
+- **Out of Scope** — a required section naming what this design deliberately does not cover. Cheap insurance against creep, and the one section a reader checks first when the work later grows.
 - Be ready to go back and clarify if something doesn't make sense
 
 **Design for isolation and clarity:**
@@ -112,6 +116,9 @@ digraph brainstorming {
   - (User preferences for spec location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
+<!-- design-records:v1 - ADR shape from gsd-doc-classifier; glossary discipline from `grill-with-docs` in mattpocock/skills (MIT, (c) Matt Pocock) -->
+- **Glossary** — when a term is sharpened during the session, write it to `GLOSSARY.md` at that moment, not batched at the end. Inline capture is what separates a living glossary from a dead one. Definition only: no implementation, no decisions.
+- **ADR** — write one only when all three hold: the decision is hard to reverse, it is surprising without context, and it was a real trade-off. Failing any one, no ADR — a register of rubber-stamped entries stops being read, the same failure mode as a bloated risk register. Format `.ultrapowers/adr/NNNN-slug.md`, with frontmatter `status:`, a `# ADR-NNNN Title` heading, and `## Context` / `## Decision` / `## Consequences` sections.
 
 **Spec Self-Review:**
 After writing the spec document, look at it with fresh eyes:
