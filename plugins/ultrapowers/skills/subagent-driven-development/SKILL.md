@@ -60,8 +60,8 @@ Absence of a plan is not an execution route. It is a reason to write a plan.
 | `NN-PLAN.md` | main session | writing-plans negotiates as it goes |
 | `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
 | `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
-| `NN-REVIEW.md` | **subagent** | already the case — [code-reviewer.md](../requesting-code-review/code-reviewer.md) |
-| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator |
+| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; the review package stays in the workspace and `NN-SUMMARY.md` cites it |
+| `ROADMAP.md`, `NN-STATE.md` | main session | short edits; "where we are" lives in the coordinator — both are rewritten whenever a status they record changes, below |
 
 Anything requiring the human's answers stays in the main session. Anything
 requiring bulk reading goes to an agent. A document writer returns a path and
@@ -153,7 +153,7 @@ a ledger file, not only in todos.
 
 - Each plan owns a workspace: at skill start, run this skill's
   `scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
-  directory (`<repo-root>/.ultrapowers/sdd/<plan-basename>/`), home to
+  directory (`<main-checkout>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
   every artifact for THIS plan: ledger, briefs, reports, review packages.
   Another plan's directory is never yours to read or write.
 - Check for this plan's ledger at `<workspace>/progress.md`. If its first
@@ -424,6 +424,10 @@ Then mark the todo complete and move on. Never move to the next task while
 the review has open Critical/Important issues that are neither fixed nor
 parked-with-ruling at the cap.
 
+`NN-STATE.md` moves too: raise its `tasks_done` in the same message. One field,
+yours, no subagent — the ledger is the workspace's record and the state file is
+the tree's, and a fraction nobody raises is a fraction that lies.
+
 ## Final Review
 
 The final whole-branch review gets a package too: run
@@ -463,11 +467,42 @@ with the ledger, the implementer reports, the plan file, and the destination
 `<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
 document's text.
 
-The workspace stays. Diffs and briefs remain on disk, at hand, for as long as
-they are useful. Clearing `.ultrapowers/sdd/` is a separate, deliberate,
-janitorial act — nothing in it is lost, which is exactly why it need not
-happen on a schedule. Sibling directories belong to other plans; leave them
-alone.
+Then bring the two state documents current yourself, in the same turn — not a
+subagent, and not later.
+
+`<phase dir>/<NN>-STATE.md` answers where one phase is and what picking it up
+cold would need. `.ultrapowers/ROADMAP.md` answers which phases exist and what
+each one's status is. Both are YAML frontmatter and then prose: the machine
+reads the fields, a person reads the prose. Prose alone does not work — the
+reader becomes a regex over a sentence, and the sentence moves.
+
+`NN-STATE.md` carries `phase`, `status`, `tasks_done`, `tasks_total`,
+`branch`, `integration` and `updated`. `ROADMAP.md` carries `current` (the
+phase in flight, or `null`), `deployed_through`, `updated`, and a `phases:`
+list of `{ phase, slug, status, integration }`. `status` is `planned`,
+`running`, `complete` or `abandoned`; `integration` is `none`, `branch` or
+`merged`.
+
+Those last two are separate fields because they move separately: a phase can
+be `abandoned` with its branch already merged — the probe landed, the approach
+did not — and `complete` with the branch still unmerged.
+`tasks_done`/`tasks_total` is a tally, not a cursor, so `6/7` says a task was
+dropped and goes on saying it once the phase is over. Deployment belongs to
+the tree rather than to a phase — one deploy carries every merged phase — so
+it is one roadmap field, not a flag on every state file.
+
+Write them when a status they record changes, not at the end of any turn in
+which something happened: a task finishing writes the state file, a phase
+ending writes both, a session that read three files and decided nothing writes
+neither. Rewrite, never append — neither is a log, and what happened is in the
+summaries and in git.
+
+The workspace stays, and it stays in the main checkout — not in this worktree,
+which finishing the branch may remove. Diffs and briefs remain on disk, at
+hand, for as long as they are useful. Clearing `.ultrapowers/sdd/` is a
+separate, deliberate, janitorial act — nothing in it is lost, which is exactly
+why it need not happen on a schedule. Sibling directories belong to other
+plans; leave them alone.
 
 The premise the old instruction rested on was false. Git history holds commits
 and diffs; it does not hold the rulings on parked findings, and it does not

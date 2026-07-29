@@ -1,18 +1,36 @@
 #!/usr/bin/env bash
 # Resolve and ensure the working-tree directory SDD uses for one plan's
-# short-lived artifacts: task briefs, implementer reports, review packages,
-# and the progress ledger. Print the plan directory's absolute path.
+# artifacts: task briefs, implementer reports, review packages, and the
+# progress ledger. Print the plan directory's absolute path.
 #
-# One directory per plan (.ultrapowers/sdd/<plan-basename>/) so a follow-up
+# One directory per plan (.ultrapowers/sdd/<kind>-<NN>-<slug>/) so a follow-up
 # plan in the same working tree can never read or overwrite another plan's
 # artifacts. A stale ledger misread as current progress makes controllers
 # skip whole task sequences — plan-scoping removes that failure structurally.
+# The name comes from the plan's directory, not its basename: every plan is
+# NN-PLAN.md now, so basenames collide between phases and between kinds. The
+# kind directory is matched by whole path from this working tree's root, and a
+# plan outside it keeps its basename behind a plan- prefix, so the two
+# namespaces stay disjoint. No flat name is injective over paths, so each
+# workspace also records the plan that owns it and refuses a second claimant.
 #
 # The workspace lives in the working tree (not under .git/) because Claude Code
 # treats .git/ as a protected path and denies agent writes there — which blocks
 # an implementer subagent from writing its report file. A self-ignoring
 # .gitignore at .ultrapowers/sdd/ keeps every plan's workspace out of
 # `git status` and out of accidental commits without modifying any tracked file.
+#
+# It lives in the MAIN checkout, not the current worktree. The workspace is kept
+# after the plan finishes, and finishing-a-development-branch removes the
+# worktree that produced it: a per-worktree workspace would be deleted there
+# without a word, the self-ignoring .gitignore having left `git status` clean
+# enough that the removal needs no --force. --git-common-dir points into the
+# main repository's .git from anywhere, including a linked worktree, so its
+# parent is the main checkout; in an ordinary repository it is just .git.
+# Upstream deliberately does the opposite, and tests for it, in
+# tests/claude-code/test-sdd-workspace.sh: right while the workspace was
+# scratch that the last step of every plan deleted, wrong once it became the
+# record that outlives the branch. Do not "restore" it without restoring that.
 #
 # Single source of truth for the workspace location, so task-brief and
 # review-package cannot drift to different directories.
@@ -28,13 +46,29 @@ fi
 plan=$1
 [ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
 
-slug=$(basename "$plan" .md)
+worktree=$(cd "$(git rev-parse --show-toplevel)" && pwd)
+plandir=$(cd "$(dirname "$plan")" && pwd)
+kinddir=$(dirname "$plandir")
+tree="$worktree/.ultrapowers"
+slug="plan-$(basename "$plan" .md)"
+case "$kinddir" in
+  "$tree/phases" | "$tree/tasks" | "$tree/adhoc") slug="$(basename "$kinddir")-$(basename "$plandir")" ;;
+esac
 [ -n "$slug" ] && [ "$slug" != "." ] && [ "$slug" != ".." ] \
   || { echo "cannot derive a workspace name from: $plan" >&2; exit 2; }
 
-root=$(git rev-parse --show-toplevel)
+root=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
 base="$root/.ultrapowers/sdd"
 dir="$base/$slug"
 mkdir -p "$dir"
 printf '*\n' > "$base/.gitignore"
+# A flat slug cannot be injective over paths, and outside the tree it is only a basename, so
+# two plans can still reduce to one. Recording the owner makes that a refusal, not a share.
+marker="$dir/.plan"
+owner="${plandir#"$worktree"/}/$(basename "$plan")"
+if [ -f "$marker" ]; then
+  held=$(cat "$marker")
+  [ "$held" = "$owner" ] || { echo "sdd-workspace: $dir already belongs to $held, not $owner" >&2; exit 2; }
+fi
+printf '%s\n' "$owner" > "$marker"
 cd "$dir" && pwd
