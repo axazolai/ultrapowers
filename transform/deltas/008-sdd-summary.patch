@@ -12,6 +12,9 @@
 +    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
 +    "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
  }
+@@ -124,1 +124,1 @@
+-  directory (`<repo-root>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
++  directory (`<main-checkout>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
 @@ -134,3 +134,7 @@
  - Create the ledger with its identity as the first line:
    `# SDD ledger — plan: <plan file path>`.
@@ -20,7 +23,7 @@
 +  its own: task number, commit range, ruling, deviation. An entry that only
 +  makes sense to its own author has not been written yet.
  - The ledger is your recovery map: the commits it names exist in git even
-@@ -418,4 +418,19 @@
+@@ -418,4 +418,20 @@
 -When the final whole-branch review is clean and its fixes are merged,
 -delete this plan's workspace (`rm -rf <workspace>`) — the git history is
 -the record now. Sibling directories belong to other plans; leave them
@@ -33,11 +36,12 @@
 +`<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
 +document's text.
 +
-+The workspace stays. Diffs and briefs remain on disk, at hand, for as long as
-+they are useful. Clearing `.ultrapowers/sdd/` is a separate, deliberate,
-+janitorial act — nothing in it is lost, which is exactly why it need not
-+happen on a schedule. Sibling directories belong to other plans; leave them
-+alone.
++The workspace stays, and it stays in the main checkout — not in this worktree,
++which finishing the branch may remove. Diffs and briefs remain on disk, at
++hand, for as long as they are useful. Clearing `.ultrapowers/sdd/` is a
++separate, deliberate, janitorial act — nothing in it is lost, which is exactly
++why it need not happen on a schedule. Sibling directories belong to other
++plans; leave them alone.
 +
 +The premise the old instruction rested on was false. Git history holds commits
 +and diffs; it does not hold the rulings on parked findings, and it does not
@@ -47,3 +51,24 @@
 @@ -500,1 +500,1 @@
 -[Delete this plan's workspace — the record now lives in git]
 +[Dispatch the summary writer: it writes 04-SUMMARY.md and returns the path. Workspace kept.]
+--- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
++++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
+@@ -3,2 +3,2 @@
+-# short-lived artifacts: task briefs, implementer reports, review packages,
+-# and the progress ledger. Print the plan directory's absolute path.
++# artifacts: task briefs, implementer reports, review packages, and the
++# progress ledger. Print the plan directory's absolute path.
+@@ -17,2 +17,10 @@
+ # `git status` and out of accidental commits without modifying any tracked file.
+ #
++# It lives in the MAIN checkout, not the current worktree. The workspace is kept
++# after the plan finishes, and finishing-a-development-branch removes the
++# worktree that produced it: a per-worktree workspace would be deleted there
++# without a word, the self-ignoring .gitignore having left `git status` clean
++# enough that the removal needs no --force. --git-common-dir points into the
++# main repository's .git from anywhere, including a linked worktree, so its
++# parent is the main checkout; in an ordinary repository it is just .git.
++#
+@@ -43,1 +43,1 @@
+-root=$(git rev-parse --show-toplevel)
++root=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)

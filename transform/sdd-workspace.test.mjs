@@ -73,3 +73,20 @@ test("the workspace self-ignores, so it never reaches git status", () => {
   sh(dir, 'printf "# ledger\\n" > "$1/progress.md"', workspace);
   assert.doesNotMatch(git(dir, "status", "--porcelain"), /sdd/);
 });
+test("a linked worktree resolves the main repository's workspace, which outlives it", () => {
+  const { dir, root } = repo();
+  const planPath = plan(dir, ".ultrapowers/phases/01-hooks/01-PLAN.md");
+  git(dir, "add", "-A");
+  git(dir, "commit", "-qm", "plan");
+
+  const wt = join(temp("sdd-workspace-wt-"), "wt");
+  git(dir, "worktree", "add", "-q", wt, "-b", "feature");
+
+  const workspace = run(wt, planPath);
+  sh(dir, 'printf "# ledger\\n" > "$1/progress.md"', workspace);
+  // No --force: the workspace self-ignores, so git reads the worktree as clean either way, which
+  // is why a workspace living inside it used to be removed here without a word.
+  git(dir, "worktree", "remove", wt);
+  assert.equal(sh(dir, '[ -f "$1/progress.md" ] && echo kept || echo lost', workspace), "kept");
+  assert.equal(workspace, `${root}/.ultrapowers/sdd/phases-01-hooks`);
+});
