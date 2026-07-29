@@ -33,6 +33,9 @@
    BASE_SHA: a7981ec
 --- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -124,1 +124,1 @@
+-  directory (`<repo-root>/.ultrapowers/sdd/<plan-basename>/`), home to
++  directory (`<repo-root>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
 @@ -443,4 +443,4 @@
  [Setup: worktree verified]
 -[Read plan file once: docs/ultrapowers/plans/feature-plan.md]
@@ -40,3 +43,39 @@
 +[Read plan file once: .ultrapowers/phases/04-hooks/04-PLAN.md]
 +[Resolve workspace: scripts/sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
  [Create todos for all tasks]
+--- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
++++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
+@@ -6,4 +6,6 @@
+-# One directory per plan (.ultrapowers/sdd/<plan-basename>/) so a follow-up
++# One directory per plan (.ultrapowers/sdd/<kind>-<NN>-<slug>/) so a follow-up
+ # plan in the same working tree can never read or overwrite another plan's
+ # artifacts. A stale ledger misread as current progress makes controllers
+ # skip whole task sequences — plan-scoping removes that failure structurally.
++# The name comes from the plan's directory, not its basename: every plan is
++# NN-PLAN.md now, so basenames collide between phases and between kinds.
+@@ -31,3 +31,9 @@
+-slug=$(basename "$plan" .md)
++plandir=$(cd "$(dirname "$plan")" && pwd)
++kinddir=$(dirname "$plandir")
++if [ "$(basename "$(dirname "$kinddir")")" = ".ultrapowers" ]; then
++  slug="$(basename "$kinddir")-$(basename "$plandir")"
++else
++  slug=$(basename "$plan" .md)
++fi
+ [ -n "$slug" ] && [ "$slug" != "." ] && [ "$slug" != ".." ] \
+   || { echo "cannot derive a workspace name from: $plan" >&2; exit 2; }
+--- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/task-brief
++++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/task-brief
+@@ -7,3 +7,3 @@
+-# Default OUTFILE: <repo-root>/.ultrapowers/sdd/<plan-basename>/task-<N>-brief.md
+-# (per plan and per worktree; concurrent runs of the SAME plan in the same
+-# working tree share it).
++# Default OUTFILE: <workspace>/task-<N>-brief.md, where <workspace> is what
++# sdd-workspace resolves for this plan — it owns the location, and restating
++# it here is how the two drift. Concurrent runs of the SAME plan share it.
+--- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/review-package
++++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/review-package
+@@ -8,1 +8,2 @@
+-# Default OUTFILE: <repo-root>/.ultrapowers/sdd/<plan-basename>/review-<base7>..<head7>.diff
++# Default OUTFILE: <workspace>/review-<base7>..<head7>.diff, where <workspace>
++# is what sdd-workspace resolves for this plan.
