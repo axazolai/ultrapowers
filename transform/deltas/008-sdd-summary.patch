@@ -58,7 +58,7 @@
 -# and the progress ledger. Print the plan directory's absolute path.
 +# artifacts: task briefs, implementer reports, review packages, and the
 +# progress ledger. Print the plan directory's absolute path.
-@@ -17,2 +17,10 @@
+@@ -17,2 +17,14 @@
  # `git status` and out of accidental commits without modifying any tracked file.
  #
 +# It lives in the MAIN checkout, not the current worktree. The workspace is kept
@@ -68,6 +68,10 @@
 +# enough that the removal needs no --force. --git-common-dir points into the
 +# main repository's .git from anywhere, including a linked worktree, so its
 +# parent is the main checkout; in an ordinary repository it is just .git.
++# Upstream deliberately does the opposite, and tests for it, in
++# tests/claude-code/test-sdd-workspace.sh: right while the workspace was
++# scratch that the last step of every plan deleted, wrong once it became the
++# record that outlives the branch. Do not "restore" it without restoring that.
 +#
 @@ -43,1 +43,1 @@
 -root=$(git rev-parse --show-toplevel)
