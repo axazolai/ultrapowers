@@ -57,7 +57,7 @@
 +| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
 +| `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
 +| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; the review package stays in the workspace and `NN-SUMMARY.md` cites it |
-+| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator |
++| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator — and `STATE.md` is rewritten at every Finish, below |
 +
 +Anything requiring the human's answers stays in the main session. Anything
 +requiring bulk reading goes to an agent. A document writer returns a path and
@@ -74,3 +74,19 @@
 +Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
 +with the plan file, the whole-branch review package, and the destination
 +`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
+@@ -428,1 +428,15 @@
+ document's text.
++
++Then update `.ultrapowers/STATE.md` yourself, in the same turn — not a
++subagent, and not later. A phase ending is provably when "where we are"
++changed, and writing the summary is already your turn; a document with an
++owner but no moment does not get written. The one that prompted this rule
++went stale through four plans, two merges and two deploys, still naming a
++published revision two behind and three finished plans as underway.
++
++`STATE.md` answers where we are, what is next, and what someone picking it up
++cold would need — never what happened, which is in the summaries and in git.
++Rewrite it rather than append to it. A phase that ends unmerged says so under
++"next", the merge becomes the next thing, and the phase after it records that
++it happened: that is why one moment is enough, and why a list of moments would
++make it a changelog.
