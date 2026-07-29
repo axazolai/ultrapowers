@@ -45,25 +45,42 @@
  [Create todos for all tasks]
 --- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace
-@@ -6,4 +6,6 @@
+@@ -6,4 +6,10 @@
 -# One directory per plan (.ultrapowers/sdd/<plan-basename>/) so a follow-up
 +# One directory per plan (.ultrapowers/sdd/<kind>-<NN>-<slug>/) so a follow-up
  # plan in the same working tree can never read or overwrite another plan's
  # artifacts. A stale ledger misread as current progress makes controllers
  # skip whole task sequences — plan-scoping removes that failure structurally.
 +# The name comes from the plan's directory, not its basename: every plan is
-+# NN-PLAN.md now, so basenames collide between phases and between kinds.
-@@ -31,3 +31,9 @@
++# NN-PLAN.md now, so basenames collide between phases and between kinds. The
++# kind directory is matched by whole path from this working tree's root, and a
++# plan outside it keeps its basename behind a plan- prefix, so the two
++# namespaces stay disjoint. No flat name is injective over paths, so each
++# workspace also records the plan that owns it and refuses a second claimant.
+@@ -31,3 +31,10 @@
 -slug=$(basename "$plan" .md)
++worktree=$(cd "$(git rev-parse --show-toplevel)" && pwd)
 +plandir=$(cd "$(dirname "$plan")" && pwd)
 +kinddir=$(dirname "$plandir")
-+if [ "$(basename "$(dirname "$kinddir")")" = ".ultrapowers" ]; then
-+  slug="$(basename "$kinddir")-$(basename "$plandir")"
-+else
-+  slug=$(basename "$plan" .md)
-+fi
++tree="$worktree/.ultrapowers"
++slug="plan-$(basename "$plan" .md)"
++case "$kinddir" in
++  "$tree/phases" | "$tree/tasks" | "$tree/adhoc") slug="$(basename "$kinddir")-$(basename "$plandir")" ;;
++esac
  [ -n "$slug" ] && [ "$slug" != "." ] && [ "$slug" != ".." ] \
    || { echo "cannot derive a workspace name from: $plan" >&2; exit 2; }
+@@ -39,2 +39,11 @@
+ printf '*\n' > "$base/.gitignore"
++# A flat slug cannot be injective over paths, and outside the tree it is only a basename, so
++# two plans can still reduce to one. Recording the owner makes that a refusal, not a share.
++marker="$dir/.plan"
++owner="${plandir#"$worktree"/}/$(basename "$plan")"
++if [ -f "$marker" ]; then
++  held=$(cat "$marker")
++  [ "$held" = "$owner" ] || { echo "sdd-workspace: $dir already belongs to $held, not $owner" >&2; exit 2; }
++fi
++printf '%s\n' "$owner" > "$marker"
+ cd "$dir" && pwd
 --- a/plugins/ultrapowers/skills/subagent-driven-development/scripts/task-brief
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/scripts/task-brief
 @@ -7,3 +7,3 @@

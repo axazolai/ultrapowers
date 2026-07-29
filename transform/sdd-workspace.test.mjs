@@ -35,7 +35,12 @@ const git = (dir, ...args) =>
 const sh = (cwd, script, ...args) =>
   execFileSync("bash", ["-c", script, "_", ...args], { cwd, encoding: "utf8" }).trim();
 
-const run = (dir, plan) => execFileSync("bash", [SCRIPT, plan], { cwd: dir, encoding: "utf8" }).trim();
+const run = (dir, plan) =>
+  execFileSync("bash", [SCRIPT, plan], {
+    cwd: dir,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
 
 function repo() {
   const dir = temp("sdd-workspace-");
@@ -64,7 +69,53 @@ test("plans sharing a basename across kinds resolve to different workspaces", ()
 test("a plan outside the tree falls back to its basename", () => {
   const { dir, root } = repo();
   const legacy = plan(dir, "docs/2026-07-28-feature.md");
-  assert.equal(run(dir, legacy), `${root}/.ultrapowers/sdd/2026-07-28-feature`);
+  assert.equal(run(dir, legacy), `${root}/.ultrapowers/sdd/plan-2026-07-28-feature`);
+});
+
+test("a fallback basename shaped like a tree slug cannot claim that tree plan's workspace", () => {
+  const { dir } = repo();
+  const real = run(dir, plan(dir, ".ultrapowers/phases/01-a/01-PLAN.md"));
+  const lookalike = run(dir, plan(dir, "docs/phases-01-a.md"));
+  assert.notEqual(lookalike, real);
+  assert.equal(basename(real), "phases-01-a");
+  assert.equal(basename(lookalike), "plan-phases-01-a");
+});
+
+test("only the working tree's own .ultrapowers, and only its three kinds, name a tree plan", () => {
+  const { dir } = repo();
+  const real = run(dir, plan(dir, ".ultrapowers/phases/01-a/01-PLAN.md"));
+  const nested = run(dir, plan(dir, "sub/.ultrapowers/phases/01-a/01-PLAN.md"));
+  const strayKind = run(dir, plan(dir, ".ultrapowers/plan/02-a/02-PLAN.md"));
+  assert.notEqual(nested, real, "a nested .ultrapowers aliased the working tree's own");
+  assert.notEqual(strayKind, real);
+  assert.equal(basename(nested), "plan-01-PLAN");
+  assert.equal(basename(strayKind), "plan-02-PLAN");
+});
+
+test("a workspace refuses a second plan rather than sharing itself", () => {
+  const { dir } = repo();
+  const first = plan(dir, "sub/.ultrapowers/phases/01-a/01-PLAN.md");
+  const second = plan(dir, "pkg/.ultrapowers/phases/01-z/01-PLAN.md");
+  run(dir, first);
+  // Both reduce to plan-01-PLAN: no flat slug is injective over paths, so the guarantee has to
+  // come from the workspace knowing whose it is.
+  assert.throws(
+    () => run(dir, second),
+    (e) => e.status === 2 && String(e.stderr).includes(first) && String(e.stderr).includes(second),
+  );
+});
+
+test("re-resolving the same plan is idempotent, from the main checkout or a worktree", () => {
+  const { dir } = repo();
+  const planPath = plan(dir, ".ultrapowers/phases/01-a/01-PLAN.md");
+  git(dir, "add", "-A");
+  git(dir, "commit", "-qm", "plan");
+  const wt = join(temp("sdd-workspace-wt-"), "wt");
+  git(dir, "worktree", "add", "-q", wt, "-b", "feature");
+  // The owner is recorded relative to the working tree, or resolving from the worktree would
+  // read as a second claimant on the workspace the main checkout just created.
+  assert.equal(run(wt, planPath), run(dir, planPath));
+  assert.equal(run(dir, planPath), run(dir, planPath));
 });
 
 test("the workspace self-ignores, so it never reaches git status", () => {
