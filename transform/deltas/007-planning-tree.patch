@@ -5,10 +5,13 @@
 -6. **Write design doc** — save to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
 +6. **Write design doc** — resolve the phase directory with `bash scripts/phase-dir phase <topic-slug>`, save the design there as `NN-SPEC.md`, and commit
  7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-@@ -111,3 +111,3 @@
+@@ -111,3 +111,6 @@
 -- Write the validated design (spec) to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md`
 +- Write the validated design (spec) to the phase directory: `bash scripts/phase-dir phase <topic-slug>` prints `.ultrapowers/phases/NN-<topic-slug>/`, and the document is `NN-SPEC.md` inside it, where `NN` is that directory's own prefix. Use `task` instead of `phase` for quick work, `adhoc` for unplanned out-of-phase work.
    - (User preferences for spec location override this default)
++- **A phase's own spec stays at the phase root as `NN-SPEC.md`, and the supporting designs that fed it go in `refs/` beside it, without the `NN-` prefix.** The folder is deliberately not `specs/`: sitting next to `NN-SPEC.md` that reads as the same thing and invites the question of which is which. The path already names the phase, so repeating it inside only slows the read. A later phase that needs this spec links to it — "on the basis of phase 04's spec" — instead of copying or moving it, and that is what keeps the path stable.
++- **A document that serves more than one phase goes to `.ultrapowers/docs/`** — a project-wide UI specification, findings from a preliminary investigation known in advance to be reused, external references. Organise it by kind at the top level, and add a subject subfolder only once a kind has grown enough that a flat list stops answering "where do I look". Place the obvious cases and ask about the doubtful ones. Never create `docs/` before something belongs in it: nothing in this tree is scaffolded ahead of its content.
++- **Name a document for what it decides, not for the artefact that carried it.** "delta 007" says nothing on its own, and a name that says nothing has already filed a design under the wrong phase. The delta number is an implementation detail; it lives in the delta.
  - Use elements-of-style:writing-clearly-and-concisely skill if available
 --- a/plugins/ultrapowers/skills/brainstorming/spec-document-reviewer-prompt.md
 +++ b/plugins/ultrapowers/skills/brainstorming/spec-document-reviewer-prompt.md
