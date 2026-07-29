@@ -57,7 +57,7 @@
 +| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
 +| `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
 +| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; the review package stays in the workspace and `NN-SUMMARY.md` cites it |
-+| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator — and `STATE.md` is rewritten at every Finish, below |
++| `ROADMAP.md`, `NN-STATE.md` | main session | short edits; "where we are" lives in the coordinator — both are rewritten whenever a status they record changes, below |
 +
 +Anything requiring the human's answers stays in the main session. Anything
 +requiring bulk reading goes to an agent. A document writer returns a path and
@@ -65,6 +65,14 @@
 +exactly what the delegation saved.
 +
  **vs. Executing Plans (parallel session):**
+@@ -391,3 +391,7 @@
+ Then mark the todo complete and move on. Never move to the next task while
+ the review has open Critical/Important issues that are neither fixed nor
+ parked-with-ruling at the cap.
++
++`NN-STATE.md` moves too: raise its `tasks_done` in the same message. One field,
++yours, no subagent — the ledger is the workspace's record and the state file is
++the tree's, and a fraction nobody raises is a fraction that lies.
 @@ -422,2 +422,6 @@
 -When the final whole-branch review is clean and its fixes are merged, write
 -the phase summary — do not delete anything.
@@ -74,19 +82,35 @@
 +Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
 +with the plan file, the whole-branch review package, and the destination
 +`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
-@@ -428,1 +428,15 @@
+@@ -428,1 +428,31 @@
  document's text.
 +
-+Then update `.ultrapowers/STATE.md` yourself, in the same turn — not a
-+subagent, and not later. A phase ending is provably when "where we are"
-+changed, and writing the summary is already your turn; a document with an
-+owner but no moment does not get written. The one that prompted this rule
-+went stale through four plans, two merges and two deploys, still naming a
-+published revision two behind and three finished plans as underway.
++Then bring the two state documents current yourself, in the same turn — not a
++subagent, and not later.
 +
-+`STATE.md` answers where we are, what is next, and what someone picking it up
-+cold would need — never what happened, which is in the summaries and in git.
-+Rewrite it rather than append to it. A phase that ends unmerged says so under
-+"next", the merge becomes the next thing, and the phase after it records that
-+it happened: that is why one moment is enough, and why a list of moments would
-+make it a changelog.
++`<phase dir>/<NN>-STATE.md` answers where one phase is and what picking it up
++cold would need. `.ultrapowers/ROADMAP.md` answers which phases exist and what
++each one's status is. Both are YAML frontmatter and then prose: the machine
++reads the fields, a person reads the prose. Prose alone does not work — the
++reader becomes a regex over a sentence, and the sentence moves.
++
++`NN-STATE.md` carries `phase`, `status`, `tasks_done`, `tasks_total`,
++`branch`, `integration` and `updated`. `ROADMAP.md` carries `current` (the
++phase in flight, or `null`), `deployed_through`, `updated`, and a `phases:`
++list of `{ phase, slug, status, integration }`. `status` is `planned`,
++`running`, `complete` or `abandoned`; `integration` is `none`, `branch` or
++`merged`.
++
++Those last two are separate fields because they move separately: a phase can
++be `abandoned` with its branch already merged — the probe landed, the approach
++did not — and `complete` with the branch still unmerged.
++`tasks_done`/`tasks_total` is a tally, not a cursor, so `6/7` says a task was
++dropped and goes on saying it once the phase is over. Deployment belongs to
++the tree rather than to a phase — one deploy carries every merged phase — so
++it is one roadmap field, not a flag on every state file.
++
++Write them when a status they record changes, not at the end of any turn in
++which something happened: a task finishing writes the state file, a phase
++ending writes both, a session that read three files and decided nothing writes
++neither. Rewrite, never append — neither is a log, and what happened is in the
++summaries and in git.
