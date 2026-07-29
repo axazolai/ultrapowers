@@ -56,7 +56,7 @@
 +| `NN-PLAN.md` | main session | writing-plans negotiates as it goes |
 +| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
 +| `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
-+| `NN-REVIEW.md` | **subagent** | already the case — [code-reviewer.md](../requesting-code-review/code-reviewer.md) |
++| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; the review package stays in the workspace and `NN-SUMMARY.md` cites it |
 +| `ROADMAP.md`, `STATE.md` | main session | short edits; "where we are" lives in the coordinator |
 +
 +Anything requiring the human's answers stays in the main session. Anything
