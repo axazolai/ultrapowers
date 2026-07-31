@@ -139,11 +139,17 @@ Every step must contain the actual content an engineer needs. These are **plan f
 
 After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
 
+Checks 1-3 are read. Checks 4 and 5 are run, and they are the ones that catch what reading cannot: re-reading a plan can never reveal that a command fails in the worktree or that a default does not survive `null`. A plan is reviewed by its own author, so the checks that add information are the ones that execute something.
+
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
 **2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+
+**4. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line.
+
+**5. Invariant check — execute the sample:** Every invariant stated in a task's Interfaces block, check against that task's own sample code before committing the plan. Run it; do not reason about it. Thirty seconds in `node -e` settles what an hour of re-reading will not. When one sample turns out wrong, sweep the plan for the whole class rather than fixing the instance — a defect in a plan's code sample is evidence about the plan, not about one task.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 

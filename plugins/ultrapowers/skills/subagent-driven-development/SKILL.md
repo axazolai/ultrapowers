@@ -462,6 +462,16 @@ Dispatch the verification writer ([verification-prompt.md](verification-prompt.m
 with the plan file, the whole-branch review package, and the destination
 `<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
 
+Before the summary writer, run the ledger read-back check. Dispatch one cheap subagent and give it the ledger path and NOTHING else — no plan, no spec, no task reports, no diffs — and ask it to answer from that file alone:
+
+- which phase this is and what it is for
+- which tasks are done, which is in flight, which remain
+- what is open, deferred or parked, and under whose ruling
+- what must not be reopened, and why
+- what the next action is
+
+It passes when the answers are correct and the agent never needed another file. It fails the moment it has to ask for one, and a failure is amended in the ledger BEFORE the summary is written. The summary writer reads the ledger as its primary source, so a gap there is inherited by the summary silently, and by then the session that could have filled it is gone. This is the only point where "the ledger is the recovery map" is tested rather than assumed, and it costs one cheap subagent per phase.
+
 Dispatch the summary writer ([summary-writer-prompt.md](summary-writer-prompt.md))
 with the ledger, the implementer reports, the plan file, and the destination
 `<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
@@ -494,8 +504,18 @@ it is one roadmap field, not a flag on every state file.
 Write them when a status they record changes, not at the end of any turn in
 which something happened: a task finishing writes the state file, a phase
 ending writes both, a session that read three files and decided nothing writes
-neither. Rewrite, never append — neither is a log, and what happened is in the
-summaries and in git.
+neither. Rewrite rather than append — neither is a log — but never drop what is
+finished. Work that closes is marked closed and keeps its entry, what remains is
+hoisted above it, and a short summary sits at the top so a reader can stop early
+without paying for the whole file. An entry that carried a debt's full reasoning
+may be compressed once the debt is paid, down to its name, one line of what it
+was, and the closed mark: the detail existed to get the work done and its record
+is the commit, while the entry exists so a reader can see the work happened at
+all. A status file that deletes its own history saves a few tokens and gives up
+the one cheap check on what actually happened; the summary and that compression
+are what keep it affordable, not amnesia. A handover that instructs its own
+deletion is the same failure with a deadline — whatever quietly moved into it
+dies on schedule.
 
 The workspace stays, and it stays in the main checkout — not in this worktree,
 which finishing the branch may remove. Diffs and briefs remain on disk, at
