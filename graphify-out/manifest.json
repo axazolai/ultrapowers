@@ -1,0 +1,152 @@
+{
+  ".build-final/.claude-plugin/marketplace.json": {
+    "mtime": 1785198647.035505,
+    "ast_hash": "3d8fd84d62748615e3cb37eba1f995ff",
+    "semantic_hash": "3d8fd84d62748615e3cb37eba1f995ff"
+  },
+  ".build-final/plugins/ultrapowers/.claude-plugin/plugin.json": {
+    "mtime": 1785198647.0368881,
+    "ast_hash": "000ab032a8cdd0aa098e8644fc1c839d",
+    "semantic_hash": "000ab032a8cdd0aa098e8644fc1c839d"
+  },
+  ".build-final/plugins/ultrapowers/hooks/hooks.json": {
+    "mtime": 1785198647.0368881,
+    "ast_hash": "1124533950edfebb5466c31a8e5a887d",
+    "semantic_hash": "1124533950edfebb5466c31a8e5a887d"
+  },
+  ".build-final/plugins/ultrapowers/hooks/session-start": {
+    "mtime": 1785198647.0378983,
+    "ast_hash": "37e78925865a04422917a2bb3e7e48ae",
+    "semantic_hash": "37e78925865a04422917a2bb3e7e48ae"
+  },
+  ".build-final/plugins/ultrapowers/skills/brainstorming/scripts/helper.js": {
+    "mtime": 1785198647.0378983,
+    "ast_hash": "09675b2c59e99fda34683b4d1da5a447",
+    "semantic_hash": "09675b2c59e99fda34683b4d1da5a447"
+  },
+  ".build-final/plugins/ultrapowers/skills/brainstorming/scripts/server.cjs": {
+    "mtime": 1785198647.038919,
+    "ast_hash": "45a31018a3a5c2c7227a24a4bb8835e7",
+    "semantic_hash": "45a31018a3a5c2c7227a24a4bb8835e7"
+  },
+  ".build-final/plugins/ultrapowers/skills/brainstorming/scripts/start-server.sh": {
+    "mtime": 1785198647.038919,
+    "ast_hash": "040f4865a928ce43dbfa62a45fc70111",
+    "semantic_hash": "040f4865a928ce43dbfa62a45fc70111"
+  },
+  ".build-final/plugins/ultrapowers/skills/brainstorming/scripts/stop-server.sh": {
+    "mtime": 1785198647.038919,
+    "ast_hash": "37ee6aa51bf10064609c37219483eab8",
+    "semantic_hash": "37ee6aa51bf10064609c37219483eab8"
+  },
+  ".build-final/plugins/ultrapowers/skills/subagent-driven-development/scripts/review-package": {
+    "mtime": 1785198647.049871,
+    "ast_hash": "a9420be8fca7c268f79ab3b83325024e",
+    "semantic_hash": "a9420be8fca7c268f79ab3b83325024e"
+  },
+  ".build-final/plugins/ultrapowers/skills/subagent-driven-development/scripts/sdd-workspace": {
+    "mtime": 1785198647.049871,
+    "ast_hash": "8a4d127259780e35e697d13ebb335337",
+    "semantic_hash": "8a4d127259780e35e697d13ebb335337"
+  },
+  ".build-final/plugins/ultrapowers/skills/subagent-driven-development/scripts/task-brief": {
+    "mtime": 1785198647.049871,
+    "ast_hash": "331db9506bf0b8f824f0f6db63c90e09",
+    "semantic_hash": "331db9506bf0b8f824f0f6db63c90e09"
+  },
+  ".build-final/plugins/ultrapowers/skills/systematic-debugging/condition-based-waiting-example.ts": {
+    "mtime": 1785198647.0508723,
+    "ast_hash": "8e502a8c1e9c7de15967202615d241d5",
+    "semantic_hash": "8e502a8c1e9c7de15967202615d241d5"
+  },
+  ".build-final/plugins/ultrapowers/skills/systematic-debugging/find-polluter.sh": {
+    "mtime": 1785198647.0508723,
+    "ast_hash": "6bc3c264a76bd77f191f9a6226805b98",
+    "semantic_hash": "6bc3c264a76bd77f191f9a6226805b98"
+  },
+  ".build-final/plugins/ultrapowers/skills/writing-skills/render-graphs.js": {
+    "mtime": 1785198647.054375,
+    "ast_hash": "e9d8be9caa34d327cac6f746f947cee0",
+    "semantic_hash": "e9d8be9caa34d327cac6f746f947cee0"
+  },
+  "transform/build-cli.mjs": {
+    "mtime": 1785198647.166718,
+    "ast_hash": "de2777bb1ddbe2e1071ec9e1b4b5c478",
+    "semantic_hash": "de2777bb1ddbe2e1071ec9e1b4b5c478"
+  },
+  "transform/build.mjs": {
+    "mtime": 1785279697.294245,
+    "ast_hash": "55f78056e98b0185fc5b791ea4a894d5",
+    "semantic_hash": "55f78056e98b0185fc5b791ea4a894d5"
+  },
+  "transform/build.test.mjs": {
+    "mtime": 1785279697.294245,
+    "ast_hash": "09192b96cade42820dbf01940350d5ce",
+    "semantic_hash": "09192b96cade42820dbf01940350d5ce"
+  },
+  "transform/classify.mjs": {
+    "mtime": 1785190928.023729,
+    "ast_hash": "771eb57610cbe8b240a5c91a8bdd31a4",
+    "semantic_hash": "771eb57610cbe8b240a5c91a8bdd31a4"
+  },
+  "transform/classify.test.mjs": {
+    "mtime": 1785191119.4786434,
+    "ast_hash": "172fe304c9717dd6304e0d07e17ebbd8",
+    "semantic_hash": "172fe304c9717dd6304e0d07e17ebbd8"
+  },
+  "transform/config.json": {
+    "mtime": 1785471460.8513856,
+    "ast_hash": "63f6d41aa2deac9bb91918cb39c7410f",
+    "semantic_hash": "63f6d41aa2deac9bb91918cb39c7410f"
+  },
+  "transform/fork-owned/marketplace.json": {
+    "mtime": 1785194630.0482328,
+    "ast_hash": "3d8fd84d62748615e3cb37eba1f995ff",
+    "semantic_hash": "3d8fd84d62748615e3cb37eba1f995ff"
+  },
+  "transform/fork-owned/phase-dir": {
+    "mtime": 1785279697.2952461,
+    "ast_hash": "7e917b291ad7c5ef1ad710ee7b504717",
+    "semantic_hash": "7e917b291ad7c5ef1ad710ee7b504717"
+  },
+  "transform/inventory.json": {
+    "mtime": 1785279697.2963464,
+    "ast_hash": "3375ca106d062c40aac164cb7c3cdbf7",
+    "semantic_hash": "3375ca106d062c40aac164cb7c3cdbf7"
+  },
+  "transform/inventory.mjs": {
+    "mtime": 1785190977.7345839,
+    "ast_hash": "20a1a4eec8ea30ad17aebde707a31fff",
+    "semantic_hash": "20a1a4eec8ea30ad17aebde707a31fff"
+  },
+  "transform/patch.mjs": {
+    "mtime": 1785194406.0935087,
+    "ast_hash": "5d91bbda2a49ad354e83b0888fa36446",
+    "semantic_hash": "5d91bbda2a49ad354e83b0888fa36446"
+  },
+  "transform/patch.test.mjs": {
+    "mtime": 1785194325.965347,
+    "ast_hash": "074260829d8c519b45929ab855cb02bb",
+    "semantic_hash": "074260829d8c519b45929ab855cb02bb"
+  },
+  "transform/phase-dir.test.mjs": {
+    "mtime": 1785279697.2963464,
+    "ast_hash": "dc3581bf7e099285ad05dd423ea5ca53",
+    "semantic_hash": "dc3581bf7e099285ad05dd423ea5ca53"
+  },
+  "transform/rename.mjs": {
+    "mtime": 1785193471.5117607,
+    "ast_hash": "a127579c39329401df2dad74a76cac7b",
+    "semantic_hash": "a127579c39329401df2dad74a76cac7b"
+  },
+  "transform/rename.test.mjs": {
+    "mtime": 1785193407.8439262,
+    "ast_hash": "bb9f8e6913048a346b47a2395ff09ea1",
+    "semantic_hash": "bb9f8e6913048a346b47a2395ff09ea1"
+  },
+  "transform/sdd-workspace.test.mjs": {
+    "mtime": 1785342801.3525062,
+    "ast_hash": "a82aa68b16f7ced40b261fea503a3cec",
+    "semantic_hash": "a82aa68b16f7ced40b261fea503a3cec"
+  }
+}

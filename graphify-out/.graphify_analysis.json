@@ -1,0 +1,367 @@
+{
+  "communities": {
+    "0": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_clients",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_content_dir",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_crypto",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_debouncetimers",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_frametemplate",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_fs",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_helperscript",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_http",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_idle_timeout_ms",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_istruthyenv",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_lastactivity",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_lifecycle_check_ms",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_mime_types",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_opcodes",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_path",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_port",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_readultrapowersversion",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_state_dir",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_telemetry_disable_env_vars",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_tokeninfo",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_ultrapowers_telemetry_disabled",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_ultrapowers_version",
+      "docref_rfc_6455"
+    ],
+    "1": [
+      "transform_build_cli",
+      "transform_build_cli_emit",
+      "transform_build_cli_git",
+      "transform_build_cli_here",
+      "transform_build_cli_main",
+      "transform_build_cli_readdeltas",
+      "transform_build_cli_readforkowned",
+      "transform_build_cli_readoriginal",
+      "transform_build_cli_refusals",
+      "transform_build_cli_repo",
+      "transform_build_cli_report",
+      "transform_build_cli_runbuild",
+      "transform_build_cli_safegit",
+      "transform_build_cli_writetree",
+      "transform_sdd_workspace_test",
+      "transform_sdd_workspace_test_git",
+      "transform_sdd_workspace_test_made",
+      "transform_sdd_workspace_test_plan",
+      "transform_sdd_workspace_test_repo",
+      "transform_sdd_workspace_test_run",
+      "transform_sdd_workspace_test_script",
+      "transform_sdd_workspace_test_sh",
+      "transform_sdd_workspace_test_temp"
+    ],
+    "2": [
+      "transform_build",
+      "transform_build_applydelta",
+      "transform_build_build",
+      "transform_build_checkattribution",
+      "transform_build_maskprotected",
+      "transform_build_stampversion",
+      "transform_build_test",
+      "transform_build_test_cfg",
+      "transform_build_test_fork_owned",
+      "transform_build_test_inventory",
+      "transform_build_test_run",
+      "transform_build_test_tree",
+      "transform_build_test_versioned",
+      "transform_patch",
+      "transform_patch_applypatch",
+      "transform_patch_assertgeometry",
+      "transform_patch_findsequence",
+      "transform_patch_parsepatch",
+      "transform_patch_stripprefix",
+      "transform_patch_test"
+    ],
+    "3": [
+      "transform_classify",
+      "transform_classify_assertreasoned",
+      "transform_classify_classify",
+      "transform_classify_matchrule",
+      "transform_classify_reconcile",
+      "transform_classify_test",
+      "transform_classify_test_config",
+      "transform_classify_test_here",
+      "transform_classify_test_inventory",
+      "transform_classify_test_rules",
+      "transform_inventory",
+      "transform_inventory_here",
+      "transform_inventory_inventory",
+      "transform_inventory_main",
+      "transform_inventory_repo",
+      "transform_inventory_report",
+      "transform_inventory_upstreampaths"
+    ],
+    "4": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_bootstrappage",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_getnewestscreen",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_handlerequest",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_isauthorized",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_isfulldocument",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_isregularfileinsidecontentdir",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_parsecookies",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_pathnameof",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_querykey",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_securityheaders",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_timingsafeequalstr"
+    ],
+    "5": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_broadcast",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_computeacceptkey",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_decodeframe",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_encodeframe",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_handlemessage",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_handleupgrade",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_isallowedwebsocketorigin",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_preferredport",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_randomport",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_startserver",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_touchactivity"
+    ],
+    "6": [
+      "transform_rename",
+      "transform_rename_apply",
+      "transform_rename_compiled",
+      "transform_rename_escapere",
+      "transform_rename_nul",
+      "transform_rename_renamepath",
+      "transform_rename_renametext",
+      "transform_rename_substitution",
+      "transform_rename_test",
+      "transform_rename_test_cfg",
+      "transform_rename_test_here"
+    ],
+    "7": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_connect",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_nextreconnectdelay",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_reloadafterrecovery",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_sendevent",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_sessionkey",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_setstatus",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_showtombstone",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_websocketurl"
+    ],
+    "8": [
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_combinegraphs",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_execsync",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_extractdotblocks",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_extractgraphbody",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_fs",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_main",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_path",
+      "build_final_plugins_ultrapowers_skills_writing_skills_render_graphs_rendertosvg"
+    ],
+    "9": [
+      "transform_phase_dir_test",
+      "transform_phase_dir_test_allocated",
+      "transform_phase_dir_test_made",
+      "transform_phase_dir_test_repo",
+      "transform_phase_dir_test_run",
+      "transform_phase_dir_test_runasync",
+      "transform_phase_dir_test_runparallel",
+      "transform_phase_dir_test_script"
+    ],
+    "10": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_command_has_server_id",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_command_line_for_pid",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_is_brainstorm_server",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_mark_stopped",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_read_expected_server_id",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_stop_server_sh__entry"
+    ],
+    "11": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_brandmarkup",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_escapehtmltext",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_renderbranding",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_waitingpage",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_wrapinframe"
+    ],
+    "12": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_browserlauncherforplatform",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_companionurl",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_maybeopenbrowser",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_urlhostforhttp"
+    ],
+    "13": [
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_condition_based_waiting_example",
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_condition_based_waiting_example_waitforevent",
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_condition_based_waiting_example_waitforeventcount",
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_condition_based_waiting_example_waitforeventmatch"
+    ],
+    "14": [
+      "build_final_plugins_ultrapowers_hooks_session_start",
+      "build_final_plugins_ultrapowers_hooks_session_start__entry",
+      "build_final_plugins_ultrapowers_hooks_session_start_escape_for_json"
+    ],
+    "15": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_chmodowneronly",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_generatetoken",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_initialtoken"
+    ],
+    "16": [
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_start_server",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_start_server_is_windows_like_shell",
+      "build_final_plugins_ultrapowers_skills_brainstorming_scripts_start_server_sh__entry"
+    ],
+    "17": [
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_review_package",
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_review_package__entry"
+    ],
+    "18": [
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_sdd_workspace",
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_sdd_workspace__entry"
+    ],
+    "19": [
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_task_brief",
+      "build_final_plugins_ultrapowers_skills_subagent_driven_development_scripts_task_brief__entry"
+    ],
+    "20": [
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_find_polluter",
+      "build_final_plugins_ultrapowers_skills_systematic_debugging_find_polluter_sh__entry"
+    ],
+    "21": [
+      "transform_fork_owned_phase_dir",
+      "transform_fork_owned_phase_dir__entry"
+    ]
+  },
+  "cohesion": {
+    "0": 0.08333333333333333,
+    "1": 0.15810276679841898,
+    "2": 0.18421052631578946,
+    "3": 0.20588235294117646,
+    "4": 0.21818181818181817,
+    "5": 0.21818181818181817,
+    "6": 0.2909090909090909,
+    "7": 0.4166666666666667,
+    "8": 0.3333333333333333,
+    "9": 0.2857142857142857,
+    "10": 0.42857142857142855,
+    "11": 0.4,
+    "12": 0.5,
+    "13": 0.5,
+    "14": 0.6666666666666666,
+    "15": 0.6666666666666666,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0
+  },
+  "gods": [
+    {
+      "id": "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_handlerequest",
+      "label": "handleRequest()",
+      "degree": 14
+    },
+    {
+      "id": "transform_build_build",
+      "label": "build()",
+      "degree": 13
+    },
+    {
+      "id": "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_handleupgrade",
+      "label": "handleUpgrade()",
+      "degree": 8
+    },
+    {
+      "id": "build_final_plugins_ultrapowers_skills_brainstorming_scripts_server_startserver",
+      "label": "startServer()",
+      "degree": 8
+    },
+    {
+      "id": "transform_build_cli_runbuild",
+      "label": "runBuild()",
+      "degree": 8
+    },
+    {
+      "id": "transform_build_cli_main",
+      "label": "main()",
+      "degree": 8
+    },
+    {
+      "id": "transform_classify_reconcile",
+      "label": "reconcile()",
+      "degree": 7
+    },
+    {
+      "id": "build_final_plugins_ultrapowers_skills_brainstorming_scripts_helper_connect",
+      "label": "connect()",
+      "degree": 6
+    },
+    {
+      "id": "transform_classify_classify",
+      "label": "classify()",
+      "degree": 6
+    },
+    {
+      "id": "transform_patch_parsepatch",
+      "label": "parsePatch()",
+      "degree": 6
+    }
+  ],
+  "surprises": [
+    {
+      "source": "runBuild()",
+      "target": "build()",
+      "source_files": [
+        "transform/build-cli.mjs",
+        "transform/build.mjs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "build()",
+      "target": "classify()",
+      "source_files": [
+        "transform/build.mjs",
+        "transform/classify.mjs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "build()",
+      "target": "reconcile()",
+      "source_files": [
+        "transform/build.mjs",
+        "transform/classify.mjs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "build()",
+      "target": "renamePath()",
+      "source_files": [
+        "transform/build.mjs",
+        "transform/rename.mjs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "build()",
+      "target": "renameText()",
+      "source_files": [
+        "transform/build.mjs",
+        "transform/rename.mjs"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}
