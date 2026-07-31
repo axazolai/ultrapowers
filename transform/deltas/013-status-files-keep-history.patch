@@ -1,0 +1,13 @@
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -497,2 +497,8 @@
+-neither. Rewrite, never append — neither is a log, and what happened is in the
+-summaries and in git.
++neither. Rewrite rather than append — neither is a log — but never drop what is
++finished. Work that closes is marked closed and keeps its entry, what remains is
++hoisted above it, and a short summary sits at the top so a reader can stop early
++without paying for the whole file. A status file that deletes its own history
++saves a few tokens and gives up the one cheap check on what actually happened;
++the summary is what keeps that affordable, not amnesia. A handover that instructs
++its own deletion is the same failure with a deadline — whatever quietly moved
++into it dies on schedule.

@@ -1,0 +1,14 @@
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -465,1 +465,11 @@
++Before the summary writer, run the ledger read-back check. Dispatch one cheap subagent and give it the ledger path and NOTHING else — no plan, no spec, no task reports, no diffs — and ask it to answer from that file alone:
++
++- which phase this is and what it is for
++- which tasks are done, which is in flight, which remain
++- what is open, deferred or parked, and under whose ruling
++- what must not be reopened, and why
++- what the next action is
++
++It passes when the answers are correct and the agent never needed another file. It fails the moment it has to ask for one, and a failure is amended in the ledger BEFORE the summary is written. The summary writer reads the ledger as its primary source, so a gap there is inherited by the summary silently, and by then the session that could have filled it is gone. This is the only point where "the ledger is the recovery map" is tested rather than assumed, and it costs one cheap subagent per phase.
++
+ Dispatch the summary writer ([summary-writer-prompt.md](summary-writer-prompt.md))
