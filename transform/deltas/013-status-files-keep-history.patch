@@ -1,13 +1,17 @@
 --- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-@@ -497,2 +497,8 @@
+@@ -497,2 +497,12 @@
 -neither. Rewrite, never append — neither is a log, and what happened is in the
 -summaries and in git.
 +neither. Rewrite rather than append — neither is a log — but never drop what is
 +finished. Work that closes is marked closed and keeps its entry, what remains is
 +hoisted above it, and a short summary sits at the top so a reader can stop early
-+without paying for the whole file. A status file that deletes its own history
-+saves a few tokens and gives up the one cheap check on what actually happened;
-+the summary is what keeps that affordable, not amnesia. A handover that instructs
-+its own deletion is the same failure with a deadline — whatever quietly moved
-+into it dies on schedule.
++without paying for the whole file. An entry that carried a debt's full reasoning
++may be compressed once the debt is paid, down to its name, one line of what it
++was, and the closed mark: the detail existed to get the work done and its record
++is the commit, while the entry exists so a reader can see the work happened at
++all. A status file that deletes its own history saves a few tokens and gives up
++the one cheap check on what actually happened; the summary and that compression
++are what keep it affordable, not amnesia. A handover that instructs its own
++deletion is the same failure with a deadline — whatever quietly moved into it
++dies on schedule.
