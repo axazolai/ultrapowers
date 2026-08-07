@@ -3,7 +3,9 @@
 A fork of [obra/superpowers](https://github.com/obra/superpowers) by Jesse Vincent (MIT),
 narrowed to Claude Code and maintained as a generated artifact rather than a hand-edited copy.
 
-The plugin itself, and what it is, is documented in
+🇬🇧 English | [🇷🇺 Русский](README.ru.md)
+
+The plugin itself, what it is and how it differs from upstream, is documented in
 [`plugins/ultrapowers/README.md`](plugins/ultrapowers/README.md). This file is about the
 repository.
 
@@ -42,6 +44,23 @@ manifest is **new**, and the build refuses until a human classifies it. Globs al
 adopt whatever upstream adds; a bare file list would be unmaintainable. Both together give the
 gate and the maintainability.
 
+## What the patch branch contains
+
+- `transform/config.json` — the recorded base (`originalTag` + its tree hash), the rename
+  substitutions, the protected slug, the revision that feeds the shipped version, the
+  attribution the build asserts, and the refusal thresholds.
+- `transform/inventory.json` — the classification manifest, the rules that propose it, and the
+  `forkOwned` list: files this fork authors outright rather than patching, currently seven —
+  the two READMEs, the marketplace manifest, `.gitattributes`, the `phase-dir` allocator, and
+  the summary-writer and verification prompts.
+- `transform/deltas/NNN-*.patch` — thirteen numbered changes to upstream's skill text, applied
+  in order. What each one does is listed in the plugin README.
+- `transform/*.mjs` — the engine (classify, rename, patch, build) and its tests.
+
+The shipped plugin version is derived, never patched: `<upstream version>-up.<revision>` from
+`config.json`, so an upstream bump cannot leave a delta asserting a stale version. Bump
+`version.revision` when the fork changes and upstream has not.
+
 ## Rebuilding
 
 ```
@@ -50,6 +69,10 @@ node --test                           # the transform still behaves
 node transform/build-cli.mjs check    # the plugin still builds, with nothing surviving that should not
 node transform/build-cli.mjs commit   # write the result to main
 ```
+
+`build-cli.mjs` also answers `emit <dir>` (write the built tree to disk), `tree`, `drift`
+(is `main` exactly what a fresh build produces?) and `facts` (the machine-readable report
+`/up-update` assesses).
 
 The build refuses, rather than producing a plausible-looking broken plugin, when: an upstream path
 is unclassified or new, a delta no longer applies, the upstream name survives outside the one

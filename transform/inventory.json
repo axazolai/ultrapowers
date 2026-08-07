@@ -190,9 +190,19 @@
       "reason": "the plugin README: install instructions point at this fork, and MIT attribution to obra/superpowers and Jesse Vincent lives here by construction rather than by freezing upstream strings"
     },
     {
+      "src": "fork-owned/README.plugin.ru.md",
+      "dest": "plugins/ultrapowers/README.ru.md",
+      "reason": "the plugin README in Russian: a translation of README.md, not a second source - the English file stays the one the attribution assertion checks, so a translation can never be what satisfies the licence"
+    },
+    {
       "src": "fork-owned/README.repo.md",
       "dest": "README.md",
       "reason": "repository-level README: what this repo is, how the three branches relate, and how to rebuild"
+    },
+    {
+      "src": "fork-owned/README.repo.ru.md",
+      "dest": "README.ru.md",
+      "reason": "repository-level README in Russian, alongside README.md"
     },
     {
       "src": "fork-owned/phase-dir",
