@@ -43,7 +43,7 @@
     {
       "match": "skills/using-superpowers/references/**",
       "class": "ignored",
-      "reason": "per-harness adaptation notes for Codex/Pi/Gemini/Antigravity; this fork targets Claude Code only, and delta 002 removes the Platform Adaptation section that links them so no reference is left dangling"
+      "reason": "per-harness adaptation notes for Codex/Pi/Gemini/Antigravity/Hermes; this fork targets Claude Code only, and delta 002 removes the Platform Adaptation section that links them so no reference is left dangling"
     },
     {
       "match": "skills/**",
@@ -76,6 +76,16 @@
       "match": ".cursor-plugin/**",
       "class": "ignored",
       "reason": "other harness (Cursor)"
+    },
+    {
+      "match": ".devin-plugin/**",
+      "class": "ignored",
+      "reason": "other harness (Devin CLI)"
+    },
+    {
+      "match": ".hermes-plugin/**",
+      "class": "ignored",
+      "reason": "other harness (Hermes Agent)"
     },
     {
       "match": ".kimi-plugin/**",
@@ -227,6 +237,7 @@
     ".claude-plugin/plugin.json": "tracked",
     ".codex-plugin/plugin.json": "ignored",
     ".cursor-plugin/plugin.json": "ignored",
+    ".devin-plugin/plugin.json": "ignored",
     ".gitattributes": "ignored",
     ".github/FUNDING.yml": "ignored",
     ".github/ISSUE_TEMPLATE/bug_report.md": "ignored",
@@ -235,6 +246,8 @@
     ".github/ISSUE_TEMPLATE/platform_support.md": "ignored",
     ".github/PULL_REQUEST_TEMPLATE.md": "ignored",
     ".gitignore": "ignored",
+    ".hermes-plugin/__init__.py": "ignored",
+    ".hermes-plugin/plugin.yaml": "ignored",
     ".kimi-plugin/plugin.json": "ignored",
     ".opencode/INSTALL.md": "ignored",
     ".opencode/plugins/superpowers.js": "ignored",
@@ -270,6 +283,8 @@
     "docs/superpowers/plans/2026-06-11-visual-companion-final-hardening-fixup.md": "ignored",
     "docs/superpowers/plans/2026-07-06-sdd-plan-scoped-workspace.md": "ignored",
     "docs/superpowers/plans/2026-07-15-sdd-fix-loop-redesign.md": "ignored",
+    "docs/superpowers/plans/2026-07-30-codex-efficiency-fixes.md": "ignored",
+    "docs/superpowers/plans/2026-08-06-hermes-version-bump-wiring.md": "ignored",
     "docs/superpowers/specs/2026-01-22-document-review-system-design.md": "ignored",
     "docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md": "ignored",
     "docs/superpowers/specs/2026-03-11-zero-dep-brainstorm-server-design.md": "ignored",
@@ -287,6 +302,8 @@
     "docs/superpowers/specs/2026-07-06-sdd-plan-scoped-workspace-eval-results.md": "ignored",
     "docs/superpowers/specs/2026-07-06-sdd-plan-scoped-workspace.md": "ignored",
     "docs/superpowers/specs/2026-07-15-sdd-fix-loop-redesign-design.md": "ignored",
+    "docs/superpowers/specs/2026-07-30-codex-efficiency-fixes-design.md": "ignored",
+    "docs/superpowers/specs/2026-08-05-hermes-version-bump-wiring-design.md": "ignored",
     "docs/testing.md": "ignored",
     "docs/windows/polyglot-hooks.md": "ignored",
     "gemini-extension.json": "ignored",
@@ -338,6 +355,7 @@
     "skills/using-superpowers/references/antigravity-tools.md": "ignored",
     "skills/using-superpowers/references/codex-tools.md": "ignored",
     "skills/using-superpowers/references/gemini-tools.md": "ignored",
+    "skills/using-superpowers/references/hermes-tools.md": "ignored",
     "skills/using-superpowers/references/pi-tools.md": "ignored",
     "skills/verification-before-completion/SKILL.md": "tracked",
     "skills/writing-plans/SKILL.md": "tracked",
@@ -375,6 +393,7 @@
     "tests/codex-plugin-sync/test-sync-to-codex-plugin.sh": "ignored",
     "tests/codex/test-marketplace-manifest.sh": "ignored",
     "tests/codex/test-package-codex-plugin.sh": "ignored",
+    "tests/devin/test-devin-plugin.sh": "ignored",
     "tests/explicit-skill-requests/prompts/action-oriented.txt": "ignored",
     "tests/explicit-skill-requests/prompts/after-planning-flow.txt": "ignored",
     "tests/explicit-skill-requests/prompts/claude-suggested-it.txt": "ignored",
@@ -389,6 +408,10 @@
     "tests/explicit-skill-requests/run-haiku-test.sh": "ignored",
     "tests/explicit-skill-requests/run-multiturn-test.sh": "ignored",
     "tests/explicit-skill-requests/run-test.sh": "ignored",
+    "tests/hermes/__init__.py": "ignored",
+    "tests/hermes/conftest.py": "ignored",
+    "tests/hermes/test_bootstrap.py": "ignored",
+    "tests/hermes/test_plugin.py": "ignored",
     "tests/hooks/test-session-start.sh": "ignored",
     "tests/kimi/run-tests.sh": "ignored",
     "tests/kimi/test-plugin-manifest.sh": "ignored",
@@ -401,6 +424,8 @@
     "tests/opencode/test-tools.sh": "ignored",
     "tests/pi/test-pi-extension.mjs": "ignored",
     "tests/shell-lint/test-lint-shell.sh": "ignored",
-    "tests/systematic-debugging/test-find-polluter.sh": "ignored"
+    "tests/systematic-debugging/test-find-polluter.sh": "ignored",
+    "tests/version-bump/test-bump-version.sh": "ignored",
+    "tests/writing-skills/test-render-graphs.sh": "ignored"
   }
 }

@@ -1,6 +1,6 @@
 --- a/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md
 +++ b/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md
-@@ -49,14 +49,6 @@
+@@ -49,15 +49,6 @@
  | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
  | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
  
@@ -11,6 +11,7 @@
 -- Codex: `references/codex-tools.md`
 -- Pi: `references/pi-tools.md`
 -- Antigravity: `references/antigravity-tools.md`
+-- Hermes Agent: `references/hermes-tools.md`
 -
  ## User Instructions
  
