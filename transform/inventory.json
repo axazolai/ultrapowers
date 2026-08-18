@@ -1,6 +1,6 @@
 {
-  "describesTree": "da1e7bb99212a060f90ffd6def69ff606775a79c",
-  "describesTag": "upstream/6.2.0",
+  "describesTree": "21219529a4e224bcb27baf8816b039c8bf7c6673",
+  "describesTag": "upstream/6.3.0",
   "pluginRoot": "plugins/ultrapowers",
   "$doc": [
     "The plugin map. 'rules' classify an upstream path; 'manifest' records the class every",

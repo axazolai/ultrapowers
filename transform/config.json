@@ -1,19 +1,27 @@
 {
-  "originalTag": "upstream/6.2.0",
-  "originalTree": "da1e7bb99212a060f90ffd6def69ff606775a79c",
-
+  "originalTag": "upstream/6.3.0",
+  "originalTree": "21219529a4e224bcb27baf8816b039c8bf7c6673",
   "substitutions": [
-    { "from": "superpowers", "to": "ultrapowers" },
-    { "from": "Superpowers", "to": "Ultrapowers" },
-    { "from": "SUPERPOWERS", "to": "ULTRAPOWERS" }
+    {
+      "from": "superpowers",
+      "to": "ultrapowers"
+    },
+    {
+      "from": "Superpowers",
+      "to": "Ultrapowers"
+    },
+    {
+      "from": "SUPERPOWERS",
+      "to": "ULTRAPOWERS"
+    }
   ],
-
   "version": {
     "revision": 5,
     "$why": "The shipped version is <upstream version>-up.<revision>, derived from originalTag at build time rather than written into a delta. A version baked into a patch is correct exactly until upstream publishes a new release, which is the one moment it needs to be right. Bump revision when the fork changes but upstream has not."
   },
-
-  "protect": ["obra/superpowers"],
+  "protect": [
+    "obra/superpowers"
+  ],
   "$protect-why": [
     "obra/superpowers is upstream's identity, not a word about the plugin, so the engine never",
     "rewrites it. Measured on 6.2.0: four occurrences across three tracked files, and they do not",
@@ -25,7 +33,6 @@
     "belongs. The failure mode this avoids is the important one: when a future upstream release adds",
     "a link we have never seen, doing nothing is always safe, and inventing an owner name is not."
   ],
-
   "attribution": {
     "$why": [
       "MIT obliges the fork to carry upstream's copyright and to name what it forked. The earlier",
@@ -44,17 +51,23 @@
       },
       {
         "path": "plugins/ultrapowers/README.md",
-        "contains": ["obra/superpowers", "Jesse Vincent", "MIT", "fork"],
+        "contains": [
+          "obra/superpowers",
+          "Jesse Vincent",
+          "MIT",
+          "fork"
+        ],
         "reason": "MIT attribution: the fork must name upstream, its author and its repository, and state that it is a fork"
       },
       {
         "path": "plugins/ultrapowers/.claude-plugin/plugin.json",
-        "contains": ["obra/superpowers"],
+        "contains": [
+          "obra/superpowers"
+        ],
         "reason": "attribution in the manifest description, which is what a user sees in /plugin without opening the README"
       }
     ]
   },
-
   "thresholds": {
     "changedFilesPct": 25,
     "unclassifiedRefuses": true,
