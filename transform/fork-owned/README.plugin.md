@@ -88,6 +88,11 @@ for what the work decides:
   appended to, but finished work is marked closed and keeps its entry, remaining work is hoisted
   above it, and a summary sits on top so a reader can stop early. A paid debt's entry may be
   compressed to its name, one line and the closed mark — never deleted.
+- **Tests come after the code, before review.** `test-driven-development` no longer demands a
+  failing test first: a unit of work is coded, the spec/plan is updated for any decision that
+  changed it, the unit’s bug-log entries are fixed, then one test per stated behaviour is written
+  and checked by mutation. Plans carry an `Acceptance:` list instead of test code. A bug that
+  does not block the work goes to `BUGS.md` and is fixed before the tests or at the end.
 
 ### Brainstorming and design records
 
@@ -139,6 +144,7 @@ Each change above is one numbered patch on the `patch` branch, applied at build 
 | `011-planning-rules-are-run` | plan checks 4 and 5 execute instead of being read |
 | `012-ledger-read-back` | the cold ledger read-back before the summary |
 | `013-status-files-keep-history` | status files compress history instead of dropping it |
+| `014-test-after-coverage` | tests after the code, before review, only for stated behaviour; a bug log |
 
 Three files are the fork's own rather than a patch on upstream's:
 `skills/brainstorming/scripts/phase-dir`,
