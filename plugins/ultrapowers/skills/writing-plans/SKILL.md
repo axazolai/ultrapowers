@@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests after the code, before review. Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
@@ -45,10 +45,10 @@ independently testable deliverable.
 ## Bite-Sized Task Granularity
 
 **Each step is one action (2-5 minutes):**
-- "Write the failing test" - step
-- "Run it to make sure it fails" - step
-- "Implement the minimal code to make the test pass" - step
-- "Run the tests and make sure they pass" - step
+- "Implement the task" - step
+- "Reconcile: write any decision that changed behaviour, scope or an interface into the plan/spec; fix this task's bug-log entries" - step
+- "Write the tests for the task's Acceptance list" - step
+- "Run them" - step
 - "Commit" - step
 
 ## Plan Document Header
@@ -95,29 +95,32 @@ include this section.]
   and return types. A task's implementer sees only their own task; this
   block is how they learn the names and types neighboring tasks use.]
 
-- [ ] **Step 1: Write the failing test**
+**Acceptance:** [one line per behaviour this task delivers — input class → expected
+result. The tests confirm exactly these; no test code is written into the plan.]
+- `function(valid input)` returns `expected`
+- `function(empty input)` raises `ValueError`
 
-```python
-def test_specific_behavior():
-    result = function(input)
-    assert result == expected
-```
-
-- [ ] **Step 2: Run test to verify it fails**
-
-Run: `pytest tests/path/test.py::test_name -v`
-Expected: FAIL with "function not defined"
-
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 1: Implement**
 
 ```python
 def function(input):
     return expected
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 2: Reconcile**
 
-Run: `pytest tests/path/test.py::test_name -v`
+A decision made while implementing that changed behaviour, scope or an interface is
+written into this task (and the spec) now, before the tests. Fix this task's open
+bug-log entries.
+
+- [ ] **Step 3: Write the acceptance tests**
+
+One test per Acceptance line, then the mutation check
+(`ultrapowers:test-driven-development`).
+
+- [ ] **Step 4: Run them**
+
+Run: `pytest tests/path/test.py -v`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -133,7 +136,7 @@ git commit -m "feat: add specific feature"
 Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code)
+- "Write tests for the above" (without an **Acceptance:** list naming each behaviour)
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task

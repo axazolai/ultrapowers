@@ -72,9 +72,12 @@ Subagent (general-purpose):
 
     ## Tests
 
-    The implementer already ran the tests and reported results with TDD
-    evidence for exactly this code. Do not re-run the suite to confirm their
-    report. Run a test only when reading the code raises a specific doubt
+    The implementer already ran the tests and reported results with
+    acceptance coverage for exactly this code. An Acceptance line with no
+    test, a test for behaviour the plan does not state, or a decision in
+    the code that the plan/spec text does not reflect is a finding.
+
+    Do not re-run the suite to confirm their report. Run a test only when reading the code raises a specific doubt
     that no existing run answers — and then a focused test, never a
     package-wide suite, race detector run, or repeated/high-count loop. If
     heavy validation seems warranted, recommend it in your report instead of

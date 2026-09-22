@@ -117,6 +117,7 @@ digraph process {
 
     "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
     "More tasks remain?" [shape=diamond];
+    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [shape=box];
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
     "Final review clean: write NN-SUMMARY, keep the workspace" [shape=box];
@@ -146,7 +147,8 @@ digraph process {
     "Park findings in ledger with rulings" -> "Append completion to ledger, mark todo complete";
     "Append completion to ledger, mark todo complete" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
-    "More tasks remain?" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [label="no"];
+    "More tasks remain?" -> "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [label="no"];
+    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)";
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
     "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
@@ -205,8 +207,8 @@ what you checked as you check it:
 The scan's output is a table, not a verdict. One row for every pair of tasks
 that share a file or an interface: the two tasks, what one produces against
 what the other consumes, and what you found. One row for every task: whether
-its own text agrees with itself — the tests it specifies against the code it
-specifies, the files it creates against the files it later touches. "The scan
+its own text agrees with itself — the Acceptance list it specifies against the
+code it specifies, the files it creates against the files it later touches. "The scan
 is clean" without those rows is not a scan you ran.
 
 Write the table to the ledger. Rule on everything you find before execution
@@ -483,6 +485,11 @@ yours, no subagent — the ledger is the workspace's record and the state file i
 the tree's, and a fraction nobody raises is a fraction that lies.
 
 ## Final Review
+
+Before it, drain the bug log: if open entries remain that belong to this
+plan's work, dispatch one implementer to fix them (reproduce, fix, a test
+only where the bug broke behaviour the spec states), then continue. Entries
+outside the plan's scope are listed to the user, not fixed.
 
 The final whole-branch review gets a package too: run
 `scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the

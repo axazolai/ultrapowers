@@ -13,9 +13,9 @@ here:
 2. Every test exercises the real thing
 ```
 
-Strict TDD produces both naturally: a test written first and watched
-failing against real code has already proven it can fail, and only earns
-a mock when the real dependency proves slow or external.
+Tests are written after the code, so neither comes for free: the mutation
+check below proves each test can fail, and a mock is earned only when the
+real dependency proves slow or external.
 
 ## Principle 1: Name the Break
 
@@ -147,10 +147,11 @@ BEFORE adding a mock or test helper:
     Unmock it or delete the assertion.
 ```
 
-## Tests Ship With the Implementation
+## Tests Ship Before Review
 
-The TDD cycle — failing test, minimal implementation, refactor — is what
-"complete" means. Ship the tests the behavior needs and only those:
+A unit of work is complete when the tests that confirm its spec/plan are
+written and pass, before its review. Ship the tests the stated behavior
+needs and only those:
 trivial code and human prose earn none, and a test written to satisfy
 process costs maintenance forever.
 

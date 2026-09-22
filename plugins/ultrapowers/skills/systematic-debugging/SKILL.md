@@ -19,6 +19,13 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 If you haven't completed Phase 1, you cannot propose fixes.
 
+## Found While Doing Other Work
+
+A bug that does not block the next step of the current work goes to the bug log
+(`ultrapowers:test-driven-development` → Bug Log) and the work continues. This process runs
+when the log is drained: before a unit of work's tests, and at the end of the work. A bug that
+blocks the next step runs through it at once.
+
 ## When to Use
 
 Use for ANY technical issue:
@@ -169,12 +176,10 @@ You MUST complete each phase before proceeding to the next.
 
 **Fix the root cause, not the symptom:**
 
-1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
-   - One-off test script if no framework
+1. **Reproduce**
+   - Simplest possible reproduction: a command or a one-off script
    - MUST have before fixing
-   - Use the `ultrapowers:test-driven-development` skill for writing proper failing tests
+   - The permanent test follows `ultrapowers:test-driven-development`: written after the fix, and only when the bug broke behaviour the spec states
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -183,7 +188,7 @@ You MUST complete each phase before proceeding to the next.
    - No bundled refactoring
 
 3. **Verify Fix**
-   - Test passes now?
+   - Reproduction no longer reproduces?
    - No other tests broken?
    - Issue actually resolved?
    - Use the `ultrapowers:verification-before-completion` skill before claiming success
@@ -217,7 +222,7 @@ If you catch yourself thinking:
 - "Quick fix for now, investigate later"
 - "Just try changing X and see if it works"
 - "Add multiple changes, run tests"
-- "Skip the test, I'll manually verify"
+- "Skip the reproduction, I'll manually verify"
 - "It's probably X, let me fix that"
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"
@@ -248,7 +253,7 @@ If you catch yourself thinking:
 | "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
 | "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
 | "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
+| "I'll reproduce after confirming fix works" | Without a reproduction first, "fixed" is unproven. |
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
@@ -261,7 +266,7 @@ If you catch yourself thinking:
 | **1. Root Cause** | Read errors, reproduce, check changes, gather evidence | Understand WHAT and WHY |
 | **2. Pattern** | Find working examples, compare | Identify differences |
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
-| **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
+| **4. Implementation** | Reproduce, fix, verify | Bug resolved, reproduction gone |
 
 ## When Process Reveals "No Root Cause"
 
