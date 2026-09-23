@@ -34,37 +34,22 @@ stop and ask.
 
 ```dot
 digraph when_to_use {
-    "Phase artefact, or >1 commit?" [shape=diamond];
+    "Have implementation plan?" [shape=diamond];
     "Tasks mostly independent?" [shape=diamond];
-    "Stay in this session?" [shape=diamond];
-    "one agent, whole chain" [shape=box];
+    "Partner chose inline, or no subagent tool?" [shape=diamond];
     "subagent-driven-development" [shape=box];
     "executing-plans" [shape=box];
-    "Offer: direct, or an agent" [shape=box];
+    "Manual execution or brainstorm first" [shape=box];
+    "One agent, given the whole chain" [shape=box];
 
-    "Phase artefact, or >1 commit?" -> "Tasks mostly independent?" [label="yes"];
-    "Phase artefact, or >1 commit?" -> "Offer: direct, or an agent" [label="no"];
-    "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
-    "Tasks mostly independent?" -> "one agent, whole chain" [label="no - coupled"];
-    "Stay in this session?" -> "subagent-driven-development" [label="yes"];
-    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
+    "Have implementation plan?" -> "Tasks mostly independent?" [label="yes"];
+    "Have implementation plan?" -> "Manual execution or brainstorm first" [label="no"];
+    "Tasks mostly independent?" -> "Partner chose inline, or no subagent tool?" [label="yes"];
+    "Tasks mostly independent?" -> "One agent, given the whole chain" [label="no - tightly coupled"];
+    "Partner chose inline, or no subagent tool?" -> "executing-plans" [label="yes"];
+    "Partner chose inline, or no subagent tool?" -> "subagent-driven-development" [label="no"];
 }
 ```
-
-**Agent-driven execution is the norm.** The exception is a one-off isolated
-task, and there the correct move is to offer the choice, not to decide
-silently.
-
-| Situation | Execution |
-|---|---|
-| Work produces a phase artefact (SPEC/PLAN/SUMMARY/VERIFICATION/REVIEW) | Agent |
-| Work spans more than one commit | Agent |
-| Tasks are tightly coupled | Agent — **one** agent, given the chain, not one per task |
-| Single edit in a known location, no plan needed | Offer: directly, or via an agent |
-
-"Offer" means ask. It does not mean proceed and mention it afterwards.
-
-Absence of a plan is not an execution route. It is a reason to write a plan.
 
 **Who writes which document:**
 
@@ -72,9 +57,9 @@ Absence of a plan is not an execution route. It is a reason to write a plan.
 |---|---|---|
 | `NN-SPEC.md` | main session | brainstorming is a dialogue with the human, one question at a time — not delegable |
 | `NN-PLAN.md` | main session | writing-plans negotiates as it goes |
-| `NN-SUMMARY.md` | **subagent** | mechanical fold of ~40k tokens of drafts ([summary-writer-prompt.md](summary-writer-prompt.md)) |
+| `NN-SUMMARY.md` | **subagent** | mechanical fold of the ledger and reports ([summary-writer-prompt.md](summary-writer-prompt.md)) |
 | `NN-VERIFICATION.md` | **subagent** | reads a lot of code, decides little ([verification-prompt.md](verification-prompt.md)) |
-| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; the review package stays in the workspace and `NN-SUMMARY.md` cites it |
+| `NN-REVIEW.md` | nobody — reserved | [code-reviewer.md](../requesting-code-review/code-reviewer.md) returns its review in the reply and takes no destination; `NN-SUMMARY.md` cites the review ranges |
 | `ROADMAP.md`, `NN-STATE.md` | main session | short edits; "where we are" lives in the coordinator — both are rewritten whenever a status they record changes, below |
 
 Anything requiring the human's answers stays in the main session. Anything
@@ -82,11 +67,11 @@ requiring bulk reading goes to an agent. A document writer returns a path and
 a confirmation — never the document's text, which would spend on the way back
 exactly what the delegation saved.
 
-**vs. Executing Plans (parallel session):**
-- Same session (no context switch)
-- Fresh subagent per task (no context pollution)
-- Review after each task (spec compliance + code quality), broad review at the end
-- Faster iteration (no human-in-loop between tasks)
+**vs. Executing Plans (inline):**
+- Fresh subagent per task (no context pollution) instead of one context doing every task
+- Review after each task (spec compliance + code quality) instead of only at the end
+- Costs a fresh context per task and per review; inline costs one context plus one final reviewer
+- Both run in this session, share the same plan workspace and ledger, and never pause between tasks
 
 ## The Process
 
@@ -120,7 +105,7 @@ digraph process {
     "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [shape=box];
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
-    "Final review clean: write NN-SUMMARY, keep the workspace" [shape=box];
+    "Final review clean: phase documents, then delete the workspace by name" [shape=box];
     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
     "Setup: worktree, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
@@ -150,8 +135,8 @@ digraph process {
     "More tasks remain?" -> "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [label="no"];
     "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)";
     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
-    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
-    "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
+    "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: phase documents, then delete the workspace by name";
+    "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
 }
 ```
 
@@ -168,8 +153,8 @@ sequences — the single most expensive failure observed. Track progress in
 a ledger file, not only in todos.
 
 - Each plan owns a workspace: at skill start, run this skill's
-  `scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
-  directory (`<main-checkout>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
+  `bash scripts/sdd-workspace PLAN_FILE` — it prints the plan's git-ignored
+  directory (`<repo-root>/.ultrapowers/sdd/<kind>-<NN>-<slug>/`), home to
   every artifact for THIS plan: ledger, briefs, reports, review packages.
   Another plan's directory is never yours to read or write.
 - Check for this plan's ledger at `<workspace>/progress.md`. If its first
@@ -207,8 +192,8 @@ what you checked as you check it:
 The scan's output is a table, not a verdict. One row for every pair of tasks
 that share a file or an interface: the two tasks, what one produces against
 what the other consumes, and what you found. One row for every task: whether
-its own text agrees with itself — the Acceptance list it specifies against the
-code it specifies, the files it creates against the files it later touches. "The scan
+its own text agrees with itself — the tests or Acceptance list it specifies against the code it
+specifies, the files it creates against the files it later touches. "The scan
 is clean" without those rows is not a scan you ran.
 
 Write the table to the ledger. Rule on everything you find before execution
@@ -287,7 +272,7 @@ Record BASE (`git rev-parse HEAD`) before dispatching — the review package
 and fix-round diffs need it.
 
 - **Task brief:** before dispatching an implementer, run this skill's
-  `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a
+  `bash scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a
   uniquely named file and prints the path. Compose the dispatch so the
   brief stays the single source of
   requirements. Your dispatch should contain: (1) one line on where this
@@ -325,7 +310,7 @@ Template: [implementer-prompt.md](implementer-prompt.md)
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package (`bash scripts/review-package PLAN_FILE BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
 
 **DONE_WITH_CONCERNS:** The implementer completed the work but flagged doubts. Read the concerns before proceeding. If the concerns are about correctness or scope, address them before review. If they're observations (e.g., "this file is getting large"), note them and proceed to review.
 
@@ -352,7 +337,7 @@ required. Implementer self-review never replaces the task review; both are
 needed.
 
 - Hand the reviewer its diff as a file: run this skill's
-  `scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the file path
+  `bash scripts/review-package PLAN_FILE BASE HEAD` and pass the reviewer the file path
   it prints (or, without bash: `git log --oneline`, `git diff --stat`,
   and `git diff -U10` for the range, redirected to one uniquely named
   file). The output never enters your own context, and the reviewer sees
@@ -431,7 +416,7 @@ output; dispatch the re-review once all three are present. Name the
 covering test files in the fix message — a one-line fix does not need the
 whole suite.
 
-**The re-review is scoped.** Run `scripts/review-package PLAN_FILE FIX_BASE HEAD`
+**The re-review is scoped.** Run `bash scripts/review-package PLAN_FILE FIX_BASE HEAD`
 where FIX_BASE is the head the previous review saw, and dispatch
 [re-review-prompt.md](re-review-prompt.md) with the findings list, the
 brief, the report file, and the printed diff path. The re-reviewer verdicts
@@ -487,12 +472,16 @@ the tree's, and a fraction nobody raises is a fraction that lies.
 ## Final Review
 
 Before it, drain the bug log: if open entries remain that belong to this
-plan's work, dispatch one implementer to fix them (reproduce, fix, a test
-only where the bug broke behaviour the spec states), then continue. Entries
-outside the plan's scope are listed to the user, not fixed.
+plan's work, dispatch one implementer to fix them (tests per the project's
+testing mode), then continue. Entries outside the plan's scope are listed to
+the partner, not fixed.
+
+The reviewer's "Declined to judge / out of spec" lines go to the partner in
+your final message: each is put into the spec (then it gets a test) or
+rejected by them, not by you.
 
 The final whole-branch review gets a package too: run
-`scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
+`bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
 branch started from, e.g. `git merge-base main HEAD`) and include the
 printed path in the final review dispatch, so the final reviewer reads
 one file instead of re-deriving the branch diff with git commands. Dispatch
@@ -507,7 +496,7 @@ with the complete findings list — not one fixer per finding.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
 Then run exactly one scoped re-review of the fix wave
-(`scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
+(`bash scripts/review-package PLAN_FILE FIX_BASE HEAD` over the fix range,
 [re-review-prompt.md](re-review-prompt.md)).
 Adjudicate any residual findings as in the task loop's breaker: park with
 rulings, or rule on the load-bearing ones and ledger what you decided. Only
@@ -526,14 +515,12 @@ took on your human partner's behalf reach them — they read it and rework
 whatever you got wrong. A ruling that dies with the workspace was a decision
 made in secret.
 
-When the final whole-branch review is clean and its fixes are merged, write the
-phase documents — do not delete anything.
+When the final whole-branch review is clean and its fixes are merged, write
+the phase documents, then delete the workspace.
 
-Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
-with the plan file, the whole-branch review package, and the destination
-`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
-
-Before the summary writer, run the ledger read-back check. Dispatch one cheap subagent and give it the ledger path and NOTHING else — no plan, no spec, no task reports, no diffs — and ask it to answer from that file alone:
+Run the ledger read-back check first. Dispatch one cheap subagent and give it
+the ledger path and NOTHING else — no plan, no spec, no task reports, no
+diffs — and ask it to answer from that file alone:
 
 - which phase this is and what it is for
 - which tasks are done, which is in flight, which remain
@@ -541,12 +528,18 @@ Before the summary writer, run the ledger read-back check. Dispatch one cheap su
 - what must not be reopened, and why
 - what the next action is
 
-It passes when the answers are correct and the agent never needed another file. It fails the moment it has to ask for one, and a failure is amended in the ledger BEFORE the summary is written. The summary writer reads the ledger as its primary source, so a gap there is inherited by the summary silently, and by then the session that could have filled it is gone. This is the only point where "the ledger is the recovery map" is tested rather than assumed, and it costs one cheap subagent per phase.
+It passes when the answers are correct and the agent never needed another
+file. A failure is amended in the ledger before the summary is written.
 
 Dispatch the summary writer ([summary-writer-prompt.md](summary-writer-prompt.md))
 with the ledger, the implementer reports, the plan file, and the destination
 `<phase dir>/<NN>-SUMMARY.md`. It returns a path; it never returns the
-document's text.
+document's text. The summary is the record that outlives the workspace:
+rulings, deviations and abandoned approaches live there, not in git.
+
+Dispatch the verification writer ([verification-prompt.md](verification-prompt.md))
+with the plan file, the whole-branch review package, and the destination
+`<phase dir>/<NN>-VERIFICATION.md`. It returns a path and a verdict.
 
 Then bring the two state documents current yourself, in the same turn — not a
 subagent, and not later.
@@ -554,52 +547,32 @@ subagent, and not later.
 `<phase dir>/<NN>-STATE.md` answers where one phase is and what picking it up
 cold would need. `.ultrapowers/ROADMAP.md` answers which phases exist and what
 each one's status is. Both are YAML frontmatter and then prose: the machine
-reads the fields, a person reads the prose. Prose alone does not work — the
-reader becomes a regex over a sentence, and the sentence moves.
+reads the fields, a person reads the prose.
 
 `NN-STATE.md` carries `phase`, `status`, `tasks_done`, `tasks_total`,
 `branch`, `integration` and `updated`. `ROADMAP.md` carries `current` (the
 phase in flight, or `null`), `deployed_through`, `updated`, and a `phases:`
 list of `{ phase, slug, status, integration }`. `status` is `planned`,
 `running`, `complete` or `abandoned`; `integration` is `none`, `branch` or
-`merged`.
-
-Those last two are separate fields because they move separately: a phase can
-be `abandoned` with its branch already merged — the probe landed, the approach
-did not — and `complete` with the branch still unmerged.
-`tasks_done`/`tasks_total` is a tally, not a cursor, so `6/7` says a task was
-dropped and goes on saying it once the phase is over. Deployment belongs to
-the tree rather than to a phase — one deploy carries every merged phase — so
-it is one roadmap field, not a flag on every state file.
+`merged`. The two are separate fields because they move separately: a phase can
+be `abandoned` with its branch already merged, and `complete` with the branch
+still unmerged. `tasks_done`/`tasks_total` is a tally, not a cursor. Deployment
+belongs to the tree rather than to a phase, so it is one roadmap field.
 
 Write them when a status they record changes, not at the end of any turn in
 which something happened: a task finishing writes the state file, a phase
 ending writes both, a session that read three files and decided nothing writes
 neither. Rewrite rather than append — neither is a log — but never drop what is
 finished. Work that closes is marked closed and keeps its entry, what remains is
-hoisted above it, and a short summary sits at the top so a reader can stop early
-without paying for the whole file. An entry that carried a debt's full reasoning
-may be compressed once the debt is paid, down to its name, one line of what it
-was, and the closed mark: the detail existed to get the work done and its record
-is the commit, while the entry exists so a reader can see the work happened at
-all. A status file that deletes its own history saves a few tokens and gives up
-the one cheap check on what actually happened; the summary and that compression
-are what keep it affordable, not amnesia. A handover that instructs its own
-deletion is the same failure with a deadline — whatever quietly moved into it
-dies on schedule.
+hoisted above it, and a short summary sits at the top so a reader can stop early.
+An entry that carried a debt's full reasoning may be compressed once the debt is
+paid, down to its name, one line of what it was, and the closed mark. A handover
+that instructs its own deletion loses whatever quietly moved into it.
 
-The workspace stays, and it stays in the main checkout — not in this worktree,
-which finishing the branch may remove. Diffs and briefs remain on disk, at
-hand, for as long as they are useful. Clearing `.ultrapowers/sdd/` is a
-separate, deliberate, janitorial act — nothing in it is lost, which is exactly
-why it need not happen on a schedule. Sibling directories belong to other
-plans; leave them alone.
-
-The premise the old instruction rested on was false. Git history holds commits
-and diffs; it does not hold the rulings on parked findings, and it does not
-hold why an approach was abandoned. Measured on one repository: 159 KB of
-irreplaceable content against 725 KB of diffs already in git. Deleting the
-workspace destroyed the first to be rid of the second.
+Then delete this plan's workspace by name: list its files (`progress.md`,
+`task-*-brief.md`, `task-*-report.md`, `task-*-tests.log`, `review-*.diff`,
+`.plan`), delete each one, then the empty directory. Never a recursive
+delete. Sibling directories belong to other plans; leave them alone.
 
 Use ultrapowers:finishing-a-development-branch.
 
@@ -624,7 +597,7 @@ You: I'm using Subagent-Driven Development to execute this plan.
 
 [Setup: worktree verified]
 [Read plan file once: .ultrapowers/phases/04-hooks/04-PLAN.md]
-[Resolve workspace: scripts/sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
+[Resolve workspace: bash scripts/sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
 [Create todos for all tasks]
 
 Task 1: Hook installation script
@@ -679,7 +652,7 @@ Re-reviewer: Missing progress reporting — ADDRESSED (src/recovery.js:41).
 [Run review-package PLAN_FILE MERGE_BASE HEAD; dispatch final code-reviewer, most capable model]
 Final reviewer: All requirements met. Deferred minors triaged: none block merge.
 
-[Dispatch the summary writer: it writes 04-SUMMARY.md and returns the path. Workspace kept.]
+[Ledger read-back passes; summary writer writes 04-SUMMARY.md; workspace deleted by name]
 
 Done! Using ultrapowers:finishing-a-development-branch.
 ```

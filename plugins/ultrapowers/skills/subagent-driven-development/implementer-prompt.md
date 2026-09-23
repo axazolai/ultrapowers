@@ -33,16 +33,19 @@ Subagent (general-purpose):
 
     Once you're clear on requirements:
     1. Implement exactly what the task specifies
-    2. Reconcile: a decision you made that changed behaviour, scope or an
-       interface is written into the task text of the plan (and the spec)
-       before any test; name each change in your report
-    3. Fix this task's open bug-log entries
-    4. Write the tests for the task's Acceptance list — one per line, none
-       for behaviour the list does not state — then the mutation check
-       (ultrapowers:test-driven-development)
-    5. Run them; commit your work
-    6. Self-review (see below)
-    7. Report back
+    2. Test per the project's testing mode
+       (`.claude/ultrapowers.json` → `tdd`; absent → test-after;
+       ultrapowers:test-driven-development):
+       - tdd: the task's failing-test steps first, then the code
+       - test-after: after the code, reconcile — a decision that changed
+         behaviour, scope or an interface is written into the task text of
+         the plan (and the spec), named in your report — then fix this
+         task's open bug-log entries, then write one test per Acceptance
+         line and run the mutation check
+    3. Verify implementation works
+    4. Commit your work
+    5. Self-review (see below)
+    6. Report back
 
     A bug you find that does not block the task goes to the project's bug
     log (`BUGS.md`, location per the project `CLAUDE.md`) and you
@@ -119,7 +122,8 @@ Subagent (general-purpose):
 
     **Testing:**
     - Do tests actually verify behavior (not just mock behavior)?
-    - Does every Acceptance line have a test, and no test cover an unstated behaviour?
+    - tdd: did every test fail first, for the expected reason?
+    - test-after: does every Acceptance line have a test, and no test cover an unstated behaviour?
     - Did every decision that changed behaviour, scope or an interface reach the plan/spec first?
     - Is the test output pristine (no stray warnings or noise)?
 
@@ -139,8 +143,10 @@ Subagent (general-purpose):
     Write your full report to [REPORT_FILE]:
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
-    - **Acceptance coverage:** each Acceptance line → the test that confirms it;
-      the command run and its passing output
+    - **Test evidence**, per the testing mode:
+      - tdd — RED: command run, relevant failing output before implementation, and why the failure was expected; GREEN: command run and relevant passing output after implementation
+      - test-after — Acceptance coverage: each Acceptance line → the test that confirms it; the command run and its passing output
+    - Any failure a run showed, including one you did not cause, by name
     - **Plan/spec changes:** each decision written back, or "none"
     - **Bug log:** entries added and entries fixed, by ID, or "none"
     - Files changed

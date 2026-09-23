@@ -22,9 +22,9 @@ If you haven't completed Phase 1, you cannot propose fixes.
 ## Found While Doing Other Work
 
 A bug that does not block the next step of the current work goes to the bug log
-(`ultrapowers:test-driven-development` → Bug Log) and the work continues. This process runs
-when the log is drained: before a unit of work's tests, and at the end of the work. A bug that
-blocks the next step runs through it at once.
+(`ultrapowers:test-driven-development` → Both Modes) and the work continues.
+This process runs when the log is drained: before a unit of work's review, and
+at the end of the work. A bug that blocks the next step runs through it at once.
 
 ## When to Use
 
@@ -176,10 +176,10 @@ You MUST complete each phase before proceeding to the next.
 
 **Fix the root cause, not the symptom:**
 
-1. **Reproduce**
-   - Simplest possible reproduction: a command or a one-off script
-   - MUST have before fixing
-   - The permanent test follows `ultrapowers:test-driven-development`: written after the fix, and only when the bug broke behaviour the spec states
+1. **Reproduce** (per the project's testing mode, `ultrapowers:test-driven-development`)
+   - Simplest possible reproduction — MUST have before fixing
+   - tdd mode: a failing automated test (one-off script if no framework)
+   - test-after mode: a command or one-off script; the permanent test is written after the fix, and only when the bug broke behaviour the spec states
 
 2. **Implement Single Fix**
    - Address the root cause identified
@@ -188,7 +188,7 @@ You MUST complete each phase before proceeding to the next.
    - No bundled refactoring
 
 3. **Verify Fix**
-   - Reproduction no longer reproduces?
+   - Reproduction passes / no longer reproduces?
    - No other tests broken?
    - Issue actually resolved?
    - Use the `ultrapowers:verification-before-completion` skill before claiming success
@@ -222,7 +222,7 @@ If you catch yourself thinking:
 - "Quick fix for now, investigate later"
 - "Just try changing X and see if it works"
 - "Add multiple changes, run tests"
-- "Skip the reproduction, I'll manually verify"
+- "Skip the test, I'll manually verify"
 - "It's probably X, let me fix that"
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"

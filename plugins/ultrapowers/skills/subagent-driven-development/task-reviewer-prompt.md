@@ -72,12 +72,13 @@ Subagent (general-purpose):
 
     ## Tests
 
-    The implementer already ran the tests and reported results with
-    acceptance coverage for exactly this code. An Acceptance line with no
-    test, a test for behaviour the plan does not state, or a decision in
-    the code that the plan/spec text does not reflect is a finding.
-
-    Do not re-run the suite to confirm their report. Run a test only when reading the code raises a specific doubt
+    The implementer already ran the tests and reported results with test
+    evidence for exactly this code — RED/GREEN in tdd mode, acceptance
+    coverage in test-after mode (`.claude/ultrapowers.json`). In test-after
+    mode an Acceptance line with no test, or a test for behaviour the plan
+    does not state, is a finding. In both modes a decision in the code that
+    the plan/spec text does not reflect is a finding. Do not re-run the suite to confirm their
+    report. Run a test only when reading the code raises a specific doubt
     that no existing run answers — and then a focused test, never a
     package-wide suite, race detector run, or repeated/high-count loop. If
     heavy validation seems warranted, recommend it in your report instead of
@@ -192,7 +193,7 @@ Subagent (general-purpose):
 
 **Placeholders:**
 - `[MODEL]` — REQUIRED: reviewer model per SKILL.md Model Selection
-- `[BRIEF_FILE]` — REQUIRED: the task brief file (`scripts/task-brief PLAN N`
+- `[BRIEF_FILE]` — REQUIRED: the task brief file (`bash scripts/task-brief PLAN N`
   prints the path; same file the implementer worked from)
 - `[GLOBAL_CONSTRAINTS]` — the binding requirements copied verbatim from
   the plan's Global Constraints section or the spec: exact values, formats,
@@ -203,7 +204,7 @@ Subagent (general-purpose):
 - `[BASE_SHA]` — commit before this task
 - `[HEAD_SHA]` — current commit
 - `[DIFF_FILE]` — REQUIRED: the path the controller wrote the review
-  package to (`scripts/review-package PLAN_FILE BASE HEAD` prints the unique
+  package to (`bash scripts/review-package PLAN_FILE BASE HEAD` prints the unique
   path it wrote; the package never enters the controller's context)
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues

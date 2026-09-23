@@ -30,6 +30,24 @@ Subagent (general-purpose):
     git diff [BASE_SHA]..[HEAD_SHA]
     ```
 
+    ## Behavior the spec is silent on
+
+    The spec says what the software must do. It does not enumerate every
+    input, environment, or condition the software will meet. For behavior
+    the spec is silent on, judge what a reasonable person using this
+    software would expect, and report each gap under "Declined to judge /
+    out of spec" with its effect on that person — not as a finding against
+    this change. The human partner decides each one: into the spec (then it
+    gets a test), or rejected.
+
+    ## Declined to judge / out of spec
+
+    Before your verdict, list every behavior you considered and set aside
+    as outside the plan or spec, one line each, with the reason and the
+    effect on a person using the software. The executor passes the list to
+    the human partner; nothing you set aside is dropped silently. An empty
+    list means you set nothing aside.
+
     ## Read-Only Review
 
     Your review is read-only on this checkout. Do not mutate the working tree, the index, HEAD, or branch state in any way. Use tools like `git show`, `git diff`, and `git log` to inspect history. If you need a working copy of a different revision, check it out into a separate temporary directory (e.g. `git worktree add /tmp/review-[SHA] [SHA]`) — never move HEAD on this checkout.
@@ -49,7 +67,8 @@ Subagent (general-purpose):
 **Structural pre-pass (fallow):** Before the checks below —
 - If this repo is a GSD project (a `.planning/` directory exists), SKIP this pre-pass: GSD's own review owns the fallow pass there. Do not run fallow.
 - Otherwise, if the `fallow` binary is resolvable (`node_modules/.bin/fallow`, or on PATH), run it over the changed files and fold any dead-code / duplication / circular-dependency findings into the Issues section, at the severity fallow reports.
-- Otherwise (fallow not installed), add ONE Minor note: "Structural pre-pass skipped — install with `pnpm add -D fallow` (workspace root: `pnpm add -D fallow -w`)." Never fail the review over a missing fallow binary.
+- Otherwise, if the repo root has a `package.json` (fallow not installed), add ONE Minor note: "Structural pre-pass skipped — install with `pnpm add -D fallow` (workspace root: `pnpm add -D fallow -w`)." Never fail the review over a missing fallow binary.
+- Otherwise (no `package.json`), skip the pre-pass silently.
 
 
     **Plan alignment:**

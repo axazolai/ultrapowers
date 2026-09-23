@@ -1,6 +1,6 @@
 # Summary Writer Prompt
 
-**Dispatch when:** the final whole-branch review is clean and its fixes are merged.
+**Dispatch when:** the final whole-branch review is clean and its fixes are merged — from subagent-driven-development, or from executing-plans (inline), where there are no implementer reports and the ledger and task test logs stand in for them. The workspace is deleted right after; this document is what remains.
 
 **Model:** a mid-tier model. This is a fold of existing text, not a judgement about the code.
 
@@ -44,11 +44,9 @@ An implementer's report is mostly narration of work that git already records —
 here is only what the code cannot show.
 
 ## Reviews
-For each review, BOTH references on one line:
-`<workspace-relative path>.diff` — `git diff <base7>..<head7>`
-Two references because they fail at different times: while the workspace is on disk the file
-is right there and opening it beats regenerating it; once the scratch is cleared the path goes
-stale and the hash range still reconstructs the same diff exactly.
+For each review, one line: what it covered and `git diff <base7>..<head7>`. The workspace and
+its review packages are deleted after this document is written; the hash range reconstructs
+the same diff.
 
 CONSTRAINTS
 - Never paste diff content into the summary. It is byte-identical to what git already stores.

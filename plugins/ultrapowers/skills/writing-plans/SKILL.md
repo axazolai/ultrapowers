@@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests after the code, before review. Frequent commits.
+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
@@ -44,7 +44,17 @@ independently testable deliverable.
 
 ## Bite-Sized Task Granularity
 
-**Each step is one action (2-5 minutes):**
+**Each step is one action (2-5 minutes).** The project's testing mode
+(`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
+
+tdd mode:
+- "Write the failing test" - step
+- "Run it to make sure it fails" - step
+- "Implement the minimal code to make the test pass" - step
+- "Run the tests and make sure they pass" - step
+- "Commit" - step
+
+test-after mode:
 - "Implement the task" - step
 - "Reconcile: write any decision that changed behaviour, scope or an interface into the plan/spec; fix this task's bug-log entries" - step
 - "Write the tests for the task's Acceptance list" - step
@@ -76,6 +86,18 @@ naming and copy rules, platform requirements — one line each, with exact
 values copied verbatim from the spec. Every task's requirements implicitly
 include this section.]
 
+## Review Focus
+
+[The five input classes or failure modes the spec implies but no task's
+tests exercise that are most likely to bite a person using this software
+— one line each, naming the input or condition and the behavior a
+reasonable person would expect, most likely first. The spec is a vision
+document: it says what the software must do, not everything it will
+meet, and its silence on an input is not permission for that input to
+break the program. Write the list here, once, with the spec in front of
+you. Then add each line to the test list of the task that owns the code —
+a failing-test step in tdd mode, an `Acceptance:` line in test-after mode.]
+
 ---
 ```
 
@@ -95,32 +117,29 @@ include this section.]
   and return types. A task's implementer sees only their own task; this
   block is how they learn the names and types neighboring tasks use.]
 
-**Acceptance:** [one line per behaviour this task delivers — input class → expected
-result. The tests confirm exactly these; no test code is written into the plan.]
-- `function(valid input)` returns `expected`
-- `function(empty input)` raises `ValueError`
+- [ ] **Step 1: Write the failing test**
 
-- [ ] **Step 1: Implement**
+```python
+def test_specific_behavior():
+    result = function(input)
+    assert result == expected
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `pytest tests/path/test.py::test_name -v`
+Expected: FAIL with "function not defined"
+
+- [ ] **Step 3: Write minimal implementation**
 
 ```python
 def function(input):
     return expected
 ```
 
-- [ ] **Step 2: Reconcile**
+- [ ] **Step 4: Run test to verify it passes**
 
-A decision made while implementing that changed behaviour, scope or an interface is
-written into this task (and the spec) now, before the tests. Fix this task's open
-bug-log entries.
-
-- [ ] **Step 3: Write the acceptance tests**
-
-One test per Acceptance line, then the mutation check
-(`ultrapowers:test-driven-development`).
-
-- [ ] **Step 4: Run them**
-
-Run: `pytest tests/path/test.py -v`
+Run: `pytest tests/path/test.py::test_name -v`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
@@ -131,12 +150,44 @@ git commit -m "feat: add specific feature"
 ```
 ````
 
+The template above is tdd mode. In test-after mode the task carries an
+**Acceptance:** list and these steps instead:
+
+````markdown
+**Acceptance:** [one line per behaviour this task delivers — input class →
+expected result. The tests confirm exactly these; no test code is written into
+the plan.]
+- `function(valid input)` returns `expected`
+- `function(empty input)` raises `ValueError`
+
+- [ ] **Step 1: Implement**
+
+```python
+def function(input):
+    return expected
+```
+
+- [ ] **Step 2: Reconcile** — a decision made while implementing that changed
+  behaviour, scope or an interface is written into this task (and the spec)
+  now, before the tests. Fix this task's open bug-log entries.
+
+- [ ] **Step 3: Write the acceptance tests** — one per Acceptance line, then the
+  mutation check (ultrapowers:test-driven-development).
+
+- [ ] **Step 4: Run them**
+
+Run: `pytest tests/path/test.py -v`
+Expected: PASS
+
+- [ ] **Step 5: Commit**
+````
+
 ## No Placeholders
 
 Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
 - "TBD", "TODO", "implement later", "fill in details"
 - "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without an **Acceptance:** list naming each behaviour)
+- "Write tests for the above" (without actual test code in tdd mode, or without an **Acceptance:** list in test-after mode)
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
@@ -145,7 +196,7 @@ Every step must contain the actual content an engineer needs. These are **plan f
 
 After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
 
-Checks 1-3 are read. Checks 4 and 5 are run, and they are the ones that catch what reading cannot: re-reading a plan can never reveal that a command fails in the worktree or that a default does not survive `null`. A plan is reviewed by its own author, so the checks that add information are the ones that execute something.
+Checks 1-4 are read. Checks 5 and 6 are run, and they are the ones that catch what reading cannot: re-reading a plan can never reveal that a command fails in the worktree or that a default does not survive `null`. A plan is reviewed by its own author, so the checks that add information are the ones that execute something.
 
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
@@ -153,28 +204,37 @@ Checks 1-3 are read. Checks 4 and 5 are run, and they are the ones that catch wh
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
-**4. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line.
+**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there goes into the owning task's test list. An empty section means you checked and found none, not that you skipped the check.
 
-**5. Invariant check — execute the sample:** Every invariant stated in a task's Interfaces block, check against that task's own sample code before committing the plan. Run it; do not reason about it. Thirty seconds in `node -e` settles what an hour of re-reading will not. When one sample turns out wrong, sweep the plan for the whole class rather than fixing the instance — a defect in a plan's code sample is evidence about the plan, not about one task.
+**5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. Tests are written after the code, so at plan time run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
+
+**6. Invariant check — execute the sample:** Every invariant stated in a task's Interfaces block, check against that task's own sample code before committing the plan. Run it; do not reason about it. Thirty seconds in `node -e` settles what an hour of re-reading will not. When one sample turns out wrong, sweep the plan for the whole class rather than fixing the instance — a defect in a plan's code sample is evidence about the plan, not about one task.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
 ## Execution Handoff
 
-After saving the plan, offer execution choice:
+After saving and self-reviewing the plan, link it for your human partner
+to read. If they have already explicitly supplied an execution method, ask
+them to review the plan and confirm it captures what they want; wait for that
+review before implementation, then use the preserved method. Otherwise, ask
+them to review the plan and choose an execution method before implementation.
 
-**"Plan complete and saved to `.ultrapowers/phases/NN-<feature-slug>/NN-PLAN.md`. Two execution options:**
+**When no execution method has already been supplied:**
 
-**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
+**"Plan complete and saved to `.ultrapowers/phases/NN-<feature-slug>/NN-PLAN.md`. Please review the plan. Which execution approach would you prefer?**
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+- **Subagent-driven** - A fresh subagent implements each task and a fresh reviewer checks it before the next one starts, then a whole-branch review at the end. Most thorough; costs a fresh context per task and per review.
+- **Native** - I implement every task myself in this session, the way this harness runs work, then one fresh reviewer on the most capable model checks the whole branch. Cheapest and fastest; no independent review until the end. Runs well with a mid-tier session model, since the plan carries the design.
 
-**Which approach?"**
+**For this plan I recommend <one of the two>, because <one sentence from the plan: how much the tasks depend on each other's interfaces, how many there are, what a shipped mistake would cost>. Does the plan capture what you want, and which approach should we use?"**
 
-**If Subagent-Driven chosen:**
+**When an execution method has already been supplied:**
+
+**"Plan complete and saved to `.ultrapowers/phases/NN-<feature-slug>/NN-PLAN.md`. Please review the plan. Does it capture what you want?"**
+
+**If Subagent-driven chosen:**
 - **REQUIRED SUB-SKILL:** Use ultrapowers:subagent-driven-development
-- Fresh subagent per task + two-stage review
 
-**If Inline Execution chosen:**
+**If Native chosen:**
 - **REQUIRED SUB-SKILL:** Use ultrapowers:executing-plans
-- Batch execution with checkpoints for review

@@ -79,10 +79,12 @@ Skip any step = lying, not verifying
 ❌ "Should pass now" / "Looks correct"
 ```
 
-**Regression tests (only where the bug broke behaviour the spec states):**
+**Regression tests (per the project's testing mode):**
 ```
-✅ Write after the fix → Run (pass) → mutation check: the reverted fix is a mutation it catches
-❌ A regression test for behaviour the spec does not state
+tdd:        ✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
+            ❌ "I've written a regression test" (without red-green verification)
+test-after: ✅ Only where the bug broke stated behaviour: write after the fix → Run (pass) → mutation check
+            ❌ A regression test for behaviour the spec does not state
 ```
 
 **Build:**
