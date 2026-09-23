@@ -1,18 +1,20 @@
+diff --git a/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md b/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md
+index 583f5ee..3bdbe55 100644
 --- a/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md
 +++ b/plugins/ultrapowers/skills/using-ultrapowers/SKILL.md
-@@ -49,15 +49,6 @@
- | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
- | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+@@ -51,14 +51,7 @@ These thoughts mean STOP—you're rationalizing:
  
--## Platform Adaptation
--
+ ## Platform Adaptation
+ 
 -If your harness appears here, read its reference file for special instructions:
 -
+-- Claude Code: `references/claude-code-tools.md`
 -- Codex: `references/codex-tools.md`
 -- Pi: `references/pi-tools.md`
 -- Antigravity: `references/antigravity-tools.md`
 -- Hermes Agent: `references/hermes-tools.md`
--
+-- Muse: `references/muse-tools.md`
++Claude Code notes, including the opt-in cheaper orchestration for subagent-driven development: `references/claude-code-tools.md`
+ 
  ## User Instructions
  
- User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Only skip skill workflows or instructions when your human partner has explicitly told you to.
