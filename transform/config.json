@@ -1,6 +1,6 @@
 {
-  "originalTag": "upstream/6.3.0",
-  "originalTree": "21219529a4e224bcb27baf8816b039c8bf7c6673",
+  "originalTag": "upstream/6.4.1",
+  "originalTree": "3c7f2d3ef243f88d3394158983e6845e313c438b",
   "substitutions": [
     {
       "from": "superpowers",
@@ -16,8 +16,8 @@
     }
   ],
   "version": {
-    "revision": 6,
-    "$why": "The shipped version is <upstream version>-up.<revision>, derived from originalTag at build time rather than written into a delta. A version baked into a patch is correct exactly until upstream publishes a new release, which is the one moment it needs to be right. Bump revision when the fork changes but upstream has not."
+    "revision": 1,
+    "$why": "The shipped version is <upstream version>-up.<revision>, derived from originalTag at build time rather than written into a delta. A version baked into a patch is correct exactly until upstream publishes a new release, which is the one moment it needs to be right. Bump revision when the fork changes on the same upstream base; reset it to 1 when originalTag moves."
   },
   "protect": [
     "obra/superpowers"
