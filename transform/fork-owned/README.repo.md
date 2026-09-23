@@ -35,7 +35,7 @@ They are orphan-rooted and share no ancestry, because merging them is never the 
 
 `transform/inventory.json` classifies every upstream path as `tracked` (carried across, renamed,
 watched for upstream changes) or `ignored` (deliberately not shipped), each with a recorded
-reason. Of upstream 6.2.0's 180 files, 51 are tracked: the plugin manifest, the `SessionStart`
+reason. Of upstream 6.4.1's 231 files, 72 are tracked: the plugin manifest, the `SessionStart`
 hook, the skills, and `LICENSE`. The rest are other harnesses, upstream's own test suite, their
 docs and their release tooling.
 
@@ -53,7 +53,7 @@ gate and the maintainability.
   `forkOwned` list: files this fork authors outright rather than patching, currently seven —
   the two READMEs, the marketplace manifest, `.gitattributes`, the `phase-dir` allocator, and
   the summary-writer and verification prompts.
-- `transform/deltas/NNN-*.patch` — fourteen numbered changes to upstream's skill text, applied
+- `transform/deltas/NNN-*.patch` — thirteen numbered changes to upstream's skill text, applied
   in order. What each one does is listed in the plugin README.
 - `transform/*.mjs` — the engine (classify, rename, patch, build) and its tests.
 
