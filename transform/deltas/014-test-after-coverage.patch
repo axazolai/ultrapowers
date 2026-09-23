@@ -1,29 +1,255 @@
 diff --git a/plugins/ultrapowers/skills/brainstorming/SKILL.md b/plugins/ultrapowers/skills/brainstorming/SKILL.md
-index 5f308dc..58bd6eb 100644
+index 894c540..5392a63 100644
 --- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
 +++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
-@@ -89,7 +89,7 @@ your path and complete them in order.
+@@ -124,7 +124,7 @@ your path and complete them in order.
  2. **Ask clarifying questions** — one at a time, the ones that matter
  3. **Present short design in chat** — approach, files touched, testing
  4. **Get approval** — STOP and wait for an explicit yes; presenting the design and starting in the same breath is skipping the gate
 -5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
-+5. **Implement** — proceed with the normal development workflow (tests after the code, before review); no plan document
++5. **Implement** — proceed with the normal development workflow (tests per the project's testing mode — see ultrapowers:test-driven-development); no plan document
  
  **Architectural:**
  1. **Explore project context** — check files, docs, recent commits
+diff --git a/plugins/ultrapowers/skills/executing-plans/SKILL.md b/plugins/ultrapowers/skills/executing-plans/SKILL.md
+index 18ddb0b..1b60251 100644
+--- a/plugins/ultrapowers/skills/executing-plans/SKILL.md
++++ b/plugins/ultrapowers/skills/executing-plans/SKILL.md
+@@ -14,11 +14,12 @@ and a fresh reviewer on every task, each re-reading the codebase from zero.
+ Inline execution pays for one context (yours) plus one reviewer at the end.
+ What it gives up is a fresh context per task and a second pair of eyes per
+ task. This skill keeps what those two things bought, by other means: the
+-brief is the spec, the ledger is your memory, TDD is the per-task gate, and
++brief is the spec, the ledger is your memory, the tests of the project's
++testing mode are the per-task gate, and
+ the final reviewer is the second pair of eyes.
+ 
+ **Core principle:** The plan already did the thinking. Execute it exactly,
+-prove each step with a test you watched fail and then pass, and leave a
++prove each task with the tests its testing mode asks for, and leave a
+ record that survives your own forgetting.
+ 
+ **Narration:** between tool calls, narrate at most one short line — the
+@@ -72,7 +73,7 @@ digraph process {
+     subgraph cluster_per_task {
+         label="Per Task";
+         "task-start: brief + BASE; read the brief" [shape=box];
+-        "Work the steps in order: TDD, run every verification, read every output" [shape=box];
++        "Work the steps in order (testing mode), run every verification, read every output" [shape=box];
+         "Step output matches plan's Expected?" [shape=diamond];
+         "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [shape=box];
+         "Commit as the plan's commit steps say" [shape=box];
+@@ -82,25 +83,27 @@ digraph process {
+ 
+     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" [shape=box];
+     "More tasks remain?" [shape=diamond];
++    "Drain the bug log: fix open entries, list out-of-scope ones" [shape=box];
+     "Final whole-branch review (fresh reviewer if you have one)" [shape=box];
+-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" [shape=box];
++    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" [shape=box];
+     "Final review clean: phase documents, then delete the workspace by name" [shape=box];
+     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+ 
+     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" -> "task-start: brief + BASE; read the brief";
+-    "task-start: brief + BASE; read the brief" -> "Work the steps in order: TDD, run every verification, read every output";
+-    "Work the steps in order: TDD, run every verification, read every output" -> "Step output matches plan's Expected?";
++    "task-start: brief + BASE; read the brief" -> "Work the steps in order (testing mode), run every verification, read every output";
++    "Work the steps in order (testing mode), run every verification, read every output" -> "Step output matches plan's Expected?";
+     "Step output matches plan's Expected?" -> "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [label="no"];
+-    "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" -> "Work the steps in order: TDD, run every verification, read every output";
++    "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" -> "Work the steps in order (testing mode), run every verification, read every output";
+     "Step output matches plan's Expected?" -> "Commit as the plan's commit steps say" [label="yes, last step"];
+     "Commit as the plan's commit steps say" -> "Completion contract met?";
+-    "Completion contract met?" -> "Work the steps in order: TDD, run every verification, read every output" [label="no - finish the task"];
++    "Completion contract met?" -> "Work the steps in order (testing mode), run every verification, read every output" [label="no - finish the task"];
+     "Completion contract met?" -> "task-done: run tests, ledger the result; mark todo complete" [label="yes"];
+     "task-done: run tests, ledger the result; mark todo complete" -> "More tasks remain?";
+     "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
+-    "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
+-    "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger";
+-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: phase documents, then delete the workspace by name";
++    "More tasks remain?" -> "Drain the bug log: fix open entries, list out-of-scope ones" [label="no"];
++    "Drain the bug log: fix open entries, list out-of-scope ones" -> "Final whole-branch review (fresh reviewer if you have one)";
++    "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger";
++    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" -> "Final review clean: phase documents, then delete the workspace by name";
+     "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
+ }
+ ```
+@@ -151,9 +154,9 @@ against it. A plan with no reachable spec gets a ledger note saying so —
+ rulings made without one are provisional.
+ 
+ **REQUIRED SUB-SKILL:** load ultrapowers:test-driven-development now,
+-before Task 1. It governs every step of every task below; a plan whose
+-steps already say "write the failing test first" does not exempt you
+-from reading it.
++before Task 1. It names the project's testing mode (`.claude/ultrapowers.json`
++→ `tdd`; absent → test-after) and what each mode asks of every task below,
++and it holds the bug log you use throughout.
+ 
+ Before Task 1, scan the plan for conflicts between tasks. The plan's
+ Interfaces blocks tell you where to look: for every task that consumes
+@@ -186,11 +189,19 @@ never in a call of its own.
+ 
+ ### 2. Work the steps
+ 
+-The plan's steps are already in RED-GREEN order; follow them in that
+-order under ultrapowers:test-driven-development, loaded at setup. A test
+-step's code is written first and run first. Watching it fail is a step,
+-not a formality — a test that passes before the implementation exists is
+-a finding about the test.
++Follow the steps in order under ultrapowers:test-driven-development, loaded
++at setup.
++
++- **tdd mode:** the plan's steps are in RED-GREEN order. A test step's code
++  is written first and run first. Watching it fail is a step, not a
++  formality — a test that passes before the implementation exists is a
++  finding about the test.
++- **test-after mode:** implement, then reconcile — a decision that changed
++  behaviour, scope or an interface goes into the plan/spec as a `Ruling:` —
++  then fix this task's open bug-log entries, then write one test per
++  `Acceptance:` line and run the mutation check.
++
++A bug that does not block the task goes to the bug log and you continue.
+ 
+ Every step that runs a command has an `Expected:` line. Run the command,
+ read its output, and compare. Three outcomes:
+@@ -241,6 +252,10 @@ the tree's, and a fraction nobody raises is a fraction that lies.
+ 
+ ## Final Review
+ 
++Before it, drain the bug log: fix the open entries that belong to this plan's
++work (tests per the testing mode); list entries outside the plan's scope to
++your human partner instead.
++
+ Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
+ (MERGE_BASE = the commit the branch started from, e.g.
+ `git merge-base main HEAD`) and review from the file it prints.
+@@ -266,11 +281,10 @@ weaker than a fresh reviewer, and your human partner decides whether that
+ is enough before merge.
+ 
+ Sort the findings before you act on any of them. The reviewer's severity
+-labels are advice; the gate is yours. Its "Declined to judge" list is
+-yours too: every line there is a ruling you make and ledger, exactly like
+-a plan conflict — `Final: Ruling: <behavior the reviewer set aside> —
+-<what a reasonable person using this software gets, and why that stands
+-or why it is now a finding> — <cost if wrong>`. Re-grade first, by effect: the
++labels are advice; the gate is yours. Its "Declined to judge / out of spec"
++list is not yours to rule on: every line goes to your human partner in your
++final message under "Out of spec — your call", and they put it into the spec
++(then it gets a test) or reject it. Re-grade first, by effect: the
+ spec is a vision document, and a finding's grade is what a reasonable
+ person using this software gets if it ships, not whether the spec names
+ the input that triggers it — a reviewer who set a finding at Minor
+@@ -283,12 +297,18 @@ because the spec was silent has graded the spec, not the effect. Then:
+   conflict, not a note that you declined a polish suggestion.
+ 
+ Fix the Critical and Important findings yourself — you are the
+-implementer here — in ONE pass. Each fix is verified by TDD, not by a
+-second reviewer: write the test that reproduces the finding, watch it
+-fail, make it pass, then run the whole suite. Record each in the ledger as
+-`Final: fixed <finding> — <test name> RED→GREEN, suite <N>/<N>`. A fix
+-without a test that failed first is not verified; a suite that is not
+-green after the pass means the pass is not over. Do not dispatch a
++implementer here — in ONE pass. Each fix is verified by its testing mode,
++not by a second reviewer, and then the whole suite runs:
++
++- **tdd mode:** write the test that reproduces the finding, watch it fail,
++  make it pass. Ledger: `Final: fixed <finding> — <test name> RED→GREEN,
++  suite <N>/<N>`. A fix without a test that failed first is not verified.
++- **test-after mode:** reproduce the finding (command or one-off script),
++  fix it, and add a test only when it broke behaviour the spec states.
++  Ledger: `Final: fixed <finding> — <reproduction> gone[, <test name>],
++  suite <N>/<N>`.
++
++A suite that is not green after the pass means the pass is not over. Do not dispatch a
+ re-review: it would re-read a diff whose covering tests already answer
+ "addressed" and whose suite run already answers "broke nothing".
+ 
+@@ -301,7 +321,8 @@ in the rulings list. There is no second fix pass.
+ Before you delete anything, collect every ledger line containing
+ `Ruling:` into your final message under "Rulings I made", in the order you
+ made them, each with what it costs if wrong, and every `minor (deferred)`
+-line under "Deferred minors". Both lists are exhaustive. Your final
++line under "Deferred minors", and every reviewer line set aside as out of spec under
++"Out of spec — your call". All three lists are exhaustive. Your final
+ message is the only place the decisions you took on your human partner's
+ behalf — and the findings you chose not to act on — reach them.
+ 
+@@ -374,7 +395,7 @@ Use ultrapowers:finishing-a-development-branch.
+ | Excuse | Reality |
+ |--------|---------|
+ | "I remember what Task N says" | You remember a summary. The brief has the exact values. Read it. |
+-| "The plan's code is right, skip watching the test fail" | A test you never saw fail proves nothing. It is one step. Run it. |
++| (tdd) "The plan's code is right, skip watching the test fail" | A test you never saw fail proves nothing. It is one step. Run it. |
+ | "I'll run the full suite at the end instead of per step" | Per-step runs are how you learn which step broke it. The end-of-task run is the contract, not a substitute. |
+ | "The plan is wrong here, I'll just do the right thing" | Do the right thing and ledger the ruling. Unledgered deviation is a decision made in secret. |
+ | "I'll write the ledger lines after a few tasks" | Compaction does not wait for a convenient moment. One line per task, in the same message as the commit. |
+@@ -383,11 +404,13 @@ Use ultrapowers:finishing-a-development-branch.
+ | "Tests should pass, the change was trivial" | "Should" is not evidence. The contract requires the command and its output. |
+ | "Subagents are slow and expensive, I'll skip the final review too" | Inline already removed the per-task reviewers. One review of the whole branch is the floor, not the ceiling. |
+ | "The reviewer said Minor, so it's Minor" | The label graded the spec's silence. Grade what the person gets. Re-grade, then gate. |
+-| "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
++| (tdd) "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
+ | "I'll fix the minors too while I'm in there" | Every minor you fix is a test, a fix, and a suite run your partner did not ask for. Ledger them; your partner decides. |
+ 
+ ## Example Workflow
+ 
++In tdd mode:
++
+ ```
+ You: I'm using the executing-plans skill to implement this plan inline.
+ 
+diff --git a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
+index 389557a..c7473c8 100644
+--- a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
++++ b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
+@@ -30,22 +30,23 @@ Subagent (general-purpose):
+     git diff [BASE_SHA]..[HEAD_SHA]
+     ```
+ 
+-    ## The spec is a vision document
++    ## Behavior the spec is silent on
+ 
+     The spec says what the software must do. It does not enumerate every
+     input, environment, or condition the software will meet. For behavior
+-    the spec is silent on, judge by what a reasonable person using this
+-    software would expect: a reasonable person's expectation is a
+-    requirement, and a spec's silence is not permission. Grade such
+-    findings by their effect on that person, not by whether the spec
+-    mentions the trigger.
++    the spec is silent on, judge what a reasonable person using this
++    software would expect, and report each gap under "Declined to judge /
++    out of spec" with its effect on that person — not as a finding against
++    this change. The human partner decides each one: into the spec (then it
++    gets a test), or rejected.
+ 
+-    ## Declined to judge
++    ## Declined to judge / out of spec
+ 
+     Before your verdict, list every behavior you considered and set aside
+-    as outside the plan or spec, one line each, with the reason. The
+-    executor rules on each line; nothing you set aside is dropped
+-    silently. An empty list means you set nothing aside.
++    as outside the plan or spec, one line each, with the reason and the
++    effect on a person using the software. The executor passes the list to
++    the human partner; nothing you set aside is dropped silently. An empty
++    list means you set nothing aside.
+ 
+     ## Read-Only Review
+ 
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-index 54c2e2d..390f90d 100644
+index 29a77d1..a6156de 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-@@ -117,6 +117,7 @@ digraph process {
+@@ -102,6 +102,7 @@ digraph process {
  
      "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
      "More tasks remain?" [shape=diamond];
 +    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [shape=box];
      "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
      "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
-     "Final review clean: write NN-SUMMARY, keep the workspace" [shape=box];
-@@ -146,7 +147,8 @@ digraph process {
+     "Final review clean: phase documents, then delete the workspace by name" [shape=box];
+@@ -131,7 +132,8 @@ digraph process {
      "Park findings in ledger with rulings" -> "Append completion to ledger, mark todo complete";
      "Append completion to ledger, mark todo complete" -> "More tasks remain?";
      "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
@@ -31,108 +257,112 @@ index 54c2e2d..390f90d 100644
 +    "More tasks remain?" -> "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [label="no"];
 +    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)";
      "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
-     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: write NN-SUMMARY, keep the workspace";
-     "Final review clean: write NN-SUMMARY, keep the workspace" -> "Use ultrapowers:finishing-a-development-branch";
-@@ -205,8 +207,8 @@ what you checked as you check it:
+     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: phase documents, then delete the workspace by name";
+     "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
+@@ -190,7 +192,7 @@ what you checked as you check it:
  The scan's output is a table, not a verdict. One row for every pair of tasks
  that share a file or an interface: the two tasks, what one produces against
  what the other consumes, and what you found. One row for every task: whether
 -its own text agrees with itself — the tests it specifies against the code it
--specifies, the files it creates against the files it later touches. "The scan
-+its own text agrees with itself — the Acceptance list it specifies against the
-+code it specifies, the files it creates against the files it later touches. "The scan
++its own text agrees with itself — the tests or Acceptance list it specifies against the code it
+ specifies, the files it creates against the files it later touches. "The scan
  is clean" without those rows is not a scan you ran.
  
- Write the table to the ledger. Rule on everything you find before execution
-@@ -484,6 +486,11 @@ the tree's, and a fraction nobody raises is a fraction that lies.
+@@ -469,6 +471,15 @@ the tree's, and a fraction nobody raises is a fraction that lies.
  
  ## Final Review
  
 +Before it, drain the bug log: if open entries remain that belong to this
-+plan's work, dispatch one implementer to fix them (reproduce, fix, a test
-+only where the bug broke behaviour the spec states), then continue. Entries
-+outside the plan's scope are listed to the user, not fixed.
++plan's work, dispatch one implementer to fix them (tests per the project's
++testing mode), then continue. Entries outside the plan's scope are listed to
++the partner, not fixed.
++
++The reviewer's "Declined to judge / out of spec" lines go to the partner in
++your final message: each is put into the spec (then it gets a test) or
++rejected by them, not by you.
 +
  The final whole-branch review gets a package too: run
- `scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
+ `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
  branch started from, e.g. `git merge-base main HEAD`) and include the
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
-index 5c8ecd6..b329cf7 100644
+index 5c8ecd6..0bf6860 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
-@@ -33,11 +33,20 @@ Subagent (general-purpose):
+@@ -33,12 +33,24 @@ Subagent (general-purpose):
  
      Once you're clear on requirements:
      1. Implement exactly what the task specifies
 -    2. Write tests (following TDD if task says to)
--    3. Verify implementation works
--    4. Commit your work
--    5. Self-review (see below)
--    6. Report back
-+    2. Reconcile: a decision you made that changed behaviour, scope or an
-+       interface is written into the task text of the plan (and the spec)
-+       before any test; name each change in your report
-+    3. Fix this task's open bug-log entries
-+    4. Write the tests for the task's Acceptance list — one per line, none
-+       for behaviour the list does not state — then the mutation check
-+       (ultrapowers:test-driven-development)
-+    5. Run them; commit your work
-+    6. Self-review (see below)
-+    7. Report back
-+
++    2. Test per the project's testing mode
++       (`.claude/ultrapowers.json` → `tdd`; absent → test-after;
++       ultrapowers:test-driven-development):
++       - tdd: the task's failing-test steps first, then the code
++       - test-after: after the code, reconcile — a decision that changed
++         behaviour, scope or an interface is written into the task text of
++         the plan (and the spec), named in your report — then fix this
++         task's open bug-log entries, then write one test per Acceptance
++         line and run the mutation check
+     3. Verify implementation works
+     4. Commit your work
+     5. Self-review (see below)
+     6. Report back
+ 
 +    A bug you find that does not block the task goes to the project's bug
 +    log (`BUGS.md`, location per the project `CLAUDE.md`) and you
 +    continue. A bug that blocks the task is fixed now.
- 
++
      Work from: [directory]
  
-@@ -110,8 +119,8 @@ Subagent (general-purpose):
+     **While you work:** If you encounter something unexpected or unclear, **ask questions**.
+@@ -110,8 +122,9 @@ Subagent (general-purpose):
  
      **Testing:**
      - Do tests actually verify behavior (not just mock behavior)?
 -    - Did I follow TDD if required?
 -    - Are tests comprehensive?
-+    - Does every Acceptance line have a test, and no test cover an unstated behaviour?
++    - tdd: did every test fail first, for the expected reason?
++    - test-after: does every Acceptance line have a test, and no test cover an unstated behaviour?
 +    - Did every decision that changed behaviour, scope or an interface reach the plan/spec first?
      - Is the test output pristine (no stray warnings or noise)?
  
      If you find issues during self-review, fix them now before reporting.
-@@ -130,9 +139,10 @@ Subagent (general-purpose):
+@@ -130,9 +143,12 @@ Subagent (general-purpose):
      Write your full report to [REPORT_FILE]:
      - What you implemented (or what you attempted, if blocked)
      - What you tested and test results
 -    - **TDD Evidence** (if TDD was required for this task):
 -      - RED: command run, relevant failing output before implementation, and why the failure was expected
 -      - GREEN: command run and relevant passing output after implementation
-+    - **Acceptance coverage:** each Acceptance line → the test that confirms it;
-+      the command run and its passing output
++    - **Test evidence**, per the testing mode:
++      - tdd — RED: command run, relevant failing output before implementation, and why the failure was expected; GREEN: command run and relevant passing output after implementation
++      - test-after — Acceptance coverage: each Acceptance line → the test that confirms it; the command run and its passing output
++    - Any failure a run showed, including one you did not cause, by name
 +    - **Plan/spec changes:** each decision written back, or "none"
 +    - **Bug log:** entries added and entries fixed, by ID, or "none"
      - Files changed
      - Self-review findings (if any)
      - Any issues or concerns
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
-index ce79694..c4617c4 100644
+index 5c619bc..d33a173 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
-@@ -72,9 +72,12 @@ Subagent (general-purpose):
+@@ -72,8 +72,12 @@ Subagent (general-purpose):
  
      ## Tests
  
 -    The implementer already ran the tests and reported results with TDD
 -    evidence for exactly this code. Do not re-run the suite to confirm their
--    report. Run a test only when reading the code raises a specific doubt
-+    The implementer already ran the tests and reported results with
-+    acceptance coverage for exactly this code. An Acceptance line with no
-+    test, a test for behaviour the plan does not state, or a decision in
-+    the code that the plan/spec text does not reflect is a finding.
-+
-+    Do not re-run the suite to confirm their report. Run a test only when reading the code raises a specific doubt
++    The implementer already ran the tests and reported results with test
++    evidence for exactly this code — RED/GREEN in tdd mode, acceptance
++    coverage in test-after mode (`.claude/ultrapowers.json`). In test-after
++    mode an Acceptance line with no test, or a test for behaviour the plan
++    does not state, is a finding. In both modes a decision in the code that
++    the plan/spec text does not reflect is a finding. Do not re-run the suite to confirm their
+     report. Run a test only when reading the code raises a specific doubt
      that no existing run answers — and then a focused test, never a
      package-wide suite, race detector run, or repeated/high-count loop. If
-     heavy validation seems warranted, recommend it in your report instead of
 diff --git a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md b/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
-index d9ca792..7bd74e9 100644
+index d9ca792..66d2ba4 100644
 --- a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
 +++ b/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
 @@ -19,6 +19,13 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
@@ -142,9 +372,9 @@ index d9ca792..7bd74e9 100644
 +## Found While Doing Other Work
 +
 +A bug that does not block the next step of the current work goes to the bug log
-+(`ultrapowers:test-driven-development` → Bug Log) and the work continues. This process runs
-+when the log is drained: before a unit of work's tests, and at the end of the work. A bug that
-+blocks the next step runs through it at once.
++(`ultrapowers:test-driven-development` → Both Modes) and the work continues.
++This process runs when the log is drained: before a unit of work's review, and
++at the end of the work. A bug that blocks the next step runs through it at once.
 +
  ## When to Use
  
@@ -157,11 +387,12 @@ index d9ca792..7bd74e9 100644
 -   - Simplest possible reproduction
 -   - Automated test if possible
 -   - One-off test script if no framework
-+1. **Reproduce**
-+   - Simplest possible reproduction: a command or a one-off script
-    - MUST have before fixing
+-   - MUST have before fixing
 -   - Use the `ultrapowers:test-driven-development` skill for writing proper failing tests
-+   - The permanent test follows `ultrapowers:test-driven-development`: written after the fix, and only when the bug broke behaviour the spec states
++1. **Reproduce** (per the project's testing mode, `ultrapowers:test-driven-development`)
++   - Simplest possible reproduction — MUST have before fixing
++   - tdd mode: a failing automated test (one-off script if no framework)
++   - test-after mode: a command or one-off script; the permanent test is written after the fix, and only when the bug broke behaviour the spec states
  
  2. **Implement Single Fix**
     - Address the root cause identified
@@ -170,19 +401,10 @@ index d9ca792..7bd74e9 100644
  
  3. **Verify Fix**
 -   - Test passes now?
-+   - Reproduction no longer reproduces?
++   - Reproduction passes / no longer reproduces?
     - No other tests broken?
     - Issue actually resolved?
     - Use the `ultrapowers:verification-before-completion` skill before claiming success
-@@ -217,7 +222,7 @@ If you catch yourself thinking:
- - "Quick fix for now, investigate later"
- - "Just try changing X and see if it works"
- - "Add multiple changes, run tests"
--- "Skip the test, I'll manually verify"
-+- "Skip the reproduction, I'll manually verify"
- - "It's probably X, let me fix that"
- - "I don't fully understand but this might work"
- - "Pattern says X but I'll adapt it differently"
 @@ -248,7 +253,7 @@ If you catch yourself thinking:
  | "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
  | "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
@@ -202,80 +424,109 @@ index d9ca792..7bd74e9 100644
  ## When Process Reveals "No Root Cause"
  
 diff --git a/plugins/ultrapowers/skills/test-driven-development/SKILL.md b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-index 4320d88..dea325a 100644
+index 46838cc..489b091 100644
 --- a/plugins/ultrapowers/skills/test-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-@@ -1,320 +1,80 @@
+@@ -1,9 +1,46 @@
  ---
  name: test-driven-development
 -description: Use when implementing any feature or bugfix, before writing implementation code
-+description: Use when a unit of work's code is complete, before its review — writes the tests that confirm the spec/plan
++description: Use when implementing any feature or bugfix — in tdd mode before writing implementation code, in test-after mode once a unit of work's code stands whole, before its review
  ---
  
 -# Test-Driven Development (TDD)
-+# Spec-Driven Tests
++# Test-Driven Development
++
++## Testing Mode
++
++Every project has a testing mode. Read `.claude/ultrapowers.json` at the project
++root: `"tdd": true` → **tdd** mode; anything else, or no file → **test-after**
++mode. The session-start note names the mode too. `/ultrapowers-tdd enable|disable`
++switches it; the partner decides, never you.
++
++- **tdd** → follow "TDD Mode" below.
++- **test-after** → follow "Test-After Mode" below.
++
++"Both Modes" applies either way.
++
++## Both Modes
++
++- **Spec first.** A decision made during the work that changes behaviour, scope
++  or an interface is written into the spec and/or plan before the tests that
++  cover it.
++- **Bug log.** A bug found during the work that does not block the next step
++  goes to the project's bug log and the work continues; a bug that blocks the
++  next step is fixed at once. File: `BUGS.md`, located where the project
++  `CLAUDE.md` says, else the project root. Entry: `BUG-NNN`, date, where,
++  symptom, reproduction, unit of work, status `Open`/`Fixed`. Before a unit's
++  review, fix its open entries; at the end of the work, before the final
++  review, fix the rest. An entry outside the work's scope is listed to the
++  partner instead of fixed. Fixed entries stay, compressed to a line. Fix a
++  logged bug with `ultrapowers:systematic-debugging`.
++- **Review Focus.** A plan's Review Focus lines are part of the owning task's
++  test list — a failing-test step in tdd mode, an `Acceptance:` line in
++  test-after mode.
++- **Failures are reported by name.** Any failure a run shows, including one you
++  did not cause, goes in your report by name. Which tests to run, and when,
++  follows the project's conventions (targeted before commit, full suite at
++  review and before push).
++- **Writing the tests:** see @writing-good-tests.md.
++
++# TDD Mode
  
  ## Overview
  
--Write the test first. Watch it fail. Write minimal code to pass.
-+Write the code first. When a unit of work stands as a working whole, and before it goes to
-+review, write the tests that confirm what the spec or plan states — and only those.
+@@ -182,15 +219,7 @@ Confirm:
  
--**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
-+A **unit of work** is what one review covers: a plan task under per-task review, otherwise the
-+whole change.
+ **Other tests fail?** Fix now.
  
--**Violating the letter of the rules is violating the spirit of the rules.**
+-**"Other tests" means the project's suite, not just your file.** A
+-green run of the test you wrote is not a green suite. Before you call
+-the change done, run the project's test command (bare `pytest`,
+-`npm test`, `cargo test` — whatever the repo uses) even when your task
+-named only one test file. A scope statement in your task bounds the
+-deliverable, not your verification. Any failure that run shows —
+-including one you didn't cause — goes in your report by name; a red
+-test you watched scroll past and didn't mention is a report falsified
+-by omission.
++A failure outside your file goes in your report by name (Both Modes).
+ 
+ ### REFACTOR - Clean Up
+ 
+@@ -316,7 +345,7 @@ Can't check all boxes? You skipped TDD. Start over.
+ 
+ ## Debugging Integration
+ 
+-Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
++Bug found that blocks the work? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression. A bug that does not block goes to the bug log first (Both Modes).
+ 
+ Never fix bugs without a test.
+ 
+@@ -328,3 +357,50 @@ Otherwise → not TDD
+ ```
+ 
+ No exceptions without your human partner's permission.
++
++# Test-After Mode
++
++Code first. When a unit of work stands as a working whole, and before it goes
++to review, write the tests that confirm what the spec or plan states — and only
++those. A **unit of work** is what one review covers: a plan task under
++per-task review, otherwise the whole change.
++
 +## The Order
- 
--## When to Use
-+At the end of a unit of work:
- 
--**Always:**
--- New features
--- Bug fixes
--- Refactoring
--- Behavior changes
-+1. **Reconcile.** A decision made during the work that changed behaviour, scope or an interface
-+   is written into the spec and/or plan first. The tests follow the updated text.
-+2. **Drain the bug log** for this unit: fix its open entries (see Bug Log below).
-+3. **Write the tests.** One per behaviour or acceptance criterion the spec or plan states. A
-+   behaviour the spec does not state gets no test; if it matters, it goes into the spec first.
++
++1. **Reconcile.** Spec/plan updated for every decision that changed behaviour,
++   scope or an interface.
++2. **Drain the bug log** for this unit.
++3. **Write the tests.** One per behaviour or acceptance criterion the spec or
++   plan states. A behaviour the spec does not state gets no test; if it
++   matters, it goes into the spec first.
 +4. **Run them.**
 +5. **Review.**
- 
--**Exceptions (ask your human partner):**
--- Throwaway prototypes
--- Generated code
--- Configuration files
-+At the end of the whole work, before the final review: drain what is left in the bug log.
- 
--Thinking "skip TDD just this once"? Stop. That's rationalization.
-+## Bug Log
- 
--## The Iron Law
-+A bug found during the work that does not block the next step goes to the project's bug log and
-+the work continues. A bug that blocks the next step is fixed at once.
- 
--```
--NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
--```
-+- File: `BUGS.md`. The project `CLAUDE.md` names its location; none stated: the project root.
-+- Entry: `BUG-NNN`, date, where (file:line or command), symptom, reproduction, unit of work,
-+  status `Open`/`Fixed`.
-+- Drain: before a unit's tests, fix that unit's open entries; at the end of the work, fix the
-+  rest. An entry outside the work's scope is listed to the user instead of fixed.
-+- Fixed entries stay, compressed to a line.
-+- Fix a logged bug with `ultrapowers:systematic-debugging`.
- 
--Write code before the test? Delete it. Start over.
++
 +## What Gets a Test
- 
--**No exceptions:**
--- Don't keep it as "reference"
--- Don't "adapt" it while writing tests
--- Don't look at it
--- Delete means delete
++
 +| Case | Test |
 +|------|------|
 +| Behaviour the spec/plan states | One test per behaviour or criterion |
@@ -284,355 +535,78 @@ index 4320d88..dea325a 100644
 +| Fixed bug outside stated behaviour | None |
 +| Standalone bug fix, no spec | The report's expected behaviour, one test, after the fix |
 +| Wiring, config, trivial mappers, passthroughs | None — covered by the test of what they enable |
- 
--Implement fresh from tests. Period.
++
 +## The Mutation Check
- 
--## Red-Green-Refactor
-+No RED step. Before finishing a test file, mentally mutate the code; at least one test fails for
-+each realistic mutation:
- 
--```dot
--digraph tdd_cycle {
--    rankdir=LR;
--    red [label="RED\nWrite failing test", shape=box, style=filled, fillcolor="#ffcccc"];
--    verify_red [label="Verify fails\ncorrectly", shape=diamond];
--    green [label="GREEN\nMinimal code", shape=box, style=filled, fillcolor="#ccffcc"];
--    verify_green [label="Verify passes\nAll green", shape=diamond];
--    refactor [label="REFACTOR\nClean up", shape=box, style=filled, fillcolor="#ccccff"];
--    next [label="Next", shape=ellipse];
-+- Wrong constant or argument
-+- Wrong branch handler
-+- Missing state change or side effect
-+- Empty or default return
-+- Missing validation for zero, empty, nil, unauthorized, or malformed input
- 
--    red -> verify_red;
--    verify_red -> green [label="yes"];
--    verify_red -> red [label="wrong\nfailure"];
--    green -> verify_green;
--    verify_green -> refactor [label="yes"];
--    verify_green -> green [label="no"];
--    refactor -> verify_green [label="stay\ngreen"];
--    verify_green -> next;
--    next -> red;
--}
--```
-+A mutation nothing catches is either a stated behaviour left unprotected — add its test — or a
-+behaviour outside the spec — leave it.
- 
--### RED - Write Failing Test
-+## Writing the Tests
- 
--Write one minimal test showing what should happen.
-+See @writing-good-tests.md: name the break each test catches, exercise the real thing, derive
-+expectations by hand.
- 
--<Good>
--```typescript
--test('retries failed operations 3 times', async () => {
--  let attempts = 0;
--  const operation = () => {
--    attempts++;
--    if (attempts < 3) throw new Error('fail');
--    return 'success';
--  };
++
++No RED step. Before finishing a test file, mentally mutate the code; at least
++one test fails for each realistic mutation: wrong constant or argument, wrong
++branch handler, missing state change or side effect, empty or default return,
++missing validation for zero, empty, nil, unauthorized or malformed input. A
++mutation nothing catches is either a stated behaviour left unprotected — add
++its test — or a behaviour outside the spec — leave it.
++
 +## Checklist
- 
--  const result = await retryOperation(operation);
--
--  expect(result).toBe('success');
--  expect(attempts).toBe(3);
--});
--```
--Clear name, tests real behavior, one thing
--</Good>
--
--<Bad>
--```typescript
--test('retry works', async () => {
--  const mock = jest.fn()
--    .mockRejectedValueOnce(new Error())
--    .mockRejectedValueOnce(new Error())
--    .mockResolvedValueOnce('success');
--  await retryOperation(mock);
--  expect(mock).toHaveBeenCalledTimes(3);
--});
--```
--Vague name, tests mock not code
--</Bad>
--
--**Requirements:**
--- One behavior
--- Clear name
--- Real code (no mocks unless unavoidable)
--
--### Verify RED - Watch It Fail
--
--**MANDATORY. Never skip.**
--
--```bash
--npm test path/to/test.test.ts
--```
--
--Confirm:
--- Test fails (not errors)
--- Failure message is expected
--- Fails because feature missing (not typos)
--
--**Test passes?** You're testing existing behavior. Fix test.
--
--**Test errors?** Fix error, re-run until it fails correctly.
--
--### GREEN - Minimal Code
--
--Write simplest code to pass the test.
--
--<Good>
--```typescript
--async function retryOperation<T>(fn: () => Promise<T>): Promise<T> {
--  for (let i = 0; i < 3; i++) {
--    try {
--      return await fn();
--    } catch (e) {
--      if (i === 2) throw e;
--    }
--  }
--  throw new Error('unreachable');
--}
--```
--Just enough to pass
--</Good>
--
--<Bad>
--```typescript
--async function retryOperation<T>(
--  fn: () => Promise<T>,
--  options?: {
--    maxRetries?: number;
--    backoff?: 'linear' | 'exponential';
--    onRetry?: (attempt: number) => void;
--  }
--): Promise<T> {
--  // YAGNI
--}
--```
--Over-engineered
--</Bad>
--
--Don't add features, refactor other code, or "improve" beyond the test.
--
--### Verify GREEN - Watch It Pass
--
--**MANDATORY.**
--
--```bash
--npm test path/to/test.test.ts
--```
--
--Confirm:
--- Test passes
--- Other tests still pass
--- Output pristine (no errors, warnings)
--
--**Test fails?** Fix code, not test.
--
--**Other tests fail?** Fix now.
--
--### REFACTOR - Clean Up
--
--After green only:
--- Remove duplication
--- Improve names
--- Extract helpers
--
--Keep tests green. Don't add behavior.
--
--### Repeat
--
--Next failing test for next feature.
--
--## Good Tests
--
--| Quality | Good | Bad |
--|---------|------|-----|
--| **Minimal** | One thing. "and" in name? Split it. | `test('validates email and domain and whitespace')` |
--| **Clear** | Name describes behavior | `test('test1')` |
--| **Shows intent** | Demonstrates desired API | Obscures what code should do |
--
--When writing or changing any test, read [writing-good-tests.md](writing-good-tests.md) for the rules that keep tests honest:
--- Name the production change that would make the test fail — before writing it
--- Assert on real behavior, never on mock behavior
--- Keep test-only code in test utilities, out of production classes
--- Understand a dependency's side effects before mocking it
--
--## Common Rationalizations
--
--| Excuse | Reality |
--|--------|---------|
--| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
--| "I'll test after" | Tests written after pass immediately — which proves nothing. They may test the wrong thing, test the implementation instead of the behavior, or miss the edge case you forgot. You never watched it fail, so you never proved it can catch the bug. Test-first forces that failure. |
--| "Tests after achieve same goals (spirit not ritual)" | Tests-after answer "what does this do?"; tests-first answer "what should this do?" Tests written after are biased by the code you already wrote — you verify the cases you remembered, not the ones you'd have discovered. Coverage without proof the tests work. |
--| "Already manually tested" | Manual testing is ad-hoc: no record of what you covered, no way to re-run it when the code changes, easy to forget cases under pressure. "Worked when I tried it" ≠ comprehensive. Automated tests run the same way every time. |
--| "Deleting X hours is wasteful" | Sunk cost fallacy — that time is already spent either way. The real choice: rewrite with TDD (high confidence) vs. keep it and bolt tests on after (low confidence, likely bugs). Keeping code you can't trust is the waste. |
--| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
--| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
--| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
--| "TDD will slow me down" | TDD IS the pragmatic path: catches bugs before commit, prevents regressions, lets you refactor without fear. "Pragmatic" shortcuts mean debugging in production — slower, not faster. |
--| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
--| "Existing code has no tests" | You're improving it. Add tests for existing code. |
--
--## Red Flags - STOP and Start Over
--
--- Code before test
--- Test after implementation
--- Test passes immediately
--- Can't explain why test failed
--- Tests added "later"
--- Rationalizing "just this once"
--- "I already manually tested it"
--- "Tests after achieve the same purpose"
--- "It's about spirit not ritual"
--- "Keep as reference" or "adapt existing code"
--- "Already spent X hours, deleting is wasteful"
--- "TDD is dogmatic, I'm being pragmatic"
--- "This is different because..."
--
--**All of these mean: Delete code. Start over with TDD.**
--
--## Example: Bug Fix
--
--**Bug:** Empty email accepted
--
--**RED**
--```typescript
--test('rejects empty email', async () => {
--  const result = await submitForm({ email: '' });
--  expect(result.error).toBe('Email required');
--});
--```
--
--**Verify RED**
--```bash
--$ npm test
--FAIL: expected 'Email required', got undefined
--```
--
--**GREEN**
--```typescript
--function submitForm(data: FormData) {
--  if (!data.email?.trim()) {
--    return { error: 'Email required' };
--  }
--  // ...
--}
--```
--
--**Verify GREEN**
--```bash
--$ npm test
--PASS
--```
--
--**REFACTOR**
--Extract validation for multiple fields if needed.
--
--## Verification Checklist
--
--Before marking work complete:
--
--- [ ] Every new function/method has a test
--- [ ] Watched each test fail before implementing
--- [ ] Each test failed for expected reason (feature missing, not typo)
--- [ ] Wrote minimal code to pass each test
--- [ ] All tests pass
--- [ ] Output pristine (no errors, warnings)
--- [ ] Tests use real code (mocks only if unavoidable)
--- [ ] Edge cases and errors covered
--
--Can't check all boxes? You skipped TDD. Start over.
--
--## When Stuck
--
--| Problem | Solution |
--|---------|----------|
--| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
--| Test too complicated | Design too complicated. Simplify interface. |
--| Must mock everything | Code too coupled. Use dependency injection. |
--| Test setup huge | Extract helpers. Still complex? Simplify design. |
--
--## Debugging Integration
--
--Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
--
--Never fix bugs without a test.
--
--## Final Rule
--
--```
--Production code → test exists and failed first
--Otherwise → not TDD
--```
--
--No exceptions without your human partner's permission.
++
 +- [ ] Spec/plan updated for every decision that changed behaviour, scope or an interface
 +- [ ] This unit's bug-log entries fixed
 +- [ ] Every stated behaviour has a test; no test covers an unstated one
 +- [ ] Mutation check done
-+- [ ] Tests run, output pristine
++- [ ] Tests run, output pristine, failures reported by name
 +- [ ] Then review
 diff --git a/plugins/ultrapowers/skills/test-driven-development/writing-good-tests.md b/plugins/ultrapowers/skills/test-driven-development/writing-good-tests.md
-index 2946c89..52e247d 100644
+index 2946c89..d5a0830 100644
 --- a/plugins/ultrapowers/skills/test-driven-development/writing-good-tests.md
 +++ b/plugins/ultrapowers/skills/test-driven-development/writing-good-tests.md
-@@ -13,9 +13,9 @@ here:
+@@ -13,9 +13,11 @@ here:
  2. Every test exercises the real thing
  ```
  
 -Strict TDD produces both naturally: a test written first and watched
 -failing against real code has already proven it can fail, and only earns
 -a mock when the real dependency proves slow or external.
-+Tests are written after the code, so neither comes for free: the mutation
-+check below proves each test can fail, and a mock is earned only when the
-+real dependency proves slow or external.
++In tdd mode strict TDD produces both naturally: a test written first and
++watched failing against real code has already proven it can fail, and only
++earns a mock when the real dependency proves slow or external. In test-after
++mode neither comes for free: the mutation check below proves each test can
++fail.
  
  ## Principle 1: Name the Break
  
-@@ -147,10 +147,11 @@ BEFORE adding a mock or test helper:
-     Unmock it or delete the assertion.
- ```
+@@ -149,8 +151,10 @@ BEFORE adding a mock or test helper:
  
--## Tests Ship With the Implementation
-+## Tests Ship Before Review
+ ## Tests Ship With the Implementation
  
 -The TDD cycle — failing test, minimal implementation, refactor — is what
 -"complete" means. Ship the tests the behavior needs and only those:
-+A unit of work is complete when the tests that confirm its spec/plan are
-+written and pass, before its review. Ship the tests the stated behavior
-+needs and only those:
++In tdd mode the cycle — failing test, minimal implementation, refactor — is
++what "complete" means; in test-after mode, the tests that confirm the
++spec/plan written and passing before the unit's review. Ship the tests the
++behavior needs and only those:
  trivial code and human prose earn none, and a test written to satisfy
  process costs maintenance forever.
  
 diff --git a/plugins/ultrapowers/skills/verification-before-completion/SKILL.md b/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
-index 7d45333..2ac4323 100644
+index 7d45333..563338e 100644
 --- a/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
 +++ b/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
-@@ -79,10 +79,10 @@ Skip any step = lying, not verifying
+@@ -79,10 +79,12 @@ Skip any step = lying, not verifying
  ❌ "Should pass now" / "Looks correct"
  ```
  
 -**Regression tests (TDD Red-Green):**
-+**Regression tests (only where the bug broke behaviour the spec states):**
++**Regression tests (per the project's testing mode):**
  ```
 -✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
 -❌ "I've written a regression test" (without red-green verification)
-+✅ Write after the fix → Run (pass) → mutation check: the reverted fix is a mutation it catches
-+❌ A regression test for behaviour the spec does not state
++tdd:        ✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
++            ❌ "I've written a regression test" (without red-green verification)
++test-after: ✅ Only where the bug broke stated behaviour: write after the fix → Run (pass) → mutation check
++            ❌ A regression test for behaviour the spec does not state
  ```
  
  **Build:**
 diff --git a/plugins/ultrapowers/skills/writing-plans/SKILL.md b/plugins/ultrapowers/skills/writing-plans/SKILL.md
-index f81989a..0126ef6 100644
+index c61a5c1..cf4560c 100644
 --- a/plugins/ultrapowers/skills/writing-plans/SKILL.md
 +++ b/plugins/ultrapowers/skills/writing-plans/SKILL.md
 @@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
@@ -640,78 +614,98 @@ index f81989a..0126ef6 100644
  ## Overview
  
 -Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
-+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests after the code, before review. Frequent commits.
++Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
  
  Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
  
-@@ -45,10 +45,10 @@ independently testable deliverable.
+@@ -44,13 +44,23 @@ independently testable deliverable.
+ 
  ## Bite-Sized Task Granularity
  
- **Each step is one action (2-5 minutes):**
--- "Write the failing test" - step
--- "Run it to make sure it fails" - step
--- "Implement the minimal code to make the test pass" - step
--- "Run the tests and make sure they pass" - step
+-**Each step is one action (2-5 minutes):**
++**Each step is one action (2-5 minutes).** The project's testing mode
++(`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
++
++tdd mode:
+ - "Write the failing test" - step
+ - "Run it to make sure it fails" - step
+ - "Implement the minimal code to make the test pass" - step
+ - "Run the tests and make sure they pass" - step
+ - "Commit" - step
+ 
++test-after mode:
 +- "Implement the task" - step
 +- "Reconcile: write any decision that changed behaviour, scope or an interface into the plan/spec; fix this task's bug-log entries" - step
 +- "Write the tests for the task's Acceptance list" - step
 +- "Run them" - step
- - "Commit" - step
- 
++- "Commit" - step
++
  ## Plan Document Header
-@@ -95,29 +95,32 @@ include this section.]
-   and return types. A task's implementer sees only their own task; this
-   block is how they learn the names and types neighboring tasks use.]
  
--- [ ] **Step 1: Write the failing test**
-+**Acceptance:** [one line per behaviour this task delivers — input class → expected
-+result. The tests confirm exactly these; no test code is written into the plan.]
+ **Every plan MUST start with this header:**
+@@ -85,8 +95,8 @@ reasonable person would expect, most likely first. The spec is a vision
+ document: it says what the software must do, not everything it will
+ meet, and its silence on an input is not permission for that input to
+ break the program. Write the list here, once, with the spec in front of
+-you. Then, for each line, add the test that pins it to the task that
+-owns the code, in that task's own step style.]
++you. Then add each line to the test list of the task that owns the code —
++a failing-test step in tdd mode, an `Acceptance:` line in test-after mode.]
+ 
+ ---
+ ```
+@@ -140,12 +150,44 @@ git commit -m "feat: add specific feature"
+ ```
+ ````
+ 
++The template above is tdd mode. In test-after mode the task carries an
++**Acceptance:** list and these steps instead:
++
++````markdown
++**Acceptance:** [one line per behaviour this task delivers — input class →
++expected result. The tests confirm exactly these; no test code is written into
++the plan.]
 +- `function(valid input)` returns `expected`
 +- `function(empty input)` raises `ValueError`
 +
 +- [ ] **Step 1: Implement**
- 
- ```python
--def test_specific_behavior():
--    result = function(input)
--    assert result == expected
++
++```python
 +def function(input):
 +    return expected
- ```
- 
--- [ ] **Step 2: Run test to verify it fails**
-+- [ ] **Step 2: Reconcile**
- 
--Run: `pytest tests/path/test.py::test_name -v`
--Expected: FAIL with "function not defined"
-+A decision made while implementing that changed behaviour, scope or an interface is
-+written into this task (and the spec) now, before the tests. Fix this task's open
-+bug-log entries.
- 
--- [ ] **Step 3: Write minimal implementation**
-+- [ ] **Step 3: Write the acceptance tests**
- 
--```python
--def function(input):
--    return expected
--```
-+One test per Acceptance line, then the mutation check
-+(`ultrapowers:test-driven-development`).
- 
--- [ ] **Step 4: Run test to verify it passes**
++```
++
++- [ ] **Step 2: Reconcile** — a decision made while implementing that changed
++  behaviour, scope or an interface is written into this task (and the spec)
++  now, before the tests. Fix this task's open bug-log entries.
++
++- [ ] **Step 3: Write the acceptance tests** — one per Acceptance line, then the
++  mutation check (ultrapowers:test-driven-development).
++
 +- [ ] **Step 4: Run them**
- 
--Run: `pytest tests/path/test.py::test_name -v`
++
 +Run: `pytest tests/path/test.py -v`
- Expected: PASS
++Expected: PASS
++
++- [ ] **Step 5: Commit**
++````
++
+ ## No Placeholders
  
- - [ ] **Step 5: Commit**
-@@ -133,7 +136,7 @@ git commit -m "feat: add specific feature"
  Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
  - "TBD", "TODO", "implement later", "fill in details"
  - "Add appropriate error handling" / "add validation" / "handle edge cases"
 -- "Write tests for the above" (without actual test code)
-+- "Write tests for the above" (without an **Acceptance:** list naming each behaviour)
++- "Write tests for the above" (without actual test code in tdd mode, or without an **Acceptance:** list in test-after mode)
  - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
  - Steps that describe what to do without showing how (code blocks required for code steps)
  - References to types, functions, or methods not defined in any task
+@@ -162,7 +204,7 @@ Checks 1-4 are read. Checks 5 and 6 are run, and they are the ones that catch wh
+ 
+ **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
+ 
+-**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
++**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there goes into the owning task's test list. An empty section means you checked and found none, not that you skipped the check.
+ 
+ **5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. Tests are written after the code, so at plan time run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
+ 
