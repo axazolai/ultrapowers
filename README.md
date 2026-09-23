@@ -59,7 +59,8 @@ gate and the maintainability.
 
 The shipped plugin version is derived, never patched: `<upstream version>-up.<revision>` from
 `config.json`, so an upstream bump cannot leave a delta asserting a stale version. Bump
-`version.revision` when the fork changes and upstream has not.
+`version.revision` when the fork changes on the same upstream base; reset it to 1 when
+`originalTag` moves to a new upstream release.
 
 ## Rebuilding
 

@@ -49,8 +49,9 @@ hot-reload'а нет.
 
 ### Режим тестирования: tdd или test-after
 
-У каждого проекта есть режим тестирования, он задаётся `/ultrapowers-tdd enable|disable`
-(хранится в `.claude/ultrapowers.json`; нет файла — test-after):
+У каждого проекта есть режим тестирования — ключ `"tdd"` в `.claude/ultrapowers.json` (нет файла —
+test-after). Бандл claude-config переключает его командой `/ultrapowers-tdd enable|disable`; без
+бандла ключ ставится вручную:
 
 - **tdd** — разработка через тесты по апстриму: сначала падающий тест, RED → GREEN → REFACTOR,
   TDD-доказательства в отчётах задач, исправления после финального ревью через RED → GREEN.

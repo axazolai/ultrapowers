@@ -492,7 +492,11 @@ the ledger's deferred-minor and parked lines so it can triage which must be
 fixed before merge.
 
 If the final whole-branch review returns findings, dispatch ONE fix subagent
-with the complete findings list — not one fixer per finding.
+with the complete findings list — not one fixer per finding — and the
+project's testing mode: tdd, each fix RED → GREEN; test-after, reproduce →
+fix → a test only where the finding broke behaviour the spec states.
+Findings about behaviour the spec is silent on are not in that list; they go
+to the partner.
 Per-finding fixers each rebuild context and re-run suites; a real
 session's final-review fix wave cost more than all its tasks combined.
 Then run exactly one scoped re-review of the fix wave
@@ -513,7 +517,9 @@ with what it costs if wrong. The list is exhaustive: if the ledger holds a
 ruling, the list holds it. That list is the only place the decisions you
 took on your human partner's behalf reach them — they read it and rework
 whatever you got wrong. A ruling that dies with the workspace was a decision
-made in secret.
+made in secret. Collect the same way every deferred minor under "Deferred
+minors" and every reviewer line set aside as out of spec — per-task and
+final — under "Out of spec — your call".
 
 When the final whole-branch review is clean and its fixes are merged, write
 the phase documents, then delete the workspace.

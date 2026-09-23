@@ -9,8 +9,9 @@ description: Use when implementing any feature or bugfix — in tdd mode before 
 
 Every project has a testing mode. Read `.claude/ultrapowers.json` at the project
 root: `"tdd": true` → **tdd** mode; anything else, or no file → **test-after**
-mode. The session-start note names the mode too. `/ultrapowers-tdd enable|disable`
-switches it; the partner decides, never you.
+mode. The session-start note names the mode too. The partner switches it —
+`/ultrapowers-tdd enable|disable` where the claude-config bundle is installed,
+otherwise by setting `"tdd"` in that file — never you.
 
 - **tdd** → follow "TDD Mode" below.
 - **test-after** → follow "Test-After Mode" below.

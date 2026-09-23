@@ -49,8 +49,9 @@ to 1 on a new base. Everything not listed below is upstream's work, carried acro
 
 ### Testing mode: tdd or test-after
 
-Every project has a testing mode, set with `/ultrapowers-tdd enable|disable` (stored in
-`.claude/ultrapowers.json`; no file means test-after):
+Every project has a testing mode, stored as `"tdd"` in `.claude/ultrapowers.json` (no file means
+test-after). The claude-config bundle switches it with `/ultrapowers-tdd enable|disable`; without
+the bundle, set the key by hand:
 
 - **tdd** — upstream's test-driven development: failing test first, RED → GREEN → REFACTOR, TDD
   evidence in task reports, RED → GREEN fixes after the final review.

@@ -91,7 +91,7 @@ Subagent (general-purpose):
 
     **Testing:**
     - Tests verify real behavior, not mocks?
-    - Edge cases covered?
+    - Edge cases covered? (test-after mode: the ones the spec states)
     - Integration tests where they matter?
     - All tests passing?
 
@@ -123,7 +123,8 @@ Subagent (general-purpose):
     [Bugs, security issues, data loss risks, broken functionality]
 
     #### Important (Should Fix)
-    [Architecture problems, missing features, poor error handling, test gaps]
+    [Architecture problems, missing features, poor error handling, test gaps
+    (test-after mode: gaps against behavior the spec states)]
 
     #### Minor (Nice to Have)
     [Code style, optimization opportunities, documentation polish]
@@ -136,6 +137,10 @@ Subagent (general-purpose):
 
     ### Recommendations
     [Improvements for code quality, architecture, or process]
+
+    ### Declined to judge / out of spec
+    [One line each: the behavior, why it was set aside, its effect on a person
+    using the software. "None" if nothing was set aside.]
 
     ### Assessment
 
@@ -166,7 +171,7 @@ Subagent (general-purpose):
 - `[BASE_SHA]` — starting commit
 - `[HEAD_SHA]` — ending commit
 
-**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Assessment
+**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Declined to judge / out of spec, Assessment
 
 ## Example Output
 

@@ -70,6 +70,12 @@ Subagent (general-purpose):
     implementer grading their own work. Judge the code on its merits — a
     stated rationale never downgrades a finding's severity.
 
+    ## Behavior the spec is silent on
+
+    A gap in behavior the task and spec do not mention is not a finding
+    against this task. List it under "Out of spec" with its effect on a
+    person using the software; the controller ledgers it for the partner.
+
     ## Tests
 
     The implementer already ran the tests and reported results with test
@@ -208,4 +214,4 @@ Subagent (general-purpose):
   path it wrote; the package never enters the controller's context)
 
 **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues
-(Critical/Important/Minor), Task quality verdict
+(Critical/Important/Minor), Out of spec, Task quality verdict
