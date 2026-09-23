@@ -41,9 +41,24 @@
       "reason": "Cursor harness wiring - not Claude Code"
     },
     {
+      "match": "skills/using-superpowers/references/claude-code-tools.md",
+      "class": "tracked",
+      "reason": "the one harness reference this fork serves: Claude Code notes, including the opt-in nested SDD controller"
+    },
+    {
       "match": "skills/using-superpowers/references/**",
       "class": "ignored",
       "reason": "per-harness adaptation notes for Codex/Pi/Gemini/Antigravity/Hermes; this fork targets Claude Code only, and delta 002 removes the Platform Adaptation section that links them so no reference is left dangling"
+    },
+    {
+      "match": "skills/diagnosing-superpowers/templates/issue.md",
+      "class": "ignored",
+      "reason": "the GitHub-issue step is removed from this fork (delta 015); its template has no reader"
+    },
+    {
+      "match": "skills/diagnosing-superpowers/references/github-issues.md",
+      "class": "ignored",
+      "reason": "the GitHub-issue step is removed from this fork (delta 015); its reference has no reader"
     },
     {
       "match": "skills/**",
@@ -98,6 +113,11 @@
       "reason": "other harness (opencode)"
     },
     {
+      "match": ".muse-plugin/**",
+      "class": "ignored",
+      "reason": "Muse harness manifests; this fork ships for Claude Code only"
+    },
+    {
       "match": ".pi/**",
       "class": "ignored",
       "reason": "other harness (Pi)"
@@ -131,6 +151,11 @@
       "match": "scripts/**",
       "class": "ignored",
       "reason": "upstream release tooling (version bump, codex packaging, shell lint); the fork releases through /up-update instead"
+    },
+    {
+      "match": "index.js",
+      "class": "ignored",
+      "reason": "npm entry point for OpenCode/Muse packaging; not part of the Claude Code plugin"
     },
     {
       "match": "package.json",
@@ -242,6 +267,7 @@
     ".github/FUNDING.yml": "ignored",
     ".github/ISSUE_TEMPLATE/bug_report.md": "ignored",
     ".github/ISSUE_TEMPLATE/config.yml": "ignored",
+    ".github/ISSUE_TEMPLATE/diagnosis_report.md": "ignored",
     ".github/ISSUE_TEMPLATE/feature_request.md": "ignored",
     ".github/ISSUE_TEMPLATE/platform_support.md": "ignored",
     ".github/PULL_REQUEST_TEMPLATE.md": "ignored",
@@ -249,6 +275,8 @@
     ".hermes-plugin/__init__.py": "ignored",
     ".hermes-plugin/plugin.yaml": "ignored",
     ".kimi-plugin/plugin.json": "ignored",
+    ".muse-plugin/marketplace.json": "ignored",
+    ".muse-plugin/plugin.json": "ignored",
     ".opencode/INSTALL.md": "ignored",
     ".opencode/plugins/superpowers.js": "ignored",
     ".pi/extensions/superpowers.ts": "ignored",
@@ -285,6 +313,7 @@
     "docs/superpowers/plans/2026-07-15-sdd-fix-loop-redesign.md": "ignored",
     "docs/superpowers/plans/2026-07-30-codex-efficiency-fixes.md": "ignored",
     "docs/superpowers/plans/2026-08-06-hermes-version-bump-wiring.md": "ignored",
+    "docs/superpowers/plans/2026-08-27-diagnosing-superpowers.md": "ignored",
     "docs/superpowers/specs/2026-01-22-document-review-system-design.md": "ignored",
     "docs/superpowers/specs/2026-02-19-visual-brainstorming-refactor-design.md": "ignored",
     "docs/superpowers/specs/2026-03-11-zero-dep-brainstorm-server-design.md": "ignored",
@@ -304,6 +333,7 @@
     "docs/superpowers/specs/2026-07-15-sdd-fix-loop-redesign-design.md": "ignored",
     "docs/superpowers/specs/2026-07-30-codex-efficiency-fixes-design.md": "ignored",
     "docs/superpowers/specs/2026-08-05-hermes-version-bump-wiring-design.md": "ignored",
+    "docs/superpowers/specs/2026-08-27-diagnosing-superpowers-design.md": "ignored",
     "docs/testing.md": "ignored",
     "docs/windows/polyglot-hooks.md": "ignored",
     "gemini-extension.json": "ignored",
@@ -311,6 +341,7 @@
     "hooks/hooks.json": "tracked",
     "hooks/run-hook.cmd": "tracked",
     "hooks/session-start": "tracked",
+    "index.js": "ignored",
     "package.json": "ignored",
     "scripts/bump-version.sh": "ignored",
     "scripts/lint-shell.sh": "ignored",
@@ -324,8 +355,30 @@
     "skills/brainstorming/scripts/stop-server.sh": "tracked",
     "skills/brainstorming/spec-document-reviewer-prompt.md": "tracked",
     "skills/brainstorming/visual-companion.md": "tracked",
+    "skills/diagnosing-superpowers/SKILL.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/analyst-common.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/cost-and-time.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/plan-adherence.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/quality-evidence.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/repeated-work.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/request-conflicts.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/scrub-audit.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/scrub.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/similar-session.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/skill-timeline.md": "tracked",
+    "skills/diagnosing-superpowers/prompts/stumbles.md": "tracked",
+    "skills/diagnosing-superpowers/references/context-safety.md": "tracked",
+    "skills/diagnosing-superpowers/references/github-issues.md": "ignored",
+    "skills/diagnosing-superpowers/references/redaction-policy.md": "tracked",
+    "skills/diagnosing-superpowers/references/session-discovery.md": "tracked",
+    "skills/diagnosing-superpowers/templates/bundle-README.md": "tracked",
+    "skills/diagnosing-superpowers/templates/case.md": "tracked",
+    "skills/diagnosing-superpowers/templates/issue.md": "ignored",
+    "skills/diagnosing-superpowers/templates/report.md": "tracked",
     "skills/dispatching-parallel-agents/SKILL.md": "tracked",
     "skills/executing-plans/SKILL.md": "tracked",
+    "skills/executing-plans/scripts/task-done": "tracked",
+    "skills/executing-plans/scripts/task-start": "tracked",
     "skills/finishing-a-development-branch/SKILL.md": "tracked",
     "skills/receiving-code-review/SKILL.md": "tracked",
     "skills/requesting-code-review/SKILL.md": "tracked",
@@ -353,9 +406,11 @@
     "skills/using-git-worktrees/SKILL.md": "tracked",
     "skills/using-superpowers/SKILL.md": "tracked",
     "skills/using-superpowers/references/antigravity-tools.md": "ignored",
+    "skills/using-superpowers/references/claude-code-tools.md": "tracked",
     "skills/using-superpowers/references/codex-tools.md": "ignored",
     "skills/using-superpowers/references/gemini-tools.md": "ignored",
     "skills/using-superpowers/references/hermes-tools.md": "ignored",
+    "skills/using-superpowers/references/muse-tools.md": "ignored",
     "skills/using-superpowers/references/pi-tools.md": "ignored",
     "skills/verification-before-completion/SKILL.md": "tracked",
     "skills/writing-plans/SKILL.md": "tracked",
@@ -384,6 +439,7 @@
     "tests/claude-code/README.md": "ignored",
     "tests/claude-code/analyze-token-usage.py": "ignored",
     "tests/claude-code/run-skill-tests.sh": "ignored",
+    "tests/claude-code/test-executing-plans-scripts.sh": "ignored",
     "tests/claude-code/test-helpers.sh": "ignored",
     "tests/claude-code/test-sdd-workspace.sh": "ignored",
     "tests/claude-code/test-subagent-driven-development-integration.sh": "ignored",
@@ -394,6 +450,7 @@
     "tests/codex/test-marketplace-manifest.sh": "ignored",
     "tests/codex/test-package-codex-plugin.sh": "ignored",
     "tests/devin/test-devin-plugin.sh": "ignored",
+    "tests/diagnosing-superpowers/test-skill-structure.sh": "ignored",
     "tests/explicit-skill-requests/prompts/action-oriented.txt": "ignored",
     "tests/explicit-skill-requests/prompts/after-planning-flow.txt": "ignored",
     "tests/explicit-skill-requests/prompts/claude-suggested-it.txt": "ignored",
@@ -421,6 +478,10 @@
     "tests/opencode/test-bootstrap-caching.sh": "ignored",
     "tests/opencode/test-plugin-loading.sh": "ignored",
     "tests/opencode/test-priority.sh": "ignored",
+    "tests/opencode/test-session-bootstrap.mjs": "ignored",
+    "tests/opencode/test-session-bootstrap.sh": "ignored",
+    "tests/opencode/test-skill-registration.mjs": "ignored",
+    "tests/opencode/test-skill-registration.sh": "ignored",
     "tests/opencode/test-tools.sh": "ignored",
     "tests/pi/test-pi-extension.mjs": "ignored",
     "tests/shell-lint/test-lint-shell.sh": "ignored",
