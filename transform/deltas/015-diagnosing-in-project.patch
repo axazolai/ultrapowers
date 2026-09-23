@@ -1,0 +1,129 @@
+diff --git a/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md b/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
+index 287e54e..979e275 100644
+--- a/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
++++ b/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
+@@ -9,7 +9,7 @@ description: Use when a ultrapowers session went wrong and your human partner wa
+ 
+ Pin down with your human partner what went wrong in a session, read the
+ transcripts on disk, and report what happened with evidence. You report;
+-you do not diagnose ultrapowers. Whoever triages the bundle or the issue
++you do not diagnose ultrapowers. Whoever triages the report or the bundle
+ decides whether ultrapowers changes.
+ 
+ **Core principle:** Every finding cites `path:line`. No citation, no
+@@ -18,7 +18,7 @@ never from memory.
+ 
+ ## Workflow
+ 
+-Create a todo per step. Steps 5–7 run only on their stated condition.
++Create a todo per step. Steps 5–6 run only on their stated condition.
+ 
+ 1. **Problem intake.** Ask one question at a time until you can write a
+    statement naming the session(s), the turn range if known, what your
+@@ -30,11 +30,14 @@ Create a todo per step. Steps 5–7 run only on their stated condition.
+    `references/session-discovery.md`. Confirm a past session by quoting its
+    first prompt and timestamp, and list every candidate you rejected with the
+    reason, or "none". Enumerate subagent transcripts. Create
+-   `~/.ultrapowers/diagnosing-ultrapowers/<session-id>/`, tell your
+-   partner the path, and fill `templates/case.md` there, following its
++   `<project>/.claude/.scratchpad/diagnosing/<session-id>/` (`<project>` is the repository this session
++   runs in), tell your partner the path, and fill `templates/case.md` there, following its
+    provenance rules for environment and skill observations.
+-3. **Triage.** Read the region around the reported problem yourself. Then
+-   dispatch one analyst subagent per dimension in parallel, each given the
++3. **Triage.** Read the region around the reported problem yourself. The
++   analyst fan-out runs only when your partner allows it: ask once, naming
++   the cost — seven parallel subagents. Without that permission, report from
++   your own reading, using the dimension files in `prompts/` as checklists.
++   With it, dispatch one analyst subagent per dimension in parallel, each given the
+    case file path, `prompts/analyst-common.md`, and one dimension file from
+    `prompts/`: `skill-timeline.md`,
+    `plan-adherence.md`, `repeated-work.md`, `stumbles.md`,
+@@ -45,14 +48,7 @@ Create a todo per step. Steps 5–7 run only on their stated condition.
+    it to the workspace, show it, and give the path. Check what cited content
+    actually proves and preserve the supporting case; a symlink alias is not a
+    redundant copy.
+-5. **GitHub issues** — when report §7 says possible or likely, or your
+-   partner asks. Search open and closed issues for the symptoms per
+-   `references/github-issues.md`. Show matches and suggest adding the
+-   report to the closest. If none match, fill `templates/issue.md`, write
+-   it to the workspace, show the exact text, and create the issue only
+-   after approval. `gh` cannot attach files; if a bundle exists, give
+-   your partner its path to attach in the browser.
+-6. **Export** — only when your partner asks for a bundle; never build one
++5. **Export** — only when your partner asks for a bundle; never build one
+    unprompted. If the intake goal was a bug report, say once that a
+    scrubbed bundle is available on request, then wait. Ask the redaction
+    level, stating what each includes: skeleton (no tool-result bodies),
+@@ -64,14 +60,14 @@ Create a todo per step. Steps 5–7 run only on their stated condition.
+    Archive (`zip -r` or `tar -czf`) only after approval. With the archive
+    path, state what it contains, point at the scrub log for replacements, and
+    say scrubbing can miss things: they must review every file before sharing.
+-7. **Similar sessions** — when asked. Turn confirmed findings into a
++6. **Similar sessions** — when asked. Turn confirmed findings into a
+    signature, list candidates by mtime and size, find marker line numbers,
+    dispatch `prompts/similar-session.md` per candidate in parallel, and
+    append report §9.
+ 
+ ## Quick reference
+ 
+-All seven analysts always run. This table says which region to read
++When your partner allows the fan-out, all seven analysts run. This table says which region to read
+ yourself in step 3 and which findings to lead with in the verdict.
+ 
+ | Complaint | Read first, lead with |
+@@ -95,13 +91,12 @@ yourself in step 3 and which findings to lead with in the verdict.
+   parent agent.
+ - **No ultrapowers diagnosis.** Report §7 states involvement and stops.
+   Never name a defect in a skill or propose a change. Your partner
+-  pressing for a fix does not waive this; point at the issue step and
++  pressing for a fix does not waive this; point at the report and
+   mention that a bundle is available on request. No advice to your
+   partner either.
+ - **Approval gates.** No archive before your partner has seen the scrub
+-  log and file list. No issue or comment before they approve the exact
+-  text.
+-- **Intake before analysis.** Nothing in steps 2–7 starts until your
++  log and file list.
++- **Intake before analysis.** Nothing in steps 2–6 starts until your
+   partner has answered. If they are away, write the questions and stop.
+   A statement you reconstructed for them is not an answer. An
+   already-scoped request — one specific event, what is running now, or
+diff --git a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/bundle-README.md b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/bundle-README.md
+index 5549a09..d6c86bd 100644
+--- a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/bundle-README.md
++++ b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/bundle-README.md
+@@ -61,8 +61,7 @@ command/result or quotation, and verify that it supports the claim. Path and
+ line existence alone are insufficient. Record specific limitations when the
+ redaction level or necessary withholding removes support.
+ 
+-Reconcile report, case, environment, findings, README and any local issue
+-draft. Refresh scrub-log counts against final files excluding the log itself.
++Reconcile report, case, environment, findings and README. Refresh scrub-log counts against final files excluding the log itself.
+ Remove stale export statements; distinguish bundle preparation from archive
+ delivery. Retain a mapping from historical anchors to included evidence.
+ 
+diff --git a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/case.md b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/case.md
+index a27cb74..c374c9e 100644
+--- a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/case.md
++++ b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/case.md
+@@ -1,6 +1,6 @@
+ # Case: <session-id>
+ 
+-Workspace: ~/.ultrapowers/diagnosing-ultrapowers/<session-id>/
++Workspace: <project>/.claude/.scratchpad/diagnosing/<session-id>/
+ Created: <ISO timestamp>
+ 
+ ## Problem statement (agreed with your human partner)
+diff --git a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/report.md b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/report.md
+index 4d4a5f3..14de2be 100644
+--- a/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/report.md
++++ b/plugins/ultrapowers/skills/diagnosing-ultrapowers/templates/report.md
+@@ -1,6 +1,6 @@
+ # Session diagnosis: <session-id>
+ 
+-Report path: ~/.ultrapowers/diagnosing-ultrapowers/<session-id>/report.md
++Report path: <project>/.claude/.scratchpad/diagnosing/<session-id>/report.md
+ Written: <ISO timestamp>
+ 
+ ## 1. Problem statement (REQUIRED)
