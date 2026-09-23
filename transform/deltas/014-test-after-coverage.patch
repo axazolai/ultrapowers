@@ -12,7 +12,7 @@ index 894c540..5392a63 100644
  **Architectural:**
  1. **Explore project context** — check files, docs, recent commits
 diff --git a/plugins/ultrapowers/skills/executing-plans/SKILL.md b/plugins/ultrapowers/skills/executing-plans/SKILL.md
-index 18ddb0b..1b60251 100644
+index 18ddb0b..9b721ff 100644
 --- a/plugins/ultrapowers/skills/executing-plans/SKILL.md
 +++ b/plugins/ultrapowers/skills/executing-plans/SKILL.md
 @@ -14,11 +14,12 @@ and a fresh reviewer on every task, each re-reading the codebase from zero.
@@ -124,7 +124,7 @@ index 18ddb0b..1b60251 100644
  Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
  (MERGE_BASE = the commit the branch started from, e.g.
  `git merge-base main HEAD`) and review from the file it prints.
-@@ -266,11 +281,10 @@ weaker than a fresh reviewer, and your human partner decides whether that
+@@ -266,15 +281,13 @@ weaker than a fresh reviewer, and your human partner decides whether that
  is enough before merge.
  
  Sort the findings before you act on any of them. The reviewer's severity
@@ -133,14 +133,21 @@ index 18ddb0b..1b60251 100644
 -a plan conflict — `Final: Ruling: <behavior the reviewer set aside> —
 -<what a reasonable person using this software gets, and why that stands
 -or why it is now a finding> — <cost if wrong>`. Re-grade first, by effect: the
+-spec is a vision document, and a finding's grade is what a reasonable
+-person using this software gets if it ships, not whether the spec names
+-the input that triggers it — a reviewer who set a finding at Minor
+-because the spec was silent has graded the spec, not the effect. Then:
 +labels are advice; the gate is yours. Its "Declined to judge / out of spec"
 +list is not yours to rule on: every line goes to your human partner in your
 +final message under "Out of spec — your call", and they put it into the spec
-+(then it gets a test) or reject it. Re-grade first, by effect: the
- spec is a vision document, and a finding's grade is what a reasonable
- person using this software gets if it ships, not whether the spec names
- the input that triggers it — a reviewer who set a finding at Minor
-@@ -283,12 +297,18 @@ because the spec was silent has graded the spec, not the effect. Then:
++(then it gets a test) or reject it. Re-grade first, by effect: a finding's
++grade is what a person using this software gets if it ships. A finding whose
++trigger the spec is silent on joins "Out of spec — your call" whatever its
++label; it never enters the fix pass on your ruling. Then:
+ 
+ - **Critical and Important** enter the fix pass.
+ - **Minor** goes to the ledger as `Final: minor (deferred): <one-liner>`
+@@ -283,12 +296,18 @@ because the spec was silent has graded the spec, not the effect. Then:
    conflict, not a note that you declined a polish suggestion.
  
  Fix the Critical and Important findings yourself — you are the
@@ -165,7 +172,7 @@ index 18ddb0b..1b60251 100644
  re-review: it would re-read a diff whose covering tests already answer
  "addressed" and whose suite run already answers "broke nothing".
  
-@@ -301,7 +321,8 @@ in the rulings list. There is no second fix pass.
+@@ -301,7 +320,8 @@ in the rulings list. There is no second fix pass.
  Before you delete anything, collect every ledger line containing
  `Ruling:` into your final message under "Rulings I made", in the order you
  made them, each with what it costs if wrong, and every `minor (deferred)`
@@ -175,7 +182,7 @@ index 18ddb0b..1b60251 100644
  message is the only place the decisions you took on your human partner's
  behalf — and the findings you chose not to act on — reach them.
  
-@@ -374,7 +395,7 @@ Use ultrapowers:finishing-a-development-branch.
+@@ -374,7 +394,7 @@ Use ultrapowers:finishing-a-development-branch.
  | Excuse | Reality |
  |--------|---------|
  | "I remember what Task N says" | You remember a summary. The brief has the exact values. Read it. |
@@ -184,11 +191,13 @@ index 18ddb0b..1b60251 100644
  | "I'll run the full suite at the end instead of per step" | Per-step runs are how you learn which step broke it. The end-of-task run is the contract, not a substitute. |
  | "The plan is wrong here, I'll just do the right thing" | Do the right thing and ledger the ruling. Unledgered deviation is a decision made in secret. |
  | "I'll write the ledger lines after a few tasks" | Compaction does not wait for a convenient moment. One line per task, in the same message as the commit. |
-@@ -383,11 +404,13 @@ Use ultrapowers:finishing-a-development-branch.
+@@ -382,12 +402,14 @@ Use ultrapowers:finishing-a-development-branch.
+ | "I read my own diff carefully; the final reviewer is redundant" | Same author, same blind spots. The reviewer is the only fresh context this run buys. |
  | "Tests should pass, the change was trivial" | "Should" is not evidence. The contract requires the command and its output. |
  | "Subagents are slow and expensive, I'll skip the final review too" | Inline already removed the per-task reviewers. One review of the whole branch is the floor, not the ceiling. |
- | "The reviewer said Minor, so it's Minor" | The label graded the spec's silence. Grade what the person gets. Re-grade, then gate. |
+-| "The reviewer said Minor, so it's Minor" | The label graded the spec's silence. Grade what the person gets. Re-grade, then gate. |
 -| "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
++| "The reviewer said Minor, so it's Minor" | Grade what the person gets, then gate. A finding the spec is silent on is the partner's call, not a re-grade. |
 +| (tdd) "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
  | "I'll fix the minors too while I'm in there" | Every minor you fix is a test, a fix, and a suite run your partner did not ask for. Ledger them; your partner decides. |
  
@@ -200,7 +209,7 @@ index 18ddb0b..1b60251 100644
  You: I'm using the executing-plans skill to implement this plan inline.
  
 diff --git a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
-index 389557a..c7473c8 100644
+index 389557a..a07c6dd 100644
 --- a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
 +++ b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
 @@ -30,22 +30,23 @@ Subagent (general-purpose):
@@ -237,8 +246,47 @@ index 389557a..c7473c8 100644
  
      ## Read-Only Review
  
+@@ -90,7 +91,7 @@ Subagent (general-purpose):
+ 
+     **Testing:**
+     - Tests verify real behavior, not mocks?
+-    - Edge cases covered?
++    - Edge cases covered? (test-after mode: the ones the spec states)
+     - Integration tests where they matter?
+     - All tests passing?
+ 
+@@ -122,7 +123,8 @@ Subagent (general-purpose):
+     [Bugs, security issues, data loss risks, broken functionality]
+ 
+     #### Important (Should Fix)
+-    [Architecture problems, missing features, poor error handling, test gaps]
++    [Architecture problems, missing features, poor error handling, test gaps
++    (test-after mode: gaps against behavior the spec states)]
+ 
+     #### Minor (Nice to Have)
+     [Code style, optimization opportunities, documentation polish]
+@@ -136,6 +138,10 @@ Subagent (general-purpose):
+     ### Recommendations
+     [Improvements for code quality, architecture, or process]
+ 
++    ### Declined to judge / out of spec
++    [One line each: the behavior, why it was set aside, its effect on a person
++    using the software. "None" if nothing was set aside.]
++
+     ### Assessment
+ 
+     **Ready to merge?** [Yes | No | With fixes]
+@@ -165,7 +171,7 @@ Subagent (general-purpose):
+ - `[BASE_SHA]` — starting commit
+ - `[HEAD_SHA]` — ending commit
+ 
+-**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Assessment
++**Reviewer returns:** Strengths, Issues (Critical / Important / Minor), Recommendations, Declined to judge / out of spec, Assessment
+ 
+ ## Example Output
+ 
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-index 29a77d1..a6156de 100644
+index 29a77d1..4c4bf5b 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 @@ -102,6 +102,7 @@ digraph process {
@@ -284,6 +332,30 @@ index 29a77d1..a6156de 100644
  The final whole-branch review gets a package too: run
  `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
  branch started from, e.g. `git merge-base main HEAD`) and include the
+@@ -481,7 +492,11 @@ the ledger's deferred-minor and parked lines so it can triage which must be
+ fixed before merge.
+ 
+ If the final whole-branch review returns findings, dispatch ONE fix subagent
+-with the complete findings list — not one fixer per finding.
++with the complete findings list — not one fixer per finding — and the
++project's testing mode: tdd, each fix RED → GREEN; test-after, reproduce →
++fix → a test only where the finding broke behaviour the spec states.
++Findings about behaviour the spec is silent on are not in that list; they go
++to the partner.
+ Per-finding fixers each rebuild context and re-run suites; a real
+ session's final-review fix wave cost more than all its tasks combined.
+ Then run exactly one scoped re-review of the fix wave
+@@ -502,7 +517,9 @@ with what it costs if wrong. The list is exhaustive: if the ledger holds a
+ ruling, the list holds it. That list is the only place the decisions you
+ took on your human partner's behalf reach them — they read it and rework
+ whatever you got wrong. A ruling that dies with the workspace was a decision
+-made in secret.
++made in secret. Collect the same way every deferred minor under "Deferred
++minors" and every reviewer line set aside as out of spec — per-task and
++final — under "Out of spec — your call".
+ 
+ When the final whole-branch review is clean and its fixes are merged, write
+ the phase documents, then delete the workspace.
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
 index 5c8ecd6..0bf6860 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
@@ -343,11 +415,19 @@ index 5c8ecd6..0bf6860 100644
      - Self-review findings (if any)
      - Any issues or concerns
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
-index 5c619bc..d33a173 100644
+index 5c619bc..737e67d 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
-@@ -72,8 +72,12 @@ Subagent (general-purpose):
+@@ -70,10 +70,20 @@ Subagent (general-purpose):
+     implementer grading their own work. Judge the code on its merits — a
+     stated rationale never downgrades a finding's severity.
  
++    ## Behavior the spec is silent on
++
++    A gap in behavior the task and spec do not mention is not a finding
++    against this task. List it under "Out of spec" with its effect on a
++    person using the software; the controller ledgers it for the partner.
++
      ## Tests
  
 -    The implementer already ran the tests and reported results with TDD
@@ -361,6 +441,12 @@ index 5c619bc..d33a173 100644
      report. Run a test only when reading the code raises a specific doubt
      that no existing run answers — and then a focused test, never a
      package-wide suite, race detector run, or repeated/high-count loop. If
+@@ -204,4 +214,4 @@ Subagent (general-purpose):
+   path it wrote; the package never enters the controller's context)
+ 
+ **Reviewer returns:** Spec Compliance verdict (✅/❌/⚠️), Strengths, Issues
+-(Critical/Important/Minor), Task quality verdict
++(Critical/Important/Minor), Out of spec, Task quality verdict
 diff --git a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md b/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
 index d9ca792..66d2ba4 100644
 --- a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
@@ -424,10 +510,10 @@ index d9ca792..66d2ba4 100644
  ## When Process Reveals "No Root Cause"
  
 diff --git a/plugins/ultrapowers/skills/test-driven-development/SKILL.md b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-index 46838cc..489b091 100644
+index 46838cc..5584cc2 100644
 --- a/plugins/ultrapowers/skills/test-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-@@ -1,9 +1,46 @@
+@@ -1,9 +1,47 @@
  ---
  name: test-driven-development
 -description: Use when implementing any feature or bugfix, before writing implementation code
@@ -441,8 +527,9 @@ index 46838cc..489b091 100644
 +
 +Every project has a testing mode. Read `.claude/ultrapowers.json` at the project
 +root: `"tdd": true` → **tdd** mode; anything else, or no file → **test-after**
-+mode. The session-start note names the mode too. `/ultrapowers-tdd enable|disable`
-+switches it; the partner decides, never you.
++mode. The session-start note names the mode too. The partner switches it —
++`/ultrapowers-tdd enable|disable` where the claude-config bundle is installed,
++otherwise by setting `"tdd"` in that file — never you.
 +
 +- **tdd** → follow "TDD Mode" below.
 +- **test-after** → follow "Test-After Mode" below.
@@ -476,7 +563,7 @@ index 46838cc..489b091 100644
  
  ## Overview
  
-@@ -182,15 +219,7 @@ Confirm:
+@@ -182,15 +220,7 @@ Confirm:
  
  **Other tests fail?** Fix now.
  
@@ -493,7 +580,7 @@ index 46838cc..489b091 100644
  
  ### REFACTOR - Clean Up
  
-@@ -316,7 +345,7 @@ Can't check all boxes? You skipped TDD. Start over.
+@@ -316,7 +346,7 @@ Can't check all boxes? You skipped TDD. Start over.
  
  ## Debugging Integration
  
@@ -502,7 +589,7 @@ index 46838cc..489b091 100644
  
  Never fix bugs without a test.
  
-@@ -328,3 +357,50 @@ Otherwise → not TDD
+@@ -328,3 +358,50 @@ Otherwise → not TDD
  ```
  
  No exceptions without your human partner's permission.
@@ -586,9 +673,18 @@ index 2946c89..d5a0830 100644
  process costs maintenance forever.
  
 diff --git a/plugins/ultrapowers/skills/verification-before-completion/SKILL.md b/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
-index 7d45333..563338e 100644
+index 7d45333..08bb3f3 100644
 --- a/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
 +++ b/plugins/ultrapowers/skills/verification-before-completion/SKILL.md
+@@ -43,7 +43,7 @@ Skip any step = lying, not verifying
+ | Linter clean | Linter output: 0 errors | Partial check, extrapolation |
+ | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
+ | Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
+-| Regression test works | Red-green cycle verified | Test passes once |
++| Regression test works | Per testing mode (Regression tests, below) | Test passes once |
+ | Agent completed | VCS diff shows changes | Agent reports "success" |
+ | Requirements met | Line-by-line checklist | Tests passing |
+ 
 @@ -79,10 +79,12 @@ Skip any step = lying, not verifying
  ❌ "Should pass now" / "Looks correct"
  ```
@@ -707,5 +803,5 @@ index c61a5c1..cf4560c 100644
 -**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
 +**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there goes into the owning task's test list. An empty section means you checked and found none, not that you skipped the check.
  
- **5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. Tests are written after the code, so at plan time run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
+ **5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. At plan time the tests for new code do not exist yet, so run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
  
