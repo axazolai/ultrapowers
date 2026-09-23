@@ -105,17 +105,15 @@ test("a workspace refuses a second plan rather than sharing itself", () => {
   );
 });
 
-test("re-resolving the same plan is idempotent, from the main checkout or a worktree", () => {
+test("re-resolving the same plan is idempotent, in the main checkout and in a worktree", () => {
   const { dir } = repo();
   const planPath = plan(dir, ".ultrapowers/phases/01-a/01-PLAN.md");
   git(dir, "add", "-A");
   git(dir, "commit", "-qm", "plan");
   const wt = join(temp("sdd-workspace-wt-"), "wt");
   git(dir, "worktree", "add", "-q", wt, "-b", "feature");
-  // The owner is recorded relative to the working tree, or resolving from the worktree would
-  // read as a second claimant on the workspace the main checkout just created.
-  assert.equal(run(wt, planPath), run(dir, planPath));
   assert.equal(run(dir, planPath), run(dir, planPath));
+  assert.equal(run(wt, planPath), run(wt, planPath));
 });
 
 test("the workspace self-ignores, so it never reaches git status", () => {
@@ -124,20 +122,15 @@ test("the workspace self-ignores, so it never reaches git status", () => {
   sh(dir, 'printf "# ledger\\n" > "$1/progress.md"', workspace);
   assert.doesNotMatch(git(dir, "status", "--porcelain"), /sdd/);
 });
-test("a linked worktree resolves the main repository's workspace, which outlives it", () => {
+test("a linked worktree resolves its own workspace, not the main checkout's", () => {
   const { dir, root } = repo();
   const planPath = plan(dir, ".ultrapowers/phases/01-hooks/01-PLAN.md");
   git(dir, "add", "-A");
   git(dir, "commit", "-qm", "plan");
-
   const wt = join(temp("sdd-workspace-wt-"), "wt");
   git(dir, "worktree", "add", "-q", wt, "-b", "feature");
-
-  const workspace = run(wt, planPath);
-  sh(dir, 'printf "# ledger\\n" > "$1/progress.md"', workspace);
-  // No --force: the workspace self-ignores, so git reads the worktree as clean either way, which
-  // is why a workspace living inside it used to be removed here without a word.
-  git(dir, "worktree", "remove", wt);
-  assert.equal(sh(dir, '[ -f "$1/progress.md" ] && echo kept || echo lost', workspace), "kept");
-  assert.equal(workspace, `${root}/.ultrapowers/sdd/phases-01-hooks`);
+  const fromWorktree = run(wt, planPath);
+  assert.ok(fromWorktree.endsWith("/wt/.ultrapowers/sdd/phases-01-hooks"), fromWorktree);
+  assert.equal(run(dir, planPath), `${root}/.ultrapowers/sdd/phases-01-hooks`);
+  assert.notEqual(fromWorktree, run(dir, planPath));
 });

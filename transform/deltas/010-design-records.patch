@@ -1,5 +1,5 @@
 diff --git a/plugins/ultrapowers/skills/brainstorming/SKILL.md b/plugins/ultrapowers/skills/brainstorming/SKILL.md
-index de41117..e50a86a 100644
+index e361201..894c540 100644
 --- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
 +++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
 @@ -199,6 +199,8 @@ is the whole process.
@@ -20,8 +20,8 @@ index de41117..e50a86a 100644
  - Be ready to go back and clarify if something doesn't make sense
  
  **Design for isolation and clarity:**
-@@ -246,6 +250,9 @@ is the whole process.
-   - (User preferences for spec location override this default)
+@@ -249,6 +253,9 @@ is the whole process.
+ - **Name a document for what it decides, not for the artefact that carried it.** "delta 007" says nothing on its own, and a name that says nothing has already filed a design under the wrong phase. The delta number is an implementation detail; it lives in the delta.
  - Use elements-of-style:writing-clearly-and-concisely skill if available
  - Commit the design document to git
 +<!-- design-records:v1 - ADR shape from gsd-doc-classifier; glossary discipline from `grill-with-docs` in mattpocock/skills (MIT, (c) Matt Pocock) -->
