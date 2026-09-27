@@ -53,7 +53,7 @@ gate and the maintainability.
   `forkOwned` list: files this fork authors outright rather than patching, currently seven —
   the two READMEs, the marketplace manifest, `.gitattributes`, the `phase-dir` allocator, and
   the summary-writer and verification prompts.
-- `transform/deltas/NNN-*.patch` — thirteen numbered changes to upstream's skill text, applied
+- `transform/deltas/NNN-*.patch` — fourteen numbered changes to upstream's skill text, applied
   in order. What each one does is listed in the plugin README.
 - `transform/*.mjs` — the engine (classify, rename, patch, build) and its tests.
 

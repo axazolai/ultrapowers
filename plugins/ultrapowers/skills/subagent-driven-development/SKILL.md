@@ -206,6 +206,10 @@ implementation.
 
 ## Model Selection
 
+If the environment provides a model-selection policy (a `model-selection-policy` skill or a
+CLAUDE.md model section), its role map decides the model for every dispatch in this plugin and
+this section is the fallback.
+
 Use the least powerful model that can handle each role to conserve cost and increase speed.
 
 **Mechanical implementation tasks** (isolated functions, clear specs, 1-2 files): use a fast, cheap model. Most implementation tasks are mechanical when the plan is well-specified.
