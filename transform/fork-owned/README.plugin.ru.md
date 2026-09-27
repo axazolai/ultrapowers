@@ -151,6 +151,7 @@ test-after). Бандл claude-config переключает его команд
 | `011-planning-rules-are-run` | пункты 5 и 6 проверки плана исполняются, а не перечитываются |
 | `014-test-after-coverage` | режим тестирования (tdd / test-after), лог багов, находки вне спеки — партнёру |
 | `015-diagnosing-in-project` | диагностика в scratchpad проекта, без GitHub issues, аналитики — по разрешению |
+| `016-model-policy-pointer` | Model Selection уступает политике выбора моделей окружения |
 
 Три файла форк пишет сам, а не патчит апстримовые:
 `skills/brainstorming/scripts/phase-dir`,

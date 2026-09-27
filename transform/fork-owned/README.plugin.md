@@ -154,6 +154,7 @@ Each change above is one numbered patch on the `patch` branch, applied at build 
 | `011-planning-rules-are-run` | plan checks 5 and 6 execute instead of being read |
 | `014-test-after-coverage` | the testing mode (tdd / test-after), the bug log, out-of-spec findings to the partner |
 | `015-diagnosing-in-project` | diagnosing in the project scratchpad, no GitHub issues, analysts on permission |
+| `016-model-policy-pointer` | Model Selection defers to an environment's model-selection policy |
 
 Three files are the fork's own rather than a patch on upstream's:
 `skills/brainstorming/scripts/phase-dir`,
