@@ -37,19 +37,17 @@ Subagent (general-purpose):
        (`.claude/ultrapowers.json` → `tdd`; absent → test-after;
        ultrapowers:test-driven-development):
        - tdd: the task's failing-test steps first, then the code
-       - test-after: after the code, reconcile — a decision that changed
-         behaviour, scope or an interface is written into the task text of
-         the plan (and the spec), named in your report — then fix this
-         task's open bug-log entries, then write one test per Acceptance
-         line and run the mutation check
+       - test-after: after the code, write one test per Acceptance line
+         and run the mutation check; a decision that changed behaviour,
+         scope or an interface is written under the task in the plan as a
+         `Ruling:` line first, and named in your report
     3. Verify implementation works
     4. Commit your work
     5. Self-review (see below)
     6. Report back
 
-    A bug you find that does not block the task goes to the project's bug
-    log (`BUGS.md`, location per the project `CLAUDE.md`) and you
-    continue. A bug that blocks the task is fixed now.
+    A bug you find on the way is fixed on the way; it is never logged for
+    later.
 
     Work from: [directory]
 
@@ -124,7 +122,7 @@ Subagent (general-purpose):
     - Do tests actually verify behavior (not just mock behavior)?
     - tdd: did every test fail first, for the expected reason?
     - test-after: does every Acceptance line have a test, and no test cover an unstated behaviour?
-    - Did every decision that changed behaviour, scope or an interface reach the plan/spec first?
+    - Did every decision that changed behaviour, scope or an interface reach the plan first?
     - Is the test output pristine (no stray warnings or noise)?
 
     If you find issues during self-review, fix them now before reporting.

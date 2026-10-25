@@ -21,10 +21,9 @@ If you haven't completed Phase 1, you cannot propose fixes.
 
 ## Found While Doing Other Work
 
-A bug that does not block the next step of the current work goes to the bug log
-(`ultrapowers:test-driven-development` → Both Modes) and the work continues.
-This process runs when the log is drained: before a unit of work's review, and
-at the end of the work. A bug that blocks the next step runs through it at once.
+A bug found while doing other work runs through this process before that
+unit of work's review; a bug that blocks the next step runs through it at
+once. A bug outside the work's scope is listed to the partner, not logged.
 
 ## When to Use
 
@@ -95,11 +94,11 @@ You MUST complete each phase before proceeding to the next.
    ```bash
    # Layer 1: Workflow
    echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
+   echo "IDENTITY: $([ -n "${IDENTITY:-}" ] && echo SET || echo UNSET)"
 
    # Layer 2: Build script
    echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
+   printenv IDENTITY >/dev/null 2>&1 && echo "IDENTITY in environment" || echo "IDENTITY not in environment"
 
    # Layer 3: Signing script
    echo "=== Keychain state: ==="

@@ -83,10 +83,9 @@ digraph process {
 
     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" [shape=box];
     "More tasks remain?" [shape=diamond];
-    "Drain the bug log: fix open entries, list out-of-scope ones" [shape=box];
     "Final whole-branch review (fresh reviewer if you have one)" [shape=box];
     "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" [shape=box];
-    "Final review clean: phase documents, then delete the workspace by name" [shape=box];
+    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" [shape=box];
     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
 
     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" -> "task-start: brief + BASE; read the brief";
@@ -100,11 +99,10 @@ digraph process {
     "Completion contract met?" -> "task-done: run tests, ledger the result; mark todo complete" [label="yes"];
     "task-done: run tests, ledger the result; mark todo complete" -> "More tasks remain?";
     "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
-    "More tasks remain?" -> "Drain the bug log: fix open entries, list out-of-scope ones" [label="no"];
-    "Drain the bug log: fix open entries, list out-of-scope ones" -> "Final whole-branch review (fresh reviewer if you have one)";
+    "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
     "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger";
-    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" -> "Final review clean: phase documents, then delete the workspace by name";
-    "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
+    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" -> "Final review clean: Result lines + ROADMAP row, then delete the workspace by name";
+    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
 }
 ```
 
@@ -140,23 +138,17 @@ and the new one resumes from the same ledger.
   another plan's progress: leave it and start your own, fresh.
 - Create the ledger with its identity as the first line:
   `# SDD ledger — plan: <plan file path>`.
-- The ledger is read cold, by someone else. At the end of the plan a summary
-  writer subagent folds it into `NN-SUMMARY.md`, so every entry must stand on
-  its own: task number, commit range, ruling, deviation. An entry that only
-  makes sense to its own author has not been written yet.
 - `git clean -fdx` will destroy the workspace (it's git-ignored scratch);
   if that happens, recover from `git log`.
 
 Read the plan once, note its context and Global Constraints, and create a
-todo per task. If the plan names a Spec, read that too: the spec is the
-authority the plan argues from, and conflicts inside the plan resolve
-against it. A plan with no reachable spec gets a ledger note saying so —
-rulings made without one are provisional.
+todo per task. The plan's header (Goal, Constraints, Out of scope, Design)
+is the spec: the authority the tasks argue from, and conflicts inside the
+tasks resolve against it.
 
 **REQUIRED SUB-SKILL:** load ultrapowers:test-driven-development now,
 before Task 1. It names the project's testing mode (`.claude/ultrapowers.json`
-→ `tdd`; absent → test-after) and what each mode asks of every task below,
-and it holds the bug log you use throughout.
+→ `tdd`; absent → test-after) and what each mode asks of every task below.
 
 Before Task 1, scan the plan for conflicts between tasks. The plan's
 Interfaces blocks tell you where to look: for every task that consumes
@@ -196,12 +188,12 @@ at setup.
   is written first and run first. Watching it fail is a step, not a
   formality — a test that passes before the implementation exists is a
   finding about the test.
-- **test-after mode:** implement, then reconcile — a decision that changed
-  behaviour, scope or an interface goes into the plan/spec as a `Ruling:` —
-  then fix this task's open bug-log entries, then write one test per
-  `Acceptance:` line and run the mutation check.
+- **test-after mode:** implement, then write one test per `Acceptance:`
+  line and run the mutation check. A decision that changed behaviour, scope
+  or an interface goes under the task in the plan as a `Ruling:` line first.
 
-A bug that does not block the task goes to the bug log and you continue.
+A bug found on the way is fixed on the way, under
+ultrapowers:systematic-debugging; it is never logged for later.
 
 Every step that runs a command has an `Expected:` line. Run the command,
 read its output, and compare. Three outcomes:
@@ -246,15 +238,11 @@ if they pass — appends the completion line to the ledger:
 A failing run records nothing; the task is not complete. When it records,
 mark the todo complete and take the next task.
 
-`NN-STATE.md` moves too: raise its `tasks_done` in the same message. One field,
-yours, no subagent — the ledger is the workspace's record and the state file is
-the tree's, and a fraction nobody raises is a fraction that lies.
+The plan is the phase's state. In the same message, tick the task's `- [ ]`
+box in the plan file, and copy any `Ruling:` the ledger holds for the task
+under it as one line. A task you drop is marked `- [-]` with its `Ruling:`.
 
 ## Final Review
-
-Before it, drain the bug log: fix the open entries that belong to this plan's
-work (tests per the testing mode); list entries outside the plan's scope to
-your human partner instead.
 
 Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
 (MERGE_BASE = the commit the branch started from, e.g.
@@ -325,65 +313,14 @@ line under "Deferred minors", and every reviewer line set aside as out of spec u
 message is the only place the decisions you took on your human partner's
 behalf — and the findings you chose not to act on — reach them.
 
-When the final review is clean and its fixes are committed, write the phase
-documents, then delete the workspace.
-
-Run the ledger read-back check first. With a subagent tool, dispatch one cheap
-subagent and give it the ledger path and NOTHING else — no plan, no spec, no
-diffs — and ask it to answer from that file alone:
-
-- which phase this is and what it is for
-- which tasks are done, which is in flight, which remain
-- what is open, deferred or parked, and under whose ruling
-- what must not be reopened, and why
-- what the next action is
-
-It passes when the answers are correct and the agent never needed another
-file. A failure is amended in the ledger before the summary is written.
-Without a subagent tool, skip the check and say so in the ledger.
-
-Write `<phase dir>/<NN>-SUMMARY.md` from the ledger and the plan, per
-[summary-writer-prompt.md](../subagent-driven-development/summary-writer-prompt.md)
-— dispatched to a subagent when you have one, by you otherwise. There are no
-implementer reports in inline execution; the ledger's `Ruling:` lines and the
-task test logs stand in for them. The summary is the record that outlives the
-workspace.
-
-Write `<phase dir>/<NN>-VERIFICATION.md` per
-[verification-prompt.md](../subagent-driven-development/verification-prompt.md)
-with the plan file and the whole-branch review package — dispatched to a
-subagent when you have one, by you otherwise. It returns a path and a verdict.
-
-Then bring the two state documents current yourself, in the same turn — not a
-subagent, and not later.
-
-`<phase dir>/<NN>-STATE.md` answers where one phase is and what picking it up
-cold would need. `.ultrapowers/ROADMAP.md` answers which phases exist and what
-each one's status is. Both are YAML frontmatter and then prose: the machine
-reads the fields, a person reads the prose.
-
-`NN-STATE.md` carries `phase`, `status`, `tasks_done`, `tasks_total`,
-`branch`, `integration` and `updated`. `ROADMAP.md` carries `current` (the
-phase in flight, or `null`), `deployed_through`, `updated`, and a `phases:`
-list of `{ phase, slug, status, integration }`. `status` is `planned`,
-`running`, `complete` or `abandoned`; `integration` is `none`, `branch` or
-`merged`. The two are separate fields because they move separately: a phase can
-be `abandoned` with its branch already merged, and `complete` with the branch
-still unmerged. `tasks_done`/`tasks_total` is a tally, not a cursor. Deployment
-belongs to the tree rather than to a phase, so it is one roadmap field.
-
-Write them when a status they record changes, not at the end of any turn in
-which something happened: a task finishing writes the state file, a phase
-ending writes both, a session that read three files and decided nothing writes
-neither. Rewrite rather than append — neither is a log — but never drop what is
-finished. Work that closes is marked closed and keeps its entry, what remains is
-hoisted above it, and a short summary sits at the top so a reader can stop early.
-An entry that carried a debt's full reasoning may be compressed once the debt is
-paid, down to its name, one line of what it was, and the closed mark. A handover
-that instructs its own deletion loses whatever quietly moved into it.
+When the final review is clean and its fixes are committed, close the plan
+in place: add a `Result:` line at the end of each stage, or of the plan —
+commit range, suite count, review verdict — and set the phase's row in
+`.ultrapowers/ROADMAP.md` to `complete`, with `current` back to `null`. The
+plan with its ticked boxes is the record; no summary document is written.
 
 Then delete this plan's workspace by name: list its files (`progress.md`,
-`task-*-brief.md`, `task-*-tests.log`, `review-*.diff`, `.plan`), delete
+`task-*-brief.md`, `task-*-tests.log`, `review-*.diff`, `plan-path`), delete
 each one, then the empty directory. Never a recursive delete. Sibling
 directories belong to other plans; leave them alone.
 
@@ -405,57 +342,3 @@ Use ultrapowers:finishing-a-development-branch.
 | "The reviewer said Minor, so it's Minor" | Grade what the person gets, then gate. A finding the spec is silent on is the partner's call, not a re-grade. |
 | (tdd) "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
 | "I'll fix the minors too while I'm in there" | Every minor you fix is a test, a fix, and a suite run your partner did not ask for. Ledger them; your partner decides. |
-
-## Example Workflow
-
-In tdd mode:
-
-```
-You: I'm using the executing-plans skill to implement this plan inline.
-
-[Setup: worktree verified]
-[Read plan once: .ultrapowers/phases/04-hooks/04-PLAN.md; spec read]
-[Resolve workspace: sdd-workspace .ultrapowers/phases/04-hooks/04-PLAN.md — no ledger inside, fresh start]
-[Pre-flight scan: 2 shared-interface rows, 4 self-consistency rows, clean; written to ledger]
-[Create todos for all tasks]
-
-Task 1: Hook installation script
-
-[task-start plan 1 → brief read; BASE a1b2c3d]
-[Step 1: write failing test — written]
-[Step 2: run it — FAIL: install_hook not defined. Matches Expected.]
-[Step 3: implement — written]
-[Step 4: run it — PASS 1/1. Matches Expected.]
-[Step 5: commit — d4e5f6a]
-[Contract: tests ran, output read, no deviations]
-[task-done plan 1 a1b2c3d -- npm test -- hooks → ledger: Task 1: complete (commits a1b2c3d..d4e5f6a, tests: npm test -- hooks → 1/1 pass)]
-
-Task 2: Recovery modes
-
-[task-start plan 2 → brief read; BASE d4e5f6a]
-[Step 2: run failing test — FAIL, but on an import error: Task 1 exported
- installHook, brief consumes install_hook]
-[Ruling: brief's consumer name is a typo against Task 1's Produces block;
- use installHook — Ledger: Task 2: Ruling: install_hook → installHook — matches Task 1 Produces — cost if wrong: one rename]
-[Steps 2-5 as planned; commit b7c8d9e]
-[task-done plan 2 d4e5f6a -- npm test -- recovery → ledger: Task 2: complete (commits d4e5f6a..b7c8d9e, tests: npm test -- recovery → 8/8 pass)]
-
-...
-
-[After all tasks: review-package plan MERGE_BASE HEAD; dispatch code-reviewer, most capable model]
-Reviewer: One Important finding — progress reporting interval hardcoded. Two Minor.
-[Re-grade: Important stands; minors → ledger as deferred]
-[Fix pass: test_progress_interval_configurable RED → extract PROGRESS_INTERVAL → GREEN; suite 12/12; commit]
-[Ledger: Final: fixed hardcoded interval — test_progress_interval_configurable RED→GREEN, suite 12/12]
-
-Rulings I made:
-- Task 2: install_hook → installHook (brief typo; cost if wrong: one rename)
-
-Deferred minors:
-- README lacks a usage example
-- recovery.js could split verify/repair into two files
-
-[Ledger read-back passes; 04-SUMMARY.md written; workspace deleted by name]
-
-Using ultrapowers:finishing-a-development-branch.
-```

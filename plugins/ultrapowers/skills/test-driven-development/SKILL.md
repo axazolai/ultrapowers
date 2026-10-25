@@ -20,18 +20,12 @@ otherwise by setting `"tdd"` in that file — never you.
 
 ## Both Modes
 
-- **Spec first.** A decision made during the work that changes behaviour, scope
-  or an interface is written into the spec and/or plan before the tests that
-  cover it.
-- **Bug log.** A bug found during the work that does not block the next step
-  goes to the project's bug log and the work continues; a bug that blocks the
-  next step is fixed at once. File: `BUGS.md`, located where the project
-  `CLAUDE.md` says, else the project root. Entry: `BUG-NNN`, date, where,
-  symptom, reproduction, unit of work, status `Open`/`Fixed`. Before a unit's
-  review, fix its open entries; at the end of the work, before the final
-  review, fix the rest. An entry outside the work's scope is listed to the
-  partner instead of fixed. Fixed entries stay, compressed to a line. Fix a
-  logged bug with `ultrapowers:systematic-debugging`.
+- **Plan first.** A decision made during the work that changes behaviour, scope
+  or an interface is written into the plan (a `Ruling:` line under the task)
+  before the tests that cover it.
+- **Bugs are fixed in the work.** A bug found during the work is fixed before
+  that unit's review, with `ultrapowers:systematic-debugging`. A bug outside
+  the work's scope is listed to the partner, never logged beside the work.
 - **Review Focus.** A plan's Review Focus lines are part of the owning task's
   test list — a failing-test step in tdd mode, an `Acceptance:` line in
   test-after mode.
@@ -346,7 +340,7 @@ Can't check all boxes? You skipped TDD. Start over.
 
 ## Debugging Integration
 
-Bug found that blocks the work? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression. A bug that does not block goes to the bug log first (Both Modes).
+Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
 
 Never fix bugs without a test.
 
@@ -368,14 +362,13 @@ per-task review, otherwise the whole change.
 
 ## The Order
 
-1. **Reconcile.** Spec/plan updated for every decision that changed behaviour,
-   scope or an interface.
-2. **Drain the bug log** for this unit.
-3. **Write the tests.** One per behaviour or acceptance criterion the spec or
-   plan states. A behaviour the spec does not state gets no test; if it
-   matters, it goes into the spec first.
-4. **Run them.**
-5. **Review.**
+1. **Reconcile.** The plan carries every decision that changed behaviour,
+   scope or an interface (a `Ruling:` line under the task).
+2. **Write the tests.** One per behaviour or acceptance criterion the plan
+   states. A behaviour the plan does not state gets no test; if it matters,
+   it goes into the plan first.
+3. **Run them.**
+4. **Review.**
 
 ## What Gets a Test
 
@@ -399,8 +392,8 @@ its test — or a behaviour outside the spec — leave it.
 
 ## Checklist
 
-- [ ] Spec/plan updated for every decision that changed behaviour, scope or an interface
-- [ ] This unit's bug-log entries fixed
+- [ ] Plan updated for every decision that changed behaviour, scope or an interface
+- [ ] Every bug found in this unit fixed
 - [ ] Every stated behaviour has a test; no test covers an unstated one
 - [ ] Mutation check done
 - [ ] Tests run, output pristine, failures reported by name

@@ -56,71 +56,49 @@ the bundle, set the key by hand:
 - **tdd** — upstream's test-driven development: failing test first, RED → GREEN → REFACTOR, TDD
   evidence in task reports, RED → GREEN fixes after the final review.
 - **test-after** — code first; when a unit of work stands whole, and before its review, the
-  spec/plan is reconciled with the decisions made along the way, the unit's bug-log entries are
-  fixed, and one test per stated behaviour is written and checked by mutation. Plans carry an
-  `Acceptance:` list instead of test code.
+  plan carries the decisions made along the way as `Ruling:` lines, and one test per stated
+  behaviour is written and checked by mutation. Plans carry an `Acceptance:` list instead of
+  test code.
 
-In both modes: a bug that does not block the work goes to `BUGS.md` and is fixed before the
-unit's review or at the end; a decision that changes behaviour goes into the spec first; a
+In both modes: a bug found during the work is fixed in the work, before the unit's review —
+nothing is logged for later; a decision that changes behaviour goes into the plan first; a
 plan's Review Focus lines join the owning task's test list; the reviewer's findings about
-behaviour the spec is silent on go to the partner, who puts each into the spec or rejects it;
+behaviour the plan is silent on go to the partner, who puts each into the plan or rejects it;
 every failure a run shows is reported by name.
 
 ### Planning lives in a tree, not in dated files
 
 Upstream writes designs to `docs/ultrapowers/specs/YYYY-MM-DD-<topic>-design.md` and plans to
-`docs/ultrapowers/plans/YYYY-MM-DD-<feature>.md`. Here both live in one phase directory, named
-for what the work decides:
+`docs/ultrapowers/plans/YYYY-MM-DD-<feature>.md`. Here a phase has one document:
 
 - `bash scripts/phase-dir phase|task|adhoc <slug>` resolves and prints
   `.ultrapowers/phases/NN-<slug>/`, allocating a number above the highest existing one and never
   reusing it. Re-running with the same slug re-resolves the same directory, so brainstorming,
   `writing-plans`, `subagent-driven-development` and `executing-plans` cannot drift to different
   places for one phase.
-- The phase's own spec is `NN-SPEC.md` at that directory's root, its plan is `NN-PLAN.md`, and
-  the supporting designs that fed them go in `refs/` beside them. A document serving more than
-  one phase goes to `.ultrapowers/docs/`.
-- The plan's workspace is named after its phase directory and records its owner; a second plan
-  claiming it is refused rather than sharing it.
-- Nothing in the tree is scaffolded ahead of its content: a folder appears when something belongs
-  in it.
+- `NN-PLAN.md` in that directory is the phase: brainstorming writes the design as its header
+  (Goal, Branch, Constraints, Out of scope, Design, the behaviours the tests will confirm);
+  `writing-plans` appends the tasks below. There is no separate spec file — where a skill says
+  "the spec", it means the plan's header.
+- The plan is the phase's state. An executor ticks a task's `- [ ]` box as it completes, writes a
+  deviation under the task as a one-line `Ruling:`, marks a dropped task `- [-]`, and closes the
+  plan with a `Result:` line per stage (commit range, suite count, review verdict) plus the
+  phase's row in `.ultrapowers/ROADMAP.md`. No summary, verification or state file is written.
+- The workspace is deleted file by name at the end — never recursively.
 
-### Plan execution — subagent-driven or native
+### Brainstorming
 
-- **Tightly coupled tasks go to one agent given the whole chain**, not one per task.
-- **Who writes which document is fixed.** `NN-SPEC.md` and `NN-PLAN.md` stay in the main session
-  (they are dialogues); `NN-SUMMARY.md` and `NN-VERIFICATION.md` go to subagents through
-  `summary-writer-prompt.md` and `verification-prompt.md`, which return a path and a verdict
-  rather than the document's text.
-- **Both executors end the same way.** The ledger is read cold first — one cheap subagent gets
-  the ledger path and nothing else and must say what the phase is, what is done, what is open and
-  what comes next; a gap is amended before anything else. Then the summary and verification are
-  written, the state files brought current, and only then is the workspace deleted, file by
-  name — never recursively. The summary is the record that outlives it.
-- **Status files keep their history.** `ROADMAP.md` and `NN-STATE.md` are rewritten rather than
-  appended to, but finished work is marked closed and keeps its entry, remaining work is hoisted
-  above it, and a summary sits on top so a reader can stop early.
-
-### Brainstorming and design records
-
-- **Facts are yours to find; decisions are your partner's to make.** A question answerable by
-  looking at the filesystem, git history or installed versions is looked up, not asked. Every
-  question carries its own recommended answer and the reasoning for it, and the decision tree is
-  walked in dependency order.
 - **Stack drift is checked once, at design time** — `node ~/.claude/hooks/lib/stack-rules-check.mjs
   <root>`, reported only when it says `stale`.
-- **Two design sections are required**: *Testing Decisions* (the acceptance list the tests will
-  confirm, and the seams at which the behaviour will be verified) and *Out of Scope*.
-- **A glossary entry is written the moment a term is sharpened**, not batched at the end.
-- **An ADR is written only when the decision is hard to reverse, surprising without context and a
-  real trade-off** — all three.
+- **The design lists the behaviours the tests will confirm**, one line each; in test-after mode
+  the tests confirm exactly these.
 
 ### Planning checks that execute
 
-Upstream's plan self-review checks are read with fresh eyes. Here checks 5 and 6 are *run*: every
-command the plan tells an implementer to run is run first, in the worktree they will use — in
-test-after mode only what exists at plan time — and every invariant stated in a task's
-Interfaces block is executed against that task's own sample code.
+Upstream's plan self-review checks are read with fresh eyes. Here checks 6 and 7 are *run*: every
+command the plan tells an implementer to run is run first, in the worktree they will use, and
+every invariant stated in a task's Interfaces block is executed against that task's own sample
+code.
 
 ### Code review
 
@@ -146,20 +124,16 @@ Each change above is one numbered patch on the `patch` branch, applied at build 
 | `003-plugin-version-source` | the brainstorming server reads the Claude Code manifest only |
 | `004-plugin-manifest` | fork identity in `plugin.json`, upstream credited in the description |
 | `005-brand-link` | the brainstorming UI's brand link points at this fork |
-| `006-grilling-fact-lookup` | interview discipline in brainstorming |
-| `007-planning-tree` | the phase directory replaces dated `docs/` paths; phase-named workspaces |
-| `008-sdd-summary` | cold ledger read-back and `NN-SUMMARY` before the workspace is deleted by name |
-| `009-agent-first` | who writes which document; state files that keep history; coupled tasks to one agent |
-| `010-design-records` | stack-drift check, required sections, glossary and ADR discipline |
-| `011-planning-rules-are-run` | plan checks 5 and 6 execute instead of being read |
-| `014-test-after-coverage` | the testing mode (tdd / test-after), the bug log, out-of-spec findings to the partner |
+| `007-planning-tree` | one document per phase: the design as the header of `NN-PLAN.md` in the phase directory, no spec file |
+| `009-plan-is-the-state` | ticked boxes, `Ruling:` and `Result:` lines in the plan, the ROADMAP row; the workspace deleted by name |
+| `010-stack-drift-check` | stack drift checked once, at design time |
+| `011-planning-rules-are-run` | plan checks 6 and 7 execute instead of being read |
+| `014-test-after-coverage` | the testing mode (tdd / test-after), bugs fixed in the work, out-of-spec findings to the partner |
 | `015-diagnosing-in-project` | diagnosing in the project scratchpad, no GitHub issues, analysts on permission |
 | `016-model-policy-pointer` | Model Selection defers to an environment's model-selection policy |
 
-Three files are the fork's own rather than a patch on upstream's:
-`skills/brainstorming/scripts/phase-dir`,
-`skills/subagent-driven-development/summary-writer-prompt.md` and
-`skills/subagent-driven-development/verification-prompt.md`.
+One file is the fork's own rather than a patch on upstream's:
+`skills/brainstorming/scripts/phase-dir`.
 
 ## How it is built
 

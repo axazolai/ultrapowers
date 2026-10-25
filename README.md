@@ -50,10 +50,9 @@ gate and the maintainability.
   substitutions, the protected slug, the revision that feeds the shipped version, the
   attribution the build asserts, and the refusal thresholds.
 - `transform/inventory.json` — the classification manifest, the rules that propose it, and the
-  `forkOwned` list: files this fork authors outright rather than patching, currently seven —
-  the two READMEs, the marketplace manifest, `.gitattributes`, the `phase-dir` allocator, and
-  the summary-writer and verification prompts.
-- `transform/deltas/NNN-*.patch` — fourteen numbered changes to upstream's skill text, applied
+  `forkOwned` list: files this fork authors outright rather than patching, currently five —
+  the two READMEs, the marketplace manifest, `.gitattributes` and the `phase-dir` allocator.
+- `transform/deltas/NNN-*.patch` — twelve numbered changes to upstream's skill text, applied
   in order. What each one does is listed in the plugin README.
 - `transform/*.mjs` — the engine (classify, rename, patch, build) and its tests.
 

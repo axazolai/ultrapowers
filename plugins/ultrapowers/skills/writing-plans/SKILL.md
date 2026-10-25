@@ -7,15 +7,13 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
-
-Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which tests prove each task. Document those. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
 **Context:** If working in an isolated worktree, it should have been created via the `ultrapowers:using-git-worktrees` skill at execution time.
 
-**Save plans to:** the phase directory the spec already owns, as `NN-PLAN.md` — `bash ../brainstorming/scripts/phase-dir phase <feature-slug>` prints `.ultrapowers/phases/NN-<feature-slug>/`, re-resolving the existing directory rather than allocating a second one
+**Save plans to:** the phase's one document, `.ultrapowers/phases/NN-<feature-slug>/NN-PLAN.md` — `bash ../brainstorming/scripts/phase-dir phase <feature-slug>` prints the directory, re-resolving the existing one rather than allocating a second. Brainstorming wrote the design as that file's header; the tasks go below it, in the same file. There is no separate spec file: where this skill says "the spec", read the plan's header.
 - (User preferences for plan location override this default)
 
 ## Scope Check
@@ -42,10 +40,10 @@ deliverable needs them; split only where a reviewer could meaningfully
 reject one task while approving its neighbor. Each task ends with an
 independently testable deliverable.
 
-## Bite-Sized Task Granularity
+## Step Granularity
 
-**Each step is one action (2-5 minutes).** The project's testing mode
-(`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
+**Each step is one action with a checkable result.** The project's testing
+mode (`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
 
 tdd mode:
 - "Write the failing test" - step
@@ -56,35 +54,25 @@ tdd mode:
 
 test-after mode:
 - "Implement the task" - step
-- "Reconcile: write any decision that changed behaviour, scope or an interface into the plan/spec; fix this task's bug-log entries" - step
 - "Write the tests for the task's Acceptance list" - step
 - "Run them" - step
 - "Commit" - step
 
 ## Plan Document Header
 
-**Every plan MUST start with this header:**
+**Every plan starts with the design header brainstorming wrote** (Goal,
+Branch, Constraints, Out of scope, Design). Keep it as it is; add below it:
 
 ```markdown
-# [Feature Name] Implementation Plan
-
 > **For agentic workers:** REQUIRED SUB-SKILL: Use ultrapowers:subagent-driven-development (recommended) or ultrapowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
-**Goal:** [One sentence describing what this builds]
-
-**Architecture:** [2-3 sentences about approach]
 
 **Tech Stack:** [Key technologies/libraries]
 
-**Spec:** [path to the spec/design doc this plan implements — the plan
-argues from the spec, so the spec travels with it; executors read both]
-
 ## Global Constraints
 
-[The spec's project-wide requirements — version floors, dependency limits,
+[The header's project-wide requirements — version floors, dependency limits,
 naming and copy rules, platform requirements — one line each, with exact
-values copied verbatim from the spec. Every task's requirements implicitly
-include this section.]
+values. Every task's requirements implicitly include this section.]
 
 ## Review Focus
 
@@ -130,12 +118,11 @@ def test_specific_behavior():
 Run: `pytest tests/path/test.py::test_name -v`
 Expected: FAIL with "function not defined"
 
-- [ ] **Step 3: Write minimal implementation**
+- [ ] **Step 3: Implement `function(input: InputType) -> ResultType` in `exact/path/to/file.py`**
 
-```python
-def function(input):
-    return expected
-```
+One line on the approach when the signature and the test leave a choice
+(which library call, which data structure); a code block only for an
+algorithm they do not determine.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -160,55 +147,63 @@ the plan.]
 - `function(valid input)` returns `expected`
 - `function(empty input)` raises `ValueError`
 
-- [ ] **Step 1: Implement**
+- [ ] **Step 1: Implement `function(input: InputType) -> ResultType` in `exact/path/to/file.py`**
 
-```python
-def function(input):
-    return expected
-```
-
-- [ ] **Step 2: Reconcile** — a decision made while implementing that changed
-  behaviour, scope or an interface is written into this task (and the spec)
-  now, before the tests. Fix this task's open bug-log entries.
-
-- [ ] **Step 3: Write the acceptance tests** — one per Acceptance line, then the
+- [ ] **Step 2: Write the acceptance tests** — one per Acceptance line, then the
   mutation check (ultrapowers:test-driven-development).
 
-- [ ] **Step 4: Run them**
+- [ ] **Step 3: Run them**
 
 Run: `pytest tests/path/test.py -v`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 ````
 
-## No Placeholders
+## What a Step Contains
 
-Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
-- "TBD", "TODO", "implement later", "fill in details"
-- "Add appropriate error handling" / "add validation" / "handle edge cases"
-- "Write tests for the above" (without actual test code in tdd mode, or without an **Acceptance:** list in test-after mode)
-- "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
-- Steps that describe what to do without showing how (code blocks required for code steps)
-- References to types, functions, or methods not defined in any task
+A step is done when the implementer can write exactly one reasonable thing
+from it. That is the whole requirement: unambiguous, not complete. Each kind
+of step carries what makes it unambiguous and nothing more:
+
+- **A test step (tdd mode):** the test's name and its assertions, as code, with the
+  spec's exact values in them.
+- **An Acceptance line (test-after mode):** input class → expected result,
+  with the spec's exact values; the test is written from it after the code.
+- **A code step:** the exact signature (name, parameters, return type), the
+  file it lives in, and the specific values the spec pins. The implementer
+  writes the body. A body appears only for an algorithm the signature and
+  tests do not determine, or for exact copy the spec fixes.
+- **A verification step:** the command to run and the output that means it
+  passed.
+- **A reference to another task:** that task's Interfaces block says what
+  to use; the plan does not repeat that task's code.
+
+A plan is the set of decisions the implementer cannot make alone. A plan
+longer than the code it describes has written the code instead. Lines that
+decide nothing ("TBD", "handle edge cases", "add appropriate validation",
+"write tests for the above", a type or function no task defines) are the
+opposite failure, and the self-review catches both.
 
 ## Self-Review
 
 After writing the complete plan, look at the spec with fresh eyes and check the plan against it. This is a checklist you run yourself — not a subagent dispatch.
 
-Checks 1-4 are read. Checks 5 and 6 are run, and they are the ones that catch what reading cannot: re-reading a plan can never reveal that a command fails in the worktree or that a default does not survive `null`. A plan is reviewed by its own author, so the checks that add information are the ones that execute something.
-
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
-**2. Placeholder scan:** Search your plan for red flags — any of the patterns from the "No Placeholders" section above. Fix them.
+**2. Step scan:** Every step must let the implementer write exactly one reasonable thing, and no step may carry more than that: a line that decides nothing is a gap, a function body the signature and tests already determine is a transcript. Fix both.
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 **4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there goes into the owning task's test list. An empty section means you checked and found none, not that you skipped the check.
 
-**5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. At plan time the tests for new code do not exist yet, so run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
+**5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If code blocks are most of the document, replace bodies with signatures, test names and assertions, and check that each step is still unambiguous.
 
-**6. Invariant check — execute the sample:** Every invariant stated in a task's Interfaces block, check against that task's own sample code before committing the plan. Run it; do not reason about it. Thirty seconds in `node -e` settles what an hour of re-reading will not. When one sample turns out wrong, sweep the plan for the whole class rather than fixing the instance — a defect in a plan's code sample is evidence about the plan, not about one task.
+Checks 1-5 are read. Checks 6 and 7 are run.
+
+**6. Command check — run them:** run every command this plan tells an implementer to run, in the environment the implementer will use — the worktree, not the main checkout — before committing the plan. A test command for code not yet written is checked for its runner and path only.
+
+**7. Invariant check — execute the sample:** run every invariant stated in a task's Interfaces block against that task's own sample code (`node -e` is enough). When one sample is wrong, sweep the plan for the whole class, not the instance.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
 
