@@ -1,18 +1,18 @@
 diff --git a/plugins/ultrapowers/skills/brainstorming/SKILL.md b/plugins/ultrapowers/skills/brainstorming/SKILL.md
-index 894c540..5392a63 100644
+index dacc765..5104d8a 100644
 --- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
 +++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
-@@ -124,7 +124,7 @@ your path and complete them in order.
- 2. **Ask clarifying questions** — one at a time, the ones that matter
- 3. **Present short design in chat** — approach, files touched, testing
- 4. **Get approval** — STOP and wait for an explicit yes; presenting the design and starting in the same breath is skipping the gate
--5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
-+5. **Implement** — proceed with the normal development workflow (tests per the project's testing mode — see ultrapowers:test-driven-development); no plan document
+@@ -220,6 +220,8 @@ from without going back to your human partner. Cover:
+ - constraints
+ - approaches (above)
+ - the parts of the how they decided, as they decided them
++- the behaviours the tests will confirm, one line each (input class →
++  expected result); in test-after mode the tests confirm exactly these
+ - what's left to the builder
  
- **Architectural:**
- 1. **Explore project context** — check files, docs, recent commits
+ For a small change, the short design covers the same points in a line
 diff --git a/plugins/ultrapowers/skills/executing-plans/SKILL.md b/plugins/ultrapowers/skills/executing-plans/SKILL.md
-index 18ddb0b..9b721ff 100644
+index 1a62771..ec7426e 100644
 --- a/plugins/ultrapowers/skills/executing-plans/SKILL.md
 +++ b/plugins/ultrapowers/skills/executing-plans/SKILL.md
 @@ -14,11 +14,12 @@ and a fresh reviewer on every task, each re-reading the codebase from zero.
@@ -39,15 +39,13 @@ index 18ddb0b..9b721ff 100644
          "Step output matches plan's Expected?" [shape=diamond];
          "Plan wrong? Rule and ledger. Code wrong? systematic-debugging" [shape=box];
          "Commit as the plan's commit steps say" [shape=box];
-@@ -82,25 +83,27 @@ digraph process {
- 
+@@ -83,24 +84,24 @@ digraph process {
      "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" [shape=box];
      "More tasks remain?" [shape=diamond];
-+    "Drain the bug log: fix open entries, list out-of-scope ones" [shape=box];
      "Final whole-branch review (fresh reviewer if you have one)" [shape=box];
 -    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" [shape=box];
 +    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" [shape=box];
-     "Final review clean: phase documents, then delete the workspace by name" [shape=box];
+     "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" [shape=box];
      "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
  
      "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" -> "task-start: brief + BASE; read the brief";
@@ -65,30 +63,27 @@ index 18ddb0b..9b721ff 100644
      "Completion contract met?" -> "task-done: run tests, ledger the result; mark todo complete" [label="yes"];
      "task-done: run tests, ledger the result; mark todo complete" -> "More tasks remain?";
      "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
--    "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
+     "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
 -    "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger";
--    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: phase documents, then delete the workspace by name";
-+    "More tasks remain?" -> "Drain the bug log: fix open entries, list out-of-scope ones" [label="no"];
-+    "Drain the bug log: fix open entries, list out-of-scope ones" -> "Final whole-branch review (fresh reviewer if you have one)";
+-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: Result lines + ROADMAP row, then delete the workspace by name";
 +    "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger";
-+    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" -> "Final review clean: phase documents, then delete the workspace by name";
-     "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
++    "Re-grade, then: Critical/Important → ONE fix pass, each fix verified per testing mode + green suite; Minor → ledger" -> "Final review clean: Result lines + ROADMAP row, then delete the workspace by name";
+     "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
  }
  ```
-@@ -151,9 +154,9 @@ against it. A plan with no reachable spec gets a ledger note saying so —
- rulings made without one are provisional.
+@@ -146,9 +147,8 @@ is the spec: the authority the tasks argue from, and conflicts inside the
+ tasks resolve against it.
  
  **REQUIRED SUB-SKILL:** load ultrapowers:test-driven-development now,
 -before Task 1. It governs every step of every task below; a plan whose
 -steps already say "write the failing test first" does not exempt you
 -from reading it.
 +before Task 1. It names the project's testing mode (`.claude/ultrapowers.json`
-+→ `tdd`; absent → test-after) and what each mode asks of every task below,
-+and it holds the bug log you use throughout.
++→ `tdd`; absent → test-after) and what each mode asks of every task below.
  
  Before Task 1, scan the plan for conflicts between tasks. The plan's
  Interfaces blocks tell you where to look: for every task that consumes
-@@ -186,11 +189,19 @@ never in a call of its own.
+@@ -181,11 +181,19 @@ never in a call of its own.
  
  ### 2. Work the steps
  
@@ -104,27 +99,16 @@ index 18ddb0b..9b721ff 100644
 +  is written first and run first. Watching it fail is a step, not a
 +  formality — a test that passes before the implementation exists is a
 +  finding about the test.
-+- **test-after mode:** implement, then reconcile — a decision that changed
-+  behaviour, scope or an interface goes into the plan/spec as a `Ruling:` —
-+  then fix this task's open bug-log entries, then write one test per
-+  `Acceptance:` line and run the mutation check.
++- **test-after mode:** implement, then write one test per `Acceptance:`
++  line and run the mutation check. A decision that changed behaviour, scope
++  or an interface goes under the task in the plan as a `Ruling:` line first.
 +
-+A bug that does not block the task goes to the bug log and you continue.
++A bug found on the way is fixed on the way, under
++ultrapowers:systematic-debugging; it is never logged for later.
  
  Every step that runs a command has an `Expected:` line. Run the command,
  read its output, and compare. Three outcomes:
-@@ -241,6 +252,10 @@ the tree's, and a fraction nobody raises is a fraction that lies.
- 
- ## Final Review
- 
-+Before it, drain the bug log: fix the open entries that belong to this plan's
-+work (tests per the testing mode); list entries outside the plan's scope to
-+your human partner instead.
-+
- Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
- (MERGE_BASE = the commit the branch started from, e.g.
- `git merge-base main HEAD`) and review from the file it prints.
-@@ -266,15 +281,13 @@ weaker than a fresh reviewer, and your human partner decides whether that
+@@ -261,15 +269,13 @@ weaker than a fresh reviewer, and your human partner decides whether that
  is enough before merge.
  
  Sort the findings before you act on any of them. The reviewer's severity
@@ -147,7 +131,7 @@ index 18ddb0b..9b721ff 100644
  
  - **Critical and Important** enter the fix pass.
  - **Minor** goes to the ledger as `Final: minor (deferred): <one-liner>`
-@@ -283,12 +296,18 @@ because the spec was silent has graded the spec, not the effect. Then:
+@@ -278,12 +284,18 @@ because the spec was silent has graded the spec, not the effect. Then:
    conflict, not a note that you declined a polish suggestion.
  
  Fix the Critical and Important findings yourself — you are the
@@ -172,7 +156,7 @@ index 18ddb0b..9b721ff 100644
  re-review: it would re-read a diff whose covering tests already answer
  "addressed" and whose suite run already answers "broke nothing".
  
-@@ -301,7 +320,8 @@ in the rulings list. There is no second fix pass.
+@@ -296,7 +308,8 @@ in the rulings list. There is no second fix pass.
  Before you delete anything, collect every ledger line containing
  `Ruling:` into your final message under "Rulings I made", in the order you
  made them, each with what it costs if wrong, and every `minor (deferred)`
@@ -182,7 +166,7 @@ index 18ddb0b..9b721ff 100644
  message is the only place the decisions you took on your human partner's
  behalf — and the findings you chose not to act on — reach them.
  
-@@ -374,7 +394,7 @@ Use ultrapowers:finishing-a-development-branch.
+@@ -318,7 +331,7 @@ Use ultrapowers:finishing-a-development-branch.
  | Excuse | Reality |
  |--------|---------|
  | "I remember what Task N says" | You remember a summary. The brief has the exact values. Read it. |
@@ -191,7 +175,7 @@ index 18ddb0b..9b721ff 100644
  | "I'll run the full suite at the end instead of per step" | Per-step runs are how you learn which step broke it. The end-of-task run is the contract, not a substitute. |
  | "The plan is wrong here, I'll just do the right thing" | Do the right thing and ledger the ruling. Unledgered deviation is a decision made in secret. |
  | "I'll write the ledger lines after a few tasks" | Compaction does not wait for a convenient moment. One line per task, in the same message as the commit. |
-@@ -382,12 +402,14 @@ Use ultrapowers:finishing-a-development-branch.
+@@ -326,6 +339,6 @@ Use ultrapowers:finishing-a-development-branch.
  | "I read my own diff carefully; the final reviewer is redundant" | Same author, same blind spots. The reviewer is the only fresh context this run buys. |
  | "Tests should pass, the change was trivial" | "Should" is not evidence. The contract requires the command and its output. |
  | "Subagents are slow and expensive, I'll skip the final review too" | Inline already removed the per-task reviewers. One review of the whole branch is the floor, not the ceiling. |
@@ -200,14 +184,6 @@ index 18ddb0b..9b721ff 100644
 +| "The reviewer said Minor, so it's Minor" | Grade what the person gets, then gate. A finding the spec is silent on is the partner's call, not a re-grade. |
 +| (tdd) "The fix is obvious, no need for a failing test first" | The failing test is the only proof the finding was real and is now gone. Without it you have a diff and a hope. |
  | "I'll fix the minors too while I'm in there" | Every minor you fix is a test, a fix, and a suite run your partner did not ask for. Ledger them; your partner decides. |
- 
- ## Example Workflow
- 
-+In tdd mode:
-+
- ```
- You: I'm using the executing-plans skill to implement this plan inline.
- 
 diff --git a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md b/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
 index 389557a..a07c6dd 100644
 --- a/plugins/ultrapowers/skills/requesting-code-review/code-reviewer.md
@@ -286,81 +262,22 @@ index 389557a..a07c6dd 100644
  ## Example Output
  
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-index 29a77d1..4c4bf5b 100644
+index 98c41a1..b468678 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
-@@ -102,6 +102,7 @@ digraph process {
- 
-     "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
-     "More tasks remain?" [shape=diamond];
-+    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [shape=box];
-     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [shape=box];
-     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" [shape=box];
-     "Final review clean: phase documents, then delete the workspace by name" [shape=box];
-@@ -131,7 +132,8 @@ digraph process {
-     "Park findings in ledger with rulings" -> "Append completion to ledger, mark todo complete";
-     "Append completion to ledger, mark todo complete" -> "More tasks remain?";
-     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
--    "More tasks remain?" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" [label="no"];
-+    "More tasks remain?" -> "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" [label="no"];
-+    "Drain the bug log: one fix dispatch for the open entries, list out-of-scope ones" -> "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)";
-     "Dispatch final code reviewer (../requesting-code-review/code-reviewer.md)" -> "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals";
-     "Final findings? ONE fix dispatch, one scoped re-review, adjudicate residuals" -> "Final review clean: phase documents, then delete the workspace by name";
-     "Final review clean: phase documents, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
-@@ -190,7 +192,7 @@ what you checked as you check it:
- The scan's output is a table, not a verdict. One row for every pair of tasks
- that share a file or an interface: the two tasks, what one produces against
- what the other consumes, and what you found. One row for every task: whether
--its own text agrees with itself — the tests it specifies against the code it
-+its own text agrees with itself — the tests or Acceptance list it specifies against the code it
- specifies, the files it creates against the files it later touches. "The scan
- is clean" without those rows is not a scan you ran.
- 
-@@ -469,6 +471,15 @@ the tree's, and a fraction nobody raises is a fraction that lies.
- 
- ## Final Review
- 
-+Before it, drain the bug log: if open entries remain that belong to this
-+plan's work, dispatch one implementer to fix them (tests per the project's
-+testing mode), then continue. Entries outside the plan's scope are listed to
-+the partner, not fixed.
-+
+@@ -341,3 +341,7 @@ covers the whole-branch review, its single fix wave, and how you finish.
+ | "Reviews slow the loop down" | The loop without reviews is just unverified churn. Reviews are the loop's brakes and steering. |
+ | "Ledger bookkeeping is overhead" | The ledger is what survives compaction. Controllers without one have re-dispatched entire completed task sequences. |
+ | "The implementer spawned its own reviewer — free extra assurance" | It's a duplicate seat reviewing the same diff; the task review is the gate. A worker-spawned reviewer is a defect to flag, not rigor. |
 +The reviewer's "Declined to judge / out of spec" lines go to the partner in
 +your final message: each is put into the spec (then it gets a test) or
 +rejected by them, not by you.
 +
- The final whole-branch review gets a package too: run
- `bash scripts/review-package PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
- branch started from, e.g. `git merge-base main HEAD`) and include the
-@@ -481,7 +492,11 @@ the ledger's deferred-minor and parked lines so it can triage which must be
- fixed before merge.
- 
- If the final whole-branch review returns findings, dispatch ONE fix subagent
--with the complete findings list — not one fixer per finding.
-+with the complete findings list — not one fixer per finding — and the
-+project's testing mode: tdd, each fix RED → GREEN; test-after, reproduce →
-+fix → a test only where the finding broke behaviour the spec states.
-+Findings about behaviour the spec is silent on are not in that list; they go
-+to the partner.
- Per-finding fixers each rebuild context and re-run suites; a real
- session's final-review fix wave cost more than all its tasks combined.
- Then run exactly one scoped re-review of the fix wave
-@@ -502,7 +517,9 @@ with what it costs if wrong. The list is exhaustive: if the ledger holds a
- ruling, the list holds it. That list is the only place the decisions you
- took on your human partner's behalf reach them — they read it and rework
- whatever you got wrong. A ruling that dies with the workspace was a decision
--made in secret.
-+made in secret. Collect the same way every deferred minor under "Deferred
-+minors" and every reviewer line set aside as out of spec — per-task and
-+final — under "Out of spec — your call".
- 
- When the final whole-branch review is clean and its fixes are merged, write
- the phase documents, then delete the workspace.
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
-index 5c8ecd6..0bf6860 100644
+index 5c8ecd6..2eddec0 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
 +++ b/plugins/ultrapowers/skills/subagent-driven-development/implementer-prompt.md
-@@ -33,12 +33,24 @@ Subagent (general-purpose):
+@@ -33,12 +33,22 @@ Subagent (general-purpose):
  
      Once you're clear on requirements:
      1. Implement exactly what the task specifies
@@ -369,24 +286,22 @@ index 5c8ecd6..0bf6860 100644
 +       (`.claude/ultrapowers.json` → `tdd`; absent → test-after;
 +       ultrapowers:test-driven-development):
 +       - tdd: the task's failing-test steps first, then the code
-+       - test-after: after the code, reconcile — a decision that changed
-+         behaviour, scope or an interface is written into the task text of
-+         the plan (and the spec), named in your report — then fix this
-+         task's open bug-log entries, then write one test per Acceptance
-+         line and run the mutation check
++       - test-after: after the code, write one test per Acceptance line
++         and run the mutation check; a decision that changed behaviour,
++         scope or an interface is written under the task in the plan as a
++         `Ruling:` line first, and named in your report
      3. Verify implementation works
      4. Commit your work
      5. Self-review (see below)
      6. Report back
  
-+    A bug you find that does not block the task goes to the project's bug
-+    log (`BUGS.md`, location per the project `CLAUDE.md`) and you
-+    continue. A bug that blocks the task is fixed now.
++    A bug you find on the way is fixed on the way; it is never logged for
++    later.
 +
      Work from: [directory]
  
      **While you work:** If you encounter something unexpected or unclear, **ask questions**.
-@@ -110,8 +122,9 @@ Subagent (general-purpose):
+@@ -110,8 +120,9 @@ Subagent (general-purpose):
  
      **Testing:**
      - Do tests actually verify behavior (not just mock behavior)?
@@ -394,11 +309,11 @@ index 5c8ecd6..0bf6860 100644
 -    - Are tests comprehensive?
 +    - tdd: did every test fail first, for the expected reason?
 +    - test-after: does every Acceptance line have a test, and no test cover an unstated behaviour?
-+    - Did every decision that changed behaviour, scope or an interface reach the plan/spec first?
++    - Did every decision that changed behaviour, scope or an interface reach the plan first?
      - Is the test output pristine (no stray warnings or noise)?
  
      If you find issues during self-review, fix them now before reporting.
-@@ -130,9 +143,12 @@ Subagent (general-purpose):
+@@ -130,9 +141,12 @@ Subagent (general-purpose):
      Write your full report to [REPORT_FILE]:
      - What you implemented (or what you attempted, if blocked)
      - What you tested and test results
@@ -414,6 +329,47 @@ index 5c8ecd6..0bf6860 100644
      - Files changed
      - Self-review findings (if any)
      - Any issues or concerns
+diff --git a/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md b/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
+index 0319ba3..3b7e325 100644
+--- a/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
+@@ -15,7 +15,11 @@ the ledger's deferred-minor and parked lines so it can triage which must be
+ fixed before merge.
+ 
+ If the final whole-branch review returns findings, dispatch ONE fix subagent
+-with the complete findings list — not one fixer per finding.
++with the complete findings list — not one fixer per finding — and the
++project's testing mode: tdd, each fix RED → GREEN; test-after, reproduce →
++fix → a test only where the finding broke behaviour the plan states.
++Findings about behaviour the plan is silent on are not in that list; they go
++to the partner.
+ Per-finding fixers each rebuild context and re-run suites; a real
+ session's final-review fix wave cost more than all its tasks combined.
+ Then run exactly one scoped re-review of the fix wave
+@@ -37,7 +41,9 @@ with what it costs if wrong. The list is exhaustive: if the ledger holds a
+ ruling, the list holds it. That list is the only place the decisions you
+ took on your human partner's behalf reach them — they read it and rework
+ whatever you got wrong. A ruling that dies with the workspace was a decision
+-made in secret.
++made in secret. Collect the same way every deferred minor under "Deferred
++minors" and every reviewer line set aside as out of spec — per-task and
++final — under "Out of spec — your call".
+ 
+ When the final whole-branch review is clean and its fixes are merged, close
+ the plan in place: add a `Result:` line at the end of each stage, or of the
+diff --git a/plugins/ultrapowers/skills/subagent-driven-development/references/preflight.md b/plugins/ultrapowers/skills/subagent-driven-development/references/preflight.md
+index 4659b04..946d1c4 100644
+--- a/plugins/ultrapowers/skills/subagent-driven-development/references/preflight.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/references/preflight.md
+@@ -13,7 +13,7 @@ what you checked as you check it:
+ The scan's output is a table, not a verdict. One row for every pair of tasks
+ that share a file or an interface: the two tasks, what one produces against
+ what the other consumes, and what you found. One row for every task: whether
+-its own text agrees with itself — the tests it specifies against the code it
++its own text agrees with itself — the tests or Acceptance list it specifies against the code it
+ specifies, the files it creates against the files it later touches. "The scan
+ is clean" without those rows is not a scan you ran.
+ 
 diff --git a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md b/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
 index 5c619bc..737e67d 100644
 --- a/plugins/ultrapowers/skills/subagent-driven-development/task-reviewer-prompt.md
@@ -448,24 +404,23 @@ index 5c619bc..737e67d 100644
 -(Critical/Important/Minor), Task quality verdict
 +(Critical/Important/Minor), Out of spec, Task quality verdict
 diff --git a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md b/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
-index d9ca792..66d2ba4 100644
+index 301a9be..eaf2abe 100644
 --- a/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
 +++ b/plugins/ultrapowers/skills/systematic-debugging/SKILL.md
-@@ -19,6 +19,13 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
+@@ -19,6 +19,12 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
  
  If you haven't completed Phase 1, you cannot propose fixes.
  
 +## Found While Doing Other Work
 +
-+A bug that does not block the next step of the current work goes to the bug log
-+(`ultrapowers:test-driven-development` → Both Modes) and the work continues.
-+This process runs when the log is drained: before a unit of work's review, and
-+at the end of the work. A bug that blocks the next step runs through it at once.
++A bug found while doing other work runs through this process before that
++unit of work's review; a bug that blocks the next step runs through it at
++once. A bug outside the work's scope is listed to the partner, not logged.
 +
  ## When to Use
  
  Use for ANY technical issue:
-@@ -169,12 +176,10 @@ You MUST complete each phase before proceeding to the next.
+@@ -169,12 +175,10 @@ You MUST complete each phase before proceeding to the next.
  
  **Fix the root cause, not the symptom:**
  
@@ -482,7 +437,7 @@ index d9ca792..66d2ba4 100644
  
  2. **Implement Single Fix**
     - Address the root cause identified
-@@ -183,7 +188,7 @@ You MUST complete each phase before proceeding to the next.
+@@ -183,7 +187,7 @@ You MUST complete each phase before proceeding to the next.
     - No bundled refactoring
  
  3. **Verify Fix**
@@ -491,7 +446,7 @@ index d9ca792..66d2ba4 100644
     - No other tests broken?
     - Issue actually resolved?
     - Use the `ultrapowers:verification-before-completion` skill before claiming success
-@@ -248,7 +253,7 @@ If you catch yourself thinking:
+@@ -248,7 +252,7 @@ If you catch yourself thinking:
  | "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
  | "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
  | "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
@@ -500,7 +455,7 @@ index d9ca792..66d2ba4 100644
  | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
  | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
  | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-@@ -261,7 +266,7 @@ If you catch yourself thinking:
+@@ -261,7 +265,7 @@ If you catch yourself thinking:
  | **1. Root Cause** | Read errors, reproduce, check changes, gather evidence | Understand WHAT and WHY |
  | **2. Pattern** | Find working examples, compare | Identify differences |
  | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
@@ -510,10 +465,10 @@ index d9ca792..66d2ba4 100644
  ## When Process Reveals "No Root Cause"
  
 diff --git a/plugins/ultrapowers/skills/test-driven-development/SKILL.md b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-index 46838cc..5584cc2 100644
+index 46838cc..3c935a8 100644
 --- a/plugins/ultrapowers/skills/test-driven-development/SKILL.md
 +++ b/plugins/ultrapowers/skills/test-driven-development/SKILL.md
-@@ -1,9 +1,47 @@
+@@ -1,9 +1,41 @@
  ---
  name: test-driven-development
 -description: Use when implementing any feature or bugfix, before writing implementation code
@@ -538,18 +493,12 @@ index 46838cc..5584cc2 100644
 +
 +## Both Modes
 +
-+- **Spec first.** A decision made during the work that changes behaviour, scope
-+  or an interface is written into the spec and/or plan before the tests that
-+  cover it.
-+- **Bug log.** A bug found during the work that does not block the next step
-+  goes to the project's bug log and the work continues; a bug that blocks the
-+  next step is fixed at once. File: `BUGS.md`, located where the project
-+  `CLAUDE.md` says, else the project root. Entry: `BUG-NNN`, date, where,
-+  symptom, reproduction, unit of work, status `Open`/`Fixed`. Before a unit's
-+  review, fix its open entries; at the end of the work, before the final
-+  review, fix the rest. An entry outside the work's scope is listed to the
-+  partner instead of fixed. Fixed entries stay, compressed to a line. Fix a
-+  logged bug with `ultrapowers:systematic-debugging`.
++- **Plan first.** A decision made during the work that changes behaviour, scope
++  or an interface is written into the plan (a `Ruling:` line under the task)
++  before the tests that cover it.
++- **Bugs are fixed in the work.** A bug found during the work is fixed before
++  that unit's review, with `ultrapowers:systematic-debugging`. A bug outside
++  the work's scope is listed to the partner, never logged beside the work.
 +- **Review Focus.** A plan's Review Focus lines are part of the owning task's
 +  test list — a failing-test step in tdd mode, an `Acceptance:` line in
 +  test-after mode.
@@ -563,7 +512,7 @@ index 46838cc..5584cc2 100644
  
  ## Overview
  
-@@ -182,15 +220,7 @@ Confirm:
+@@ -182,15 +214,7 @@ Confirm:
  
  **Other tests fail?** Fix now.
  
@@ -580,16 +529,7 @@ index 46838cc..5584cc2 100644
  
  ### REFACTOR - Clean Up
  
-@@ -316,7 +346,7 @@ Can't check all boxes? You skipped TDD. Start over.
- 
- ## Debugging Integration
- 
--Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
-+Bug found that blocks the work? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression. A bug that does not block goes to the bug log first (Both Modes).
- 
- Never fix bugs without a test.
- 
-@@ -328,3 +358,50 @@ Otherwise → not TDD
+@@ -328,3 +352,49 @@ Otherwise → not TDD
  ```
  
  No exceptions without your human partner's permission.
@@ -603,14 +543,13 @@ index 46838cc..5584cc2 100644
 +
 +## The Order
 +
-+1. **Reconcile.** Spec/plan updated for every decision that changed behaviour,
-+   scope or an interface.
-+2. **Drain the bug log** for this unit.
-+3. **Write the tests.** One per behaviour or acceptance criterion the spec or
-+   plan states. A behaviour the spec does not state gets no test; if it
-+   matters, it goes into the spec first.
-+4. **Run them.**
-+5. **Review.**
++1. **Reconcile.** The plan carries every decision that changed behaviour,
++   scope or an interface (a `Ruling:` line under the task).
++2. **Write the tests.** One per behaviour or acceptance criterion the plan
++   states. A behaviour the plan does not state gets no test; if it matters,
++   it goes into the plan first.
++3. **Run them.**
++4. **Review.**
 +
 +## What Gets a Test
 +
@@ -634,8 +573,8 @@ index 46838cc..5584cc2 100644
 +
 +## Checklist
 +
-+- [ ] Spec/plan updated for every decision that changed behaviour, scope or an interface
-+- [ ] This unit's bug-log entries fixed
++- [ ] Plan updated for every decision that changed behaviour, scope or an interface
++- [ ] Every bug found in this unit fixed
 +- [ ] Every stated behaviour has a test; no test covers an unstated one
 +- [ ] Mutation check done
 +- [ ] Tests run, output pristine, failures reported by name
@@ -702,25 +641,25 @@ index 7d45333..08bb3f3 100644
  
  **Build:**
 diff --git a/plugins/ultrapowers/skills/writing-plans/SKILL.md b/plugins/ultrapowers/skills/writing-plans/SKILL.md
-index c61a5c1..cf4560c 100644
+index 232e8c1..dcc130a 100644
 --- a/plugins/ultrapowers/skills/writing-plans/SKILL.md
 +++ b/plugins/ultrapowers/skills/writing-plans/SKILL.md
 @@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
  
  ## Overview
  
--Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
-+Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
+-Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which tests prove each task. Document those. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
++Write implementation plans for an engineer who has not seen this codebase or this spec. Assume they write idiomatic code in the project's language once they know the exact interface and the exact test, and that they will make a reasonable choice wherever the plan leaves one open. What they cannot know is what you decided: which files, which names and signatures, which values from the spec, which tests prove each task. Document those. Give them the whole plan as bite-sized tasks. DRY. YAGNI. Tests per the project's testing mode (ultrapowers:test-driven-development). Frequent commits.
  
- Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
+ **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
  
-@@ -44,13 +44,23 @@ independently testable deliverable.
+@@ -42,13 +42,22 @@ independently testable deliverable.
  
- ## Bite-Sized Task Granularity
+ ## Step Granularity
  
--**Each step is one action (2-5 minutes):**
-+**Each step is one action (2-5 minutes).** The project's testing mode
-+(`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
+-**Each step is one action with a checkable result:**
++**Each step is one action with a checkable result.** The project's testing
++mode (`.claude/ultrapowers.json` → `tdd`; absent → test-after) picks the step shape.
 +
 +tdd mode:
  - "Write the failing test" - step
@@ -731,15 +670,14 @@ index c61a5c1..cf4560c 100644
  
 +test-after mode:
 +- "Implement the task" - step
-+- "Reconcile: write any decision that changed behaviour, scope or an interface into the plan/spec; fix this task's bug-log entries" - step
 +- "Write the tests for the task's Acceptance list" - step
 +- "Run them" - step
 +- "Commit" - step
 +
  ## Plan Document Header
  
- **Every plan MUST start with this header:**
-@@ -85,8 +95,8 @@ reasonable person would expect, most likely first. The spec is a vision
+ **Every plan starts with the design header brainstorming wrote** (Goal,
+@@ -74,8 +83,8 @@ reasonable person would expect, most likely first. The spec is a vision
  document: it says what the software must do, not everything it will
  meet, and its silence on an input is not permission for that input to
  break the program. Write the list here, once, with the spec in front of
@@ -750,7 +688,7 @@ index c61a5c1..cf4560c 100644
  
  ---
  ```
-@@ -140,12 +150,44 @@ git commit -m "feat: add specific feature"
+@@ -128,14 +137,39 @@ git commit -m "feat: add specific feature"
  ```
  ````
  
@@ -764,44 +702,39 @@ index c61a5c1..cf4560c 100644
 +- `function(valid input)` returns `expected`
 +- `function(empty input)` raises `ValueError`
 +
-+- [ ] **Step 1: Implement**
++- [ ] **Step 1: Implement `function(input: InputType) -> ResultType` in `exact/path/to/file.py`**
 +
-+```python
-+def function(input):
-+    return expected
-+```
-+
-+- [ ] **Step 2: Reconcile** — a decision made while implementing that changed
-+  behaviour, scope or an interface is written into this task (and the spec)
-+  now, before the tests. Fix this task's open bug-log entries.
-+
-+- [ ] **Step 3: Write the acceptance tests** — one per Acceptance line, then the
++- [ ] **Step 2: Write the acceptance tests** — one per Acceptance line, then the
 +  mutation check (ultrapowers:test-driven-development).
 +
-+- [ ] **Step 4: Run them**
++- [ ] **Step 3: Run them**
 +
 +Run: `pytest tests/path/test.py -v`
 +Expected: PASS
 +
-+- [ ] **Step 5: Commit**
++- [ ] **Step 4: Commit**
 +````
 +
- ## No Placeholders
+ ## What a Step Contains
  
- Every step must contain the actual content an engineer needs. These are **plan failures** — never write them:
- - "TBD", "TODO", "implement later", "fill in details"
- - "Add appropriate error handling" / "add validation" / "handle edge cases"
--- "Write tests for the above" (without actual test code)
-+- "Write tests for the above" (without actual test code in tdd mode, or without an **Acceptance:** list in test-after mode)
- - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
- - Steps that describe what to do without showing how (code blocks required for code steps)
- - References to types, functions, or methods not defined in any task
-@@ -162,7 +204,7 @@ Checks 1-4 are read. Checks 5 and 6 are run, and they are the ones that catch wh
+ A step is done when the implementer can write exactly one reasonable thing
+ from it. That is the whole requirement: unambiguous, not complete. Each kind
+ of step carries what makes it unambiguous and nothing more:
+ 
+-- **A test step:** the test's name and its assertions, as code, with the
++- **A test step (tdd mode):** the test's name and its assertions, as code, with the
+   spec's exact values in them.
++- **An Acceptance line (test-after mode):** input class → expected result,
++  with the spec's exact values; the test is written from it after the code.
+ - **A code step:** the exact signature (name, parameters, return type), the
+   file it lives in, and the specific values the spec pins. The implementer
+   writes the body. A body appears only for an algorithm the signature and
+@@ -161,7 +195,7 @@ After writing the complete plan, look at the spec with fresh eyes and check the
  
  **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
  
 -**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there gets its test added to the owning task. An empty section means you checked and found none, not that you skipped the check.
 +**4. Review Focus:** For each input class or failure mode the spec implies, is there a task whose tests exercise it? The five uncovered ones most likely to bite a person go in the Review Focus section, and each line there goes into the owning task's test list. An empty section means you checked and found none, not that you skipped the check.
  
- **5. Command check — run them:** Every command this plan tells an implementer to run, you run first, in the environment the implementer will use — the worktree, not the main checkout. The two differ: a worktree is missing whatever the repository git-ignores, so a command that passes where you wrote it can fail where they run it, and the implementer spends a fix round on your untested line. At plan time the tests for new code do not exist yet, so run what already exists — the build, the linter, the runner over the existing suite — and check a test command for code not yet written for its runner and path only.
+ **5. Proportion:** Compare the plan's length to the spec's. A plan several times longer than the spec it implements is a transcript of the program, not a plan. If code blocks are most of the document, replace bodies with signatures, test names and assertions, and check that each step is still unambiguous.
  

@@ -1,0 +1,16 @@
+diff --git a/plugins/ultrapowers/skills/brainstorming/SKILL.md b/plugins/ultrapowers/skills/brainstorming/SKILL.md
+index f21aa8f..dacc765 100644
+--- a/plugins/ultrapowers/skills/brainstorming/SKILL.md
++++ b/plugins/ultrapowers/skills/brainstorming/SKILL.md
+@@ -44,6 +44,11 @@ connects to, and keep reading until you can explain how the relevant
+ parts work today and what this change would touch. Never ask what the
+ project or their context already answers.
+ 
++In a software repo, also run `node ~/.claude/hooks/lib/stack-rules-check.mjs <root>`
++once, here. On `stale`, name what appeared and what vanished, and add the
++`rules-src/` layers answering the new markers. On `ok`, `missing` or
++`legacy`, say nothing.
++
+ ## Your First Message
+ 
+ Move the work forward, with one of these:

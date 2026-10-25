@@ -1,5 +1,5 @@
 diff --git a/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md b/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
-index 287e54e..979e275 100644
+index 63cfd7f..979e275 100644
 --- a/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
 +++ b/plugins/ultrapowers/skills/diagnosing-ultrapowers/SKILL.md
 @@ -9,7 +9,7 @@ description: Use when a ultrapowers session went wrong and your human partner wa
@@ -82,7 +82,7 @@ index 287e54e..979e275 100644
    partner either.
  - **Approval gates.** No archive before your partner has seen the scrub
 -  log and file list. No issue or comment before they approve the exact
--  text.
+-  text, and none with a placeholder summary.
 -- **Intake before analysis.** Nothing in steps 2–7 starts until your
 +  log and file list.
 +- **Intake before analysis.** Nothing in steps 2–6 starts until your

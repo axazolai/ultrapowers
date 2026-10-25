@@ -1,0 +1,112 @@
+diff --git a/plugins/ultrapowers/skills/executing-plans/SKILL.md b/plugins/ultrapowers/skills/executing-plans/SKILL.md
+index cc18769..1a62771 100644
+--- a/plugins/ultrapowers/skills/executing-plans/SKILL.md
++++ b/plugins/ultrapowers/skills/executing-plans/SKILL.md
+@@ -84,7 +84,7 @@ digraph process {
+     "More tasks remain?" [shape=diamond];
+     "Final whole-branch review (fresh reviewer if you have one)" [shape=box];
+     "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" [shape=box];
+-    "Final review clean: delete this plan's workspace" [shape=box];
++    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" [shape=box];
+     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+ 
+     "Setup: worktree, workspace + ledger, read plan + spec, pre-flight scan" -> "task-start: brief + BASE; read the brief";
+@@ -100,8 +100,8 @@ digraph process {
+     "More tasks remain?" -> "task-start: brief + BASE; read the brief" [label="yes"];
+     "More tasks remain?" -> "Final whole-branch review (fresh reviewer if you have one)" [label="no"];
+     "Final whole-branch review (fresh reviewer if you have one)" -> "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger";
+-    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: delete this plan's workspace";
+-    "Final review clean: delete this plan's workspace" -> "Use ultrapowers:finishing-a-development-branch";
++    "Re-grade, then: Critical/Important → ONE fix pass, each fix RED→GREEN + green suite; Minor → ledger" -> "Final review clean: Result lines + ROADMAP row, then delete the workspace by name";
++    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
+ }
+ ```
+ 
+@@ -230,6 +230,10 @@ if they pass — appends the completion line to the ledger:
+ A failing run records nothing; the task is not complete. When it records,
+ mark the todo complete and take the next task.
+ 
++The plan is the phase's state. In the same message, tick the task's `- [ ]`
++box in the plan file, and copy any `Ruling:` the ledger holds for the task
++under it as one line. A task you drop is marked `- [-]` with its `Ruling:`.
++
+ ## Final Review
+ 
+ Run `../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`
+@@ -296,8 +300,15 @@ line under "Deferred minors". Both lists are exhaustive. Your final
+ message is the only place the decisions you took on your human partner's
+ behalf — and the findings you chose not to act on — reach them.
+ 
+-When the final review is clean and its fixes are committed, delete this
+-plan's workspace directory — the git history is the record now. Sibling
++When the final review is clean and its fixes are committed, close the plan
++in place: add a `Result:` line at the end of each stage, or of the plan —
++commit range, suite count, review verdict — and set the phase's row in
++`.ultrapowers/ROADMAP.md` to `complete`, with `current` back to `null`. The
++plan with its ticked boxes is the record; no summary document is written.
++
++Then delete this plan's workspace by name: list its files (`progress.md`,
++`task-*-brief.md`, `task-*-tests.log`, `review-*.diff`, `plan-path`), delete
++each one, then the empty directory. Never a recursive delete. Sibling
+ directories belong to other plans; leave them alone.
+ 
+ Use ultrapowers:finishing-a-development-branch.
+diff --git a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+index f9ce762..98c41a1 100644
+--- a/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/SKILL.md
+@@ -77,7 +77,7 @@ digraph process {
+     "Setup: worktree, ledger check, read plan, pre-flight review" [shape=box];
+     "More tasks remain?" [shape=diamond];
+     "Final review and finish: read references/final-review.md" [shape=box];
+-    "Final review clean: delete this plan's workspace" [shape=box];
++    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" [shape=box];
+     "Use ultrapowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+ 
+     "Setup: worktree, ledger check, read plan, pre-flight review" -> "Dispatch implementer subagent (./implementer-prompt.md)";
+@@ -93,8 +93,8 @@ digraph process {
+     "Append completion to ledger, mark todo complete" -> "More tasks remain?";
+     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
+     "More tasks remain?" -> "Final review and finish: read references/final-review.md" [label="no"];
+-    "Final review and finish: read references/final-review.md" -> "Final review clean: delete this plan's workspace";
+-    "Final review clean: delete this plan's workspace" -> "Use ultrapowers:finishing-a-development-branch";
++    "Final review and finish: read references/final-review.md" -> "Final review clean: Result lines + ROADMAP row, then delete the workspace by name";
++    "Final review clean: Result lines + ROADMAP row, then delete the workspace by name" -> "Use ultrapowers:finishing-a-development-branch";
+ }
+ ```
+ 
+@@ -318,6 +318,10 @@ Then mark the todo complete and move on. Never move to the next task while
+ the review has open Critical/Important issues that are neither fixed nor
+ parked-with-ruling at the cap.
+ 
++The plan is the phase's state. In the same message, tick the task's `- [ ]`
++box in the plan file, and copy any `Ruling:` the ledger holds for the task
++under it as one line. A task you drop is marked `- [-]` with its `Ruling:`.
++
+ ## Final Review
+ 
+ When every task is complete, read
+diff --git a/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md b/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
+index 330425a..0319ba3 100644
+--- a/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
++++ b/plugins/ultrapowers/skills/subagent-driven-development/references/final-review.md
+@@ -39,9 +39,15 @@ took on your human partner's behalf reach them — they read it and rework
+ whatever you got wrong. A ruling that dies with the workspace was a decision
+ made in secret.
+ 
+-When the final whole-branch review is clean and its fixes are merged,
+-delete this plan's workspace (`rm -rf <workspace>`) — the git history is
+-the record now. Sibling directories belong to other plans; leave them
+-alone.
++When the final whole-branch review is clean and its fixes are merged, close
++the plan in place: add a `Result:` line at the end of each stage, or of the
++plan — commit range, suite count, review verdict — and set the phase's row in
++`.ultrapowers/ROADMAP.md` to `complete`, with `current` back to `null`. The
++plan with its ticked boxes is the record; no summary document is written.
++
++Then delete this plan's workspace by name: list its files (`progress.md`,
++`task-*-brief.md`, `task-*-report.md`, `task-*-tests.log`, `review-*.diff`,
++`plan-path`), delete each one, then the empty directory. Never a recursive
++delete. Sibling directories belong to other plans; leave them alone.
+ 
+ Use ultrapowers:finishing-a-development-branch.
